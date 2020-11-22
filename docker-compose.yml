@@ -1,0 +1,12 @@
+version: "3"
+networks:
+  pooloverlaynet:
+
+services:
+  overlay:
+    container_name: pool-api
+    image: pool-api:0.1.0
+    ports:
+      - 3000:3000
+    networks:
+      - pooloverlaynet
