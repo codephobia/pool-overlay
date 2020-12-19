@@ -14,18 +14,20 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
-// handleOverlay
-func (api *API) handleOverlay() http.Handler {
+// Handler for overlay.
+func (server *Server) handleOverlay() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			api.handleOverlayGet(w, r)
+			server.handleOverlayGet(w, r)
+		default:
+			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
 	})
 }
 
-// handleOverlayGet
-func (api *API) handleOverlayGet(w http.ResponseWriter, r *http.Request) {
+// Overlay handler for GET method.
+func (server *Server) handleOverlayGet(w http.ResponseWriter, r *http.Request) {
 	// upgrade connection
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -34,14 +36,14 @@ func (api *API) handleOverlayGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create new connection for overlay
-	oc := overlay.NewOverlayConnection(api.overlay, conn)
+	oc := overlay.NewOverlayConnection(server.overlay, conn)
 	if err != nil {
 		log.Printf("[ERROR] overlay connect: %s", err)
 		return
 	}
 
 	// register connection on overlay
-	api.overlay.Register <- oc
+	server.overlay.Register <- oc
 
 	// init read / write for socket connection
 	go oc.WritePump()

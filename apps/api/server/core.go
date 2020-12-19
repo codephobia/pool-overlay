@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/codephobia/pool-overlay/apps/api/pkg/api"
@@ -14,10 +13,8 @@ import (
 // Core is the main application.
 type Core struct {
 	db      *gorm.DB
-	api     *api.API
+	server  *api.Server
 	overlay *overlay.Overlay
-
-	done chan struct{}
 }
 
 // NewCore returns a new Core.
@@ -41,29 +38,28 @@ func NewCore() (*Core, error) {
 
 	// Initialize API Server.
 	apiConfig := &api.Config{
-		Scheme:    "https",
 		Host:      "0.0.0.0",
 		Port:      "1268",
 		PublicDir: "public",
+		Version: &api.Version{
+			Current:  "1",
+			Previous: "1",
+		},
 	}
-	api := api.NewAPI(apiConfig, overlay)
+	server := api.NewServer(apiConfig, db, overlay)
 
 	return &Core{
 		db:      db,
-		api:     api,
+		server:  server,
 		overlay: overlay,
-
-		done: make(chan struct{}),
 	}, nil
 }
 
-// Run starts the main application.
-func (c *Core) Run() error {
-	log.Printf("running")
-
+// Init initializes components in the core.
+func (c *Core) Init() {
 	// Initialize Overlay.
 	go c.overlay.Init()
 
 	// Initialize API Server.
-	return c.api.Init()
+	c.server.Init()
 }
