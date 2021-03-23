@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/codephobia/pool-overlay/apps/api/pkg/api"
+	"github.com/codephobia/pool-overlay/apps/api/pkg/game"
 	"github.com/codephobia/pool-overlay/apps/api/pkg/overlay"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -15,6 +16,7 @@ type Core struct {
 	db      *gorm.DB
 	server  *api.Server
 	overlay *overlay.Overlay
+	game    *game.Game
 }
 
 // NewCore returns a new Core.
@@ -36,6 +38,9 @@ func NewCore() (*Core, error) {
 	// Initialize Overlay.
 	overlay := overlay.NewOverlay()
 
+	// Initialize game.
+	game := game.NewGame()
+
 	// Initialize API Server.
 	apiConfig := &api.Config{
 		Host:      "0.0.0.0",
@@ -46,12 +51,13 @@ func NewCore() (*Core, error) {
 			Previous: "1",
 		},
 	}
-	server := api.NewServer(apiConfig, db, overlay)
+	server := api.NewServer(apiConfig, db, overlay, game)
 
 	return &Core{
 		db:      db,
 		server:  server,
 		overlay: overlay,
+		game:    game,
 	}, nil
 }
 

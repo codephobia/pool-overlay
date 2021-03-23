@@ -36,12 +36,15 @@ func NewOverlayConnection(overlay *Overlay, conn *websocket.Conn) *Connection {
 func (o *Connection) ReadPump() {
 	defer func() {
 		o.overlay.Unregister <- o
-		o.conn.Close()
+		if o.conn != nil {
+			o.conn.Close()
+			o.conn = nil
+		}
 	}()
 
 	o.conn.SetReadLimit(maxMessageSize)
 	o.conn.SetReadDeadline(time.Now().Add(pongWait))
-	o.conn.SetPongHandler(func(string) error { o.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	o.conn.SetPongHandler(func(string) error { return o.conn.SetReadDeadline(time.Now().Add(pongWait)) })
 
 	for {
 		_, _, err := o.conn.ReadMessage()
@@ -59,7 +62,10 @@ func (o *Connection) WritePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
-		o.conn.Close()
+		if o.conn != nil {
+			o.conn.Close()
+			o.conn = nil
+		}
 	}()
 
 	for {

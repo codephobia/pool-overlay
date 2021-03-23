@@ -34,4 +34,31 @@ func (server *Server) InitRoutes() {
 
 	// players/count
 	server.AddRouteToAllVersions("/players/count", server.handlePlayersCount())
+
+	// players/:playerID
+	server.AddRouteToAllVersions("/players/{playerID}", server.handlePlayerByID())
+
+	// game/update/type
+	server.AddRouteToAllVersions("/game/update/type", server.handleGameType())
+
+	// game
+	server.AddRouteToAllVersions("/game", server.handleGame())
+
+	// game/update/vs-mode
+	server.AddRouteToAllVersions("/game/update/vs-mode", server.handleGameVsMode())
+
+	// game/update/race-to
+	server.AddRouteToAllVersions("/game/update/race-to", server.handleGameRaceTo())
+
+	// game/update/score/{playerNum}
+	server.AddRouteToAllVersions("/game/update/score", server.handleGameScore())
+
+	// game/update/score/reset
+	server.AddRouteToAllVersions("/game/update/score/reset", server.handleGameScoreReset())
+
+	// game/update/players
+	server.AddRouteToAllVersions("/game/update/players", server.handleGamePlayers())
+
+	// game/update/teams
+	server.AddRouteToAllVersions("/game/update/teams", server.handleGameTeams())
 }

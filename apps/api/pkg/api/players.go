@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/codephobia/pool-overlay/apps/api/pkg/models"
+	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 )
 
@@ -106,6 +107,52 @@ func (server *Server) handlePlayersCountGet(w http.ResponseWriter, r *http.Reque
 
 	// return results
 	server.handleSuccess(w, r, &CountResp{
-		Count: int(count),
+		Count: count,
 	})
+}
+
+// Handler for /players/{playerID}.
+func (server *Server) handlePlayerByID() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "GET":
+			server.handlePlayerByIDGet(w, r)
+		default:
+			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
+		}
+	})
+}
+
+// PlayerById handler for GET method.
+func (server *Server) handlePlayerByIDGet(w http.ResponseWriter, r *http.Request) {
+	// get param for player id from url
+	params := mux.Vars(r)
+	playerID, ok := params["playerID"]
+	if !ok || len(playerID) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidPlayerID)
+		return
+	}
+
+	// convert player id to int
+	id, err := strconv.Atoi(playerID)
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidPlayerID)
+		return
+	}
+
+	// get player by id
+	var player models.Player
+	if err := player.LoadByID(server.db, id); err != nil {
+		if err == models.ErrPlayerIDInvalid {
+			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+			return
+		}
+		if err == models.ErrPlayerNotFound {
+			server.handleError(w, r, http.StatusNotFound, ErrPlayerNotFound)
+			return
+		}
+	}
+
+	// return results
+	server.handleSuccess(w, r, player)
 }
