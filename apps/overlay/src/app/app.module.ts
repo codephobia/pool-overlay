@@ -2,9 +2,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
+import { ScoreboardComponent } from './components/scoreboard/scoreboard.component';
 
 @NgModule({
-    declarations: [AppComponent],
+    declarations: [AppComponent, ScoreboardComponent],
     imports: [BrowserModule],
     providers: [],
     bootstrap: [AppComponent],

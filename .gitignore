@@ -41,5 +41,8 @@ Thumbs.db
 # Database
 /.tmp
 
+# Vim settings
+/.vim
+
 # Environment variables
 .env
