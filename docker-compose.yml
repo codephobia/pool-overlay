@@ -44,6 +44,9 @@ services:
 
   overlay:
     container_name: pool-overlay
+    build:
+      context: .
+      dockerfile: ./apps/overlay/Dockerfile
     image: pool-overlay:0.1.0
     ports:
       - 4200:4200
