@@ -37,6 +37,8 @@ type GameScoreResp struct {
 func (server *Server) handleGame() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
+		case "OPTIONS":
+			server.HandleOptions(w, r)
 		case "GET":
 			server.handleGameGet(w, r)
 		default:

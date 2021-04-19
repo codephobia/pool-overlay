@@ -37,6 +37,8 @@ func (server *Server) handleHealthCheck() http.Handler {
 
 // HandleSuccess handles a success response.
 func (server *Server) handleSuccess(w http.ResponseWriter, r *http.Request, data interface{}) {
+	server.SetupResponse(w, r)
+
 	// add headers to response
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -51,6 +53,8 @@ func (server *Server) handleSuccess(w http.ResponseWriter, r *http.Request, data
 
 // HandleError handles an error response
 func (server *Server) handleError(w http.ResponseWriter, r *http.Request, status int, err error) {
+	server.SetupResponse(w, r)
+
 	// add headers to response
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
