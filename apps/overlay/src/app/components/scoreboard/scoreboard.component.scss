@@ -1,5 +1,6 @@
 $gradient-dark: #939598;
 $gradient-light: #e6e7e8;
+$flag-background-color: #18191e;
 $score-background-color: #18191e;
 $versus-background-color: #99002c;
 $game-background-color: #1b3887;
@@ -20,216 +21,269 @@ $versus-text-color: #ffffff;
 
   .players {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     flex: 1 0 auto;
 
-    .player {
+    .bar {
       display: flex;
       flex-direction: row;
       flex: 1 0 auto;
-      height: 60px;
+      height: 3px;
+      background-image: linear-gradient(
+        90deg,
+        $gradient-dark,
+        $gradient-light,
+        $gradient-dark
+      );
+      clip-path: polygon(1px 0, calc(100% - 1px) 0, 100% 100%, 0 100%);
 
-      .divider {
-        position: relative;
-        z-index: 2;
-        width: 3px;
-        background-image: linear-gradient(
-          180deg,
-          $gradient-dark,
-          $gradient-light,
-          $gradient-dark
-        );
+      &.top {
+        margin: 0 11px;
       }
 
-      .flag {
-        width: 77px;
-        background-color: red;
-        margin: 0 8px;
-        position: relative;
-        z-index: 1;
-
-        &:before {
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          content: '';
-          background-color: inherit;
-          width: 19px;
-          transform-origin: 100%;
-          z-index: -1;
-        }
-
-        &:after {
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          content: '';
-          background-color: inherit;
-          width: 19px;
-          transform-origin: 100%;
-          z-index: -1;
-        }
-      }
-
-      .player-name {
-        margin: 0 -11px;
-        display: flex;
-        flex-direction: column;
-        width: 350px;
-        background-image: linear-gradient(
-          180deg,
-          $gradient-light,
-          $gradient-dark
-        );
-        justify-content: center;
-        align-items: center;
-        text-transform: uppercase;
-        font-size: 28px;
-        color: $player-name-text-color;
-      }
-
-      &.one {
-        .divider {
-          transform: skewX(-20deg);
-        }
-
-        .flag {
-          &:before {
-            right: calc(100% - 11px);
-            transform: skewX(-20deg);
-          }
-
-          &:after {
-            left: calc(100% - 11px);
-            transform: skewX(-20deg);
-          }
-        }
-
-        .player-name {
-          clip-path: polygon(22px 0, 100% 0, calc(100% - 22px) 100%, 0 100%);
-        }
-      }
-
-      &.two {
-        .divider {
-          transform: skewX(20deg);
-        }
-        .flag {
-          &:before {
-            left: calc(100% - 11px);
-            transform: skewX(20deg);
-          }
-
-          &:after {
-            right: calc(100% - 11px);
-            transform: skewX(20deg);
-          }
-        }
-        .player-name {
-          clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 100%, 22px 100%);
-        }
+      &.bottom {
+        margin: 0 -12px;
       }
     }
 
-    .scores {
+    .player-info {
       display: flex;
       flex-direction: row;
       flex: 1 0 auto;
-      height: 60px;
 
-      .divider {
-        position: relative;
-        z-index: 2;
-        width: 3px;
-        background-image: linear-gradient(
-          180deg,
-          $gradient-dark,
-          $gradient-light,
-          $gradient-dark
-        );
-
-        &.left {
-          transform: skewX(-20deg);
-        }
-
-        &.right {
-          transform: skewX(20deg);
-        }
-      }
-
-      .score {
+      .player {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         flex: 1 0 auto;
-        background-color: $score-background-color;
-        width: 64px;
-        margin: 0 8px;
-        position: relative;
-        z-index: 1;
-        font-size: 28px;
-        color: $score-text-color;
-        justify-content: center;
-        align-items: center;
+        height: 60px;
 
-        &:before {
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          content: '';
-          background-color: inherit;
-          width: 19px;
-          transform-origin: 100%;
-          z-index: -1;
+        .divider {
+          position: relative;
+          z-index: 2;
+          width: 3px;
+          background-image: linear-gradient(
+            180deg,
+            $gradient-dark,
+            $gradient-light,
+            $gradient-dark
+          );
         }
 
-        &:after {
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          content: '';
-          background-color: inherit;
-          width: 19px;
-          transform-origin: 100%;
-          z-index: -1;
-        }
+        .flag {
+          width: 77px;
+          background-color: $flag-background-color;
+          margin: 0 8px;
+          position: relative;
+          z-index: 1;
 
-        &.left {
           &:before {
-            right: calc(100% - 11px);
-            transform: skewX(-20deg);
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            content: '';
+            background-color: inherit;
+            width: 19px;
+            transform-origin: 100%;
+            z-index: -1;
           }
 
           &:after {
-            left: calc(100% - 11px);
-            transform: skewX(-20deg);
-          }
-        }
-        &.right {
-          &:before {
-            left: calc(100% - 11px);
-            transform: skewX(20deg);
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            content: '';
+            background-color: inherit;
+            width: 19px;
+            transform-origin: 100%;
+            z-index: -1;
           }
 
-          &:after {
-            right: calc(100% - 11px);
+          img {
+            position: absolute;
+            z-index: 2;
+            top: 0;
+            left: -19px;
+          }
+        }
+
+        .player-name {
+          margin: 0 -11px;
+          display: flex;
+          flex-direction: column;
+          width: 350px;
+          background-image: linear-gradient(
+            180deg,
+            $gradient-light,
+            $gradient-dark
+          );
+          justify-content: center;
+          align-items: center;
+          text-transform: uppercase;
+          font-size: 28px;
+          color: $player-name-text-color;
+        }
+
+        &.one {
+          .divider {
+            transform: skewX(-20deg);
+          }
+
+          .flag {
+            &:before {
+              right: calc(100% - 11px);
+              transform: skewX(-20deg);
+            }
+
+            &:after {
+              left: calc(100% - 11px);
+              transform: skewX(-20deg);
+            }
+
+            img {
+              clip-path: polygon(
+                19px 0,
+                100% 0,
+                calc(100% - 19px) 100%,
+                0 100%
+              );
+            }
+          }
+
+          .player-name {
+            clip-path: polygon(22px 0, 100% 0, calc(100% - 22px) 100%, 0 100%);
+          }
+        }
+
+        &.two {
+          .divider {
             transform: skewX(20deg);
+          }
+          .flag {
+            &:before {
+              left: calc(100% - 11px);
+              transform: skewX(20deg);
+            }
+
+            &:after {
+              right: calc(100% - 11px);
+              transform: skewX(20deg);
+            }
+
+            img {
+              clip-path: polygon(
+                0 0,
+                calc(100% - 19px) 0,
+                100% 100%,
+                19px 100%
+              );
+            }
+          }
+          .player-name {
+            clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 100%, 22px 100%);
           }
         }
       }
 
-      .versus {
+      .scores {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         flex: 1 0 auto;
-        margin: 0 -11px;
-        width: 100px;
-        background-color: $versus-background-color;
-        clip-path: polygon(22px 0, calc(100% - 22px) 0, 100% 100%, 0 100%);
-        font-size: 28px;
-        color: $versus-text-color;
-        justify-content: center;
-        align-items: center;
-        text-transform: uppercase;
+        height: 60px;
+
+        .divider {
+          position: relative;
+          z-index: 2;
+          width: 3px;
+          background-image: linear-gradient(
+            180deg,
+            $gradient-dark,
+            $gradient-light,
+            $gradient-dark
+          );
+
+          &.left {
+            transform: skewX(-20deg);
+          }
+
+          &.right {
+            transform: skewX(20deg);
+          }
+        }
+
+        .score {
+          display: flex;
+          flex-direction: column;
+          flex: 1 0 auto;
+          background-color: $score-background-color;
+          width: 64px;
+          margin: 0 8px;
+          position: relative;
+          z-index: 1;
+          font-size: 28px;
+          color: $score-text-color;
+          justify-content: center;
+          align-items: center;
+
+          &:before {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            content: '';
+            background-color: inherit;
+            width: 19px;
+            transform-origin: 100%;
+            z-index: -1;
+          }
+
+          &:after {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            content: '';
+            background-color: inherit;
+            width: 19px;
+            transform-origin: 100%;
+            z-index: -1;
+          }
+
+          &.left {
+            &:before {
+              right: calc(100% - 11px);
+              transform: skewX(-20deg);
+            }
+
+            &:after {
+              left: calc(100% - 11px);
+              transform: skewX(-20deg);
+            }
+          }
+          &.right {
+            &:before {
+              left: calc(100% - 11px);
+              transform: skewX(20deg);
+            }
+
+            &:after {
+              right: calc(100% - 11px);
+              transform: skewX(20deg);
+            }
+          }
+        }
+
+        .versus {
+          display: flex;
+          flex-direction: column;
+          flex: 1 0 auto;
+          margin: 0 -11px;
+          width: 100px;
+          background-color: $versus-background-color;
+          clip-path: polygon(22px 0, calc(100% - 22px) 0, 100% 100%, 0 100%);
+          font-size: 28px;
+          color: $versus-text-color;
+          justify-content: center;
+          align-items: center;
+          text-transform: uppercase;
+        }
       }
     }
   }

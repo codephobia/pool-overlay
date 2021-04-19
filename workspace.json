@@ -25,7 +25,9 @@
               "apps/overlay/src/favicon.ico",
               "apps/overlay/src/assets"
             ],
-            "styles": ["apps/overlay/src/styles.scss"],
+            "styles": [
+              "apps/overlay/src/styles.scss"
+            ],
             "scripts": []
           },
           "configurations": {
@@ -39,7 +41,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,
@@ -57,7 +58,10 @@
                 }
               ]
             }
-          }
+          },
+          "outputs": [
+            "{options.outputPath}"
+          ]
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -84,7 +88,10 @@
               "apps/overlay/tsconfig.spec.json",
               "apps/overlay/tsconfig.editor.json"
             ],
-            "exclude": ["**/node_modules/**", "!apps/overlay/**/*"]
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/overlay/**/*"
+            ]
           }
         },
         "test": {
@@ -92,7 +99,10 @@
           "options": {
             "jestConfig": "apps/overlay/jest.config.js",
             "passWithNoTests": true
-          }
+          },
+          "outputs": [
+            "coverage/apps/overlay"
+          ]
         }
       }
     },
@@ -117,8 +127,13 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": ["apps/overlay-e2e/tsconfig.e2e.json"],
-            "exclude": ["**/node_modules/**", "!apps/overlay-e2e/**/*"]
+            "tsConfig": [
+              "apps/overlay-e2e/tsconfig.e2e.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/overlay-e2e/**/*"
+            ]
           }
         }
       }
