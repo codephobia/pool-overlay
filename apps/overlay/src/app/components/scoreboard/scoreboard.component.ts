@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
+import { GameType, gameTypeToString } from '../../models/game-type.enum';
 import { ScoreboardStore } from './scoreboard.store';
 
 @Component({
@@ -20,5 +21,13 @@ export class ScoreboardComponent implements OnInit {
 
   public ngOnInit(): void {
     this._scoreboardStore.getGame();
+  }
+
+  public gameTypeName(gameType: GameType | null): string {
+    if (gameType === null) {
+      return '';
+    }
+
+    return gameTypeToString(gameType);
   }
 }

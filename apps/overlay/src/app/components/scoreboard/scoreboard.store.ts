@@ -17,8 +17,11 @@ export interface ScoreboardState {
 
 @Injectable()
 export class ScoreboardStore extends ComponentStore<ScoreboardState> {
-  // updaters
+  constructor(private _apiService: APIService) {
+    super({ game: null, hidden: false });
+  }
 
+  // updaters
   readonly setGame = this.updater((state, game: IGame) => ({ ...state, game }));
 
   readonly setGameType = this.updater((state, type: GameType) => ({
@@ -124,8 +127,4 @@ export class ScoreboardStore extends ComponentStore<ScoreboardState> {
       )
     );
   });
-
-  constructor(private _apiService: APIService) {
-    super({ game: null, hidden: false });
-  }
 }
