@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	writeWait      = 1 * time.Second
+	writeWait      = 10 * time.Second
 	pongWait       = 60 * time.Second
 	pingPeriod     = 10 * time.Second
-	maxMessageSize = 512
+	maxMessageSize = 1024
 )
 
 // Connection is a websocket connection for the OBS Overlay.
@@ -38,7 +38,6 @@ func (o *Connection) ReadPump() {
 		o.overlay.Unregister <- o
 		if o.conn != nil {
 			o.conn.Close()
-			o.conn = nil
 		}
 	}()
 
@@ -64,7 +63,6 @@ func (o *Connection) WritePump() {
 		ticker.Stop()
 		if o.conn != nil {
 			o.conn.Close()
-			o.conn = nil
 		}
 	}()
 

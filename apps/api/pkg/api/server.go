@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/codephobia/pool-overlay/apps/api/pkg/game"
 	"github.com/codephobia/pool-overlay/apps/api/pkg/overlay"
+	"github.com/codephobia/pool-overlay/apps/api/pkg/state"
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 )
@@ -18,7 +18,7 @@ type Server struct {
 	config  *Config
 	db      *gorm.DB
 	overlay *overlay.Overlay
-	game    *game.Game
+	state   *state.State
 
 	httpServer *http.Server
 	router     *mux.Router
@@ -26,12 +26,12 @@ type Server struct {
 }
 
 // NewServer returns a new api server.
-func NewServer(config *Config, db *gorm.DB, overlay *overlay.Overlay, game *game.Game) *Server {
+func NewServer(config *Config, db *gorm.DB, overlay *overlay.Overlay, state *state.State) *Server {
 	return &Server{
 		config:  config,
 		db:      db,
 		overlay: overlay,
-		game:    game,
+		state:   state,
 
 		router:  mux.NewRouter().StrictSlash(true),
 		version: make(map[string]*mux.Router),

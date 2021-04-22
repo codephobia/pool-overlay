@@ -1,12 +1,12 @@
 [
-    {
-        "id": 1,
-        "country": "Canada",
-        "image_path": "canada.svg"
-    },
-    {
-        "id": 2,
-        "country": "USA",
-        "image_path": "usa.svg"
-    }
+  {
+    "id": 1,
+    "country": "Canada",
+    "image_path": "ca.png"
+  },
+  {
+    "id": 2,
+    "country": "USA",
+    "image_path": "us.png"
+  }
 ]

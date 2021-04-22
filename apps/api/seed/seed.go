@@ -38,6 +38,7 @@ func main() {
 		&models.Player{},
 		&models.Team{},
 		&models.TeamPlayer{},
+		&models.Game{},
 	)
 
 	// Load seeds from json files.

@@ -25,4 +25,6 @@ var (
 	ErrInvalidGameVsMode = errors.New("invalid game mode")
 	// ErrInvalidGameDirection - Game direction invalid.
 	ErrInvalidGameDirection = errors.New("invalid game direction")
+	// ErrUnableToBroadcastUpdate - Unable to broadcast update.
+	ErrUnableToBroadcastUpdate = errors.New("unable to broadcast update")
 )

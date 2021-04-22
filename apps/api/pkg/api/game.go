@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/codephobia/pool-overlay/apps/api/pkg/game"
+	"github.com/codephobia/pool-overlay/apps/api/pkg/events"
 	"github.com/codephobia/pool-overlay/apps/api/pkg/models"
+	"github.com/codephobia/pool-overlay/apps/api/pkg/overlay"
 )
 
 const (
@@ -15,12 +16,12 @@ const (
 
 // GameTypeResp is a reponse containing the game type.
 type GameTypeResp struct {
-	Type game.Type `json:"type"`
+	Type models.GameType `json:"type"`
 }
 
 // GameVsModeResp is a reponse containing the game type.
 type GameVsModeResp struct {
-	VsMode game.VsMode `json:"vs_mode"`
+	VsMode models.GameVsMode `json:"vs_mode"`
 }
 
 // GameRaceToResp is a reponse containing the game race to.
@@ -30,7 +31,8 @@ type GameRaceToResp struct {
 
 // GameScoreResp is a reponse containing the game score.
 type GameScoreResp struct {
-	Score game.Score `json:"score"`
+	ScoreOne int `json:"score_one"`
+	ScoreTwo int `json:"score_two"`
 }
 
 // Handler for /game.
@@ -50,7 +52,7 @@ func (server *Server) handleGame() http.Handler {
 // Game handler for GET method.
 func (server *Server) handleGameGet(w http.ResponseWriter, r *http.Request) {
 	// send response
-	server.handleSuccess(w, r, server.game)
+	server.handleSuccess(w, r, server.state.Game)
 }
 
 // Handler for /game/update/type.
@@ -72,19 +74,30 @@ func (server *Server) handleGameTypeGet(w http.ResponseWriter, r *http.Request) 
 
 	// get game type from query params
 	gameType, err := strconv.ParseUint(v.Get("type"), 10, 0)
-	if err != nil || !game.Type(gameType).IsValid() {
+	if err != nil || !models.GameType(gameType).IsValid() {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
 		return
 	}
 
 	// update game type
-	server.game.SetType(game.Type(gameType))
+	server.state.Game.SetType(models.GameType(gameType))
 
-	// TODO: BROADCAST OVERLAY UPDATE
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.GameEventType,
+		events.NewGameEventPayload(server.state.Game),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
 
 	// send response
 	server.handleSuccess(w, r, GameTypeResp{
-		Type: game.Type(gameType),
+		Type: models.GameType(gameType),
 	})
 }
 
@@ -107,19 +120,30 @@ func (server *Server) handleGameVsModeGet(w http.ResponseWriter, r *http.Request
 
 	// get game mode from query params
 	gameMode, err := strconv.ParseUint(v.Get("mode"), 10, 0)
-	if err != nil || !game.VsMode(gameMode).IsValid() {
+	if err != nil || !models.GameVsMode(gameMode).IsValid() {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameVsMode)
 		return
 	}
 
 	// update game mode
-	server.game.SetVsMode(game.VsMode(gameMode))
+	server.state.Game.SetVsMode(models.GameVsMode(gameMode))
 
-	// TODO: BROADCAST OVERLAY UPDATE
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.GameEventType,
+		events.NewGameEventPayload(server.state.Game),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
 
 	// send response
 	server.handleSuccess(w, r, GameVsModeResp{
-		VsMode: game.VsMode(gameMode),
+		VsMode: models.GameVsMode(gameMode),
 	})
 }
 
@@ -156,16 +180,27 @@ func (server *Server) handleGameRaceToGet(w http.ResponseWriter, r *http.Request
 
 	// update race to number
 	if direction == gameDirectionIncrement {
-		server.game.IncrementRaceTo()
+		server.state.Game.IncrementRaceTo()
 	} else {
-		server.game.DecrementRaceTo()
+		server.state.Game.DecrementRaceTo()
 	}
 
-	// TODO: BROADCAST OVERLAY UPDATE
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.GameEventType,
+		events.NewGameEventPayload(server.state.Game),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
 
 	// send response
 	server.handleSuccess(w, r, GameRaceToResp{
-		RaceTo: server.game.RaceTo,
+		RaceTo: server.state.Game.RaceTo,
 	})
 }
 
@@ -189,7 +224,7 @@ func (server *Server) handleGameScoreGet(w http.ResponseWriter, r *http.Request)
 	// get player num to from query params
 	playerNum, err := strconv.Atoi(v.Get("playerNum"))
 	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, game.ErrInvalidPlayerNumber)
+		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
 		return
 	}
 
@@ -209,22 +244,34 @@ func (server *Server) handleGameScoreGet(w http.ResponseWriter, r *http.Request)
 
 	// update score
 	if direction == gameDirectionIncrement {
-		if err := server.game.IncrementScore(playerNum); err != nil {
+		if err := server.state.Game.IncrementScore(playerNum); err != nil {
 			server.handleError(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
 	} else {
-		if err := server.game.DecrementScore(playerNum); err != nil {
+		if err := server.state.Game.DecrementScore(playerNum); err != nil {
 			server.handleError(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
 	}
 
-	// TODO: BROADCAST OVERLAY UPDATE
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.GameEventType,
+		events.NewGameEventPayload(server.state.Game),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
 
 	// send response
 	server.handleSuccess(w, r, GameScoreResp{
-		Score: server.game.Score,
+		ScoreOne: server.state.Game.ScoreOne,
+		ScoreTwo: server.state.Game.ScoreTwo,
 	})
 }
 
@@ -243,13 +290,25 @@ func (server *Server) handleGameScoreReset() http.Handler {
 // Game score reset handler for GET method.
 func (server *Server) handleGameScoreResetGet(w http.ResponseWriter, r *http.Request) {
 	// reset game score
-	server.game.ResetScore()
+	server.state.Game.ResetScore()
 
-	// TODO: BROADCAST OVERLAY UPDATE
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.GameEventType,
+		events.NewGameEventPayload(server.state.Game),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
 
 	// send response
 	server.handleSuccess(w, r, GameScoreResp{
-		Score: server.game.Score,
+		ScoreOne: server.state.Game.ScoreOne,
+		ScoreTwo: server.state.Game.ScoreTwo,
 	})
 }
 
@@ -273,14 +332,14 @@ func (server *Server) handleGamePlayersGet(w http.ResponseWriter, r *http.Reques
 	// get player num from query params
 	playerNum, err := strconv.Atoi(v.Get("playerNum"))
 	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, game.ErrInvalidPlayerNumber)
+		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
 		return
 	}
 
 	// get player id from query params
 	playerID, err := strconv.Atoi(v.Get("playerID"))
 	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, game.ErrInvalidPlayerID)
+		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerID)
 		return
 	}
 
@@ -296,15 +355,26 @@ func (server *Server) handleGamePlayersGet(w http.ResponseWriter, r *http.Reques
 		}
 	}
 
-	if err := server.game.SetPlayer(playerNum, &player); err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, game.ErrInvalidPlayerNumber)
+	if err := server.state.Game.SetPlayer(playerNum, &player); err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
 		return
 	}
 
-	// TODO: BROADCAST OVERLAY UPDATE
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.GameEventType,
+		events.NewGameEventPayload(server.state.Game),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
 
 	// send response
-	server.handleSuccess(w, r, server.game)
+	server.handleSuccess(w, r, server.state.Game)
 }
 
 // Handler for /game/update/teams
@@ -327,14 +397,14 @@ func (server *Server) handleGameTeamsGet(w http.ResponseWriter, r *http.Request)
 	// get team num from query params
 	teamNum, err := strconv.Atoi(v.Get("teamNum"))
 	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, game.ErrInvalidPlayerNumber)
+		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
 		return
 	}
 
 	// get team id from query params
 	teamID, err := strconv.Atoi(v.Get("teamID"))
 	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, game.ErrInvalidPlayerID)
+		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerID)
 		return
 	}
 
@@ -350,13 +420,24 @@ func (server *Server) handleGameTeamsGet(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	if err := server.game.SetTeam(teamNum, &team); err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, game.ErrInvalidTeamNumber)
+	if err := server.state.Game.SetTeam(teamNum, &team); err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidTeamNumber)
 		return
 	}
 
-	// TODO: BROADCAST OVERLAY UPDATE
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.GameEventType,
+		events.NewGameEventPayload(server.state.Game),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
 
 	// send response
-	server.handleSuccess(w, r, server.game)
+	server.handleSuccess(w, r, server.state.Game)
 }

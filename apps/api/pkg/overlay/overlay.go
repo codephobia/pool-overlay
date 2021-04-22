@@ -1,6 +1,8 @@
 package overlay
 
-import "sync"
+import (
+	"sync"
+)
 
 // Overlay managed multiple websocket connections to the overlay.
 type Overlay struct {

@@ -1,21 +1,44 @@
-package game
+package models
 
 import (
+	"errors"
 	"sync"
+	"time"
 
-	"github.com/codephobia/pool-overlay/apps/api/pkg/models"
+	"gorm.io/gorm"
+)
+
+var (
+	// ErrInvalidPlayerNumber - Invalid player number.
+	ErrInvalidPlayerNumber = errors.New("invalid player number")
+	// ErrInvalidPlayerID - Invalid player ID.
+	ErrInvalidPlayerID = errors.New("invalid player id")
+	// ErrInvalidTeamNumber - Invalid team number.
+	ErrInvalidTeamNumber = errors.New("invalid team number")
 )
 
 // Game is the current state of the game being played.
 type Game struct {
-	Type      Type           `json:"type"`
-	VsMode    VsMode         `json:"vs_mode"`
-	RaceTo    int            `json:"race_to"`
-	Score     Score          `json:"score"`
-	PlayerOne *models.Player `json:"player_one,omitempty"`
-	PlayerTwo *models.Player `json:"player_two,omitempty"`
-	TeamOne   *models.Team   `json:"team_one,omitempty"`
-	TeamTwo   *models.Team   `json:"team_two,omitempty"`
+	ID       uint       `json:"id,omitempty" gorm:"primarykey"`
+	Type     GameType   `json:"type"`
+	VsMode   GameVsMode `json:"vs_mode"`
+	RaceTo   int        `json:"race_to"`
+	ScoreOne int        `json:"score_one"`
+	ScoreTwo int        `json:"score_two"`
+
+	PlayerOneID uint `json:"player_one_id,omitempty"`
+	PlayerTwoID uint `json:"player_two_id,omitempty"`
+	TeamOneID   uint `json:"team_one_id,omitempty"`
+	TeamTwoID   uint `json:"team_two_id,omitempty"`
+
+	PlayerOne *Player `json:"player_one,omitempty" gorm:"foreignKey:id"`
+	PlayerTwo *Player `json:"player_two,omitempty" gorm:"foreignKey:id"`
+	TeamOne   *Team   `json:"team_one,omitempty" gorm:"foreignKey:id"`
+	TeamTwo   *Team   `json:"team_two,omitempty" gorm:"foreignKey:id"`
+
+	CreatedAt *time.Time      `json:"created_at,omitempty"`
+	UpdatedAt *time.Time      `json:"updated_at,omitempty"`
+	DeletedAt *gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
 
 	mutex sync.Mutex `json:"-"`
 }
@@ -30,15 +53,15 @@ func NewGame() *Game {
 }
 
 // SetType sets the Type of the current game.
-func (g *Game) SetType(t Type) {
+func (g *Game) SetType(t GameType) {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
 	g.Type = t
 }
 
-// SetVsMode changes the current VsMode of the game.
-func (g *Game) SetVsMode(mode VsMode) {
+// SetVsMode changes the current GameVsMode of the game.
+func (g *Game) SetVsMode(mode GameVsMode) {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
@@ -75,14 +98,14 @@ func (g *Game) IncrementScore(playerNum int) error {
 
 	switch playerNum {
 	case 1:
-		newScore := g.Score.One + 1
+		newScore := g.ScoreOne + 1
 		if newScore <= g.RaceTo {
-			g.Score.One = newScore
+			g.ScoreOne = newScore
 		}
 	case 2:
-		newScore := g.Score.Two + 1
+		newScore := g.ScoreTwo + 1
 		if newScore <= g.RaceTo {
-			g.Score.Two = newScore
+			g.ScoreTwo = newScore
 		}
 	default:
 		return ErrInvalidPlayerNumber
@@ -98,14 +121,14 @@ func (g *Game) DecrementScore(playerNum int) error {
 
 	switch playerNum {
 	case 1:
-		newScore := g.Score.One - 1
+		newScore := g.ScoreOne - 1
 		if newScore >= 0 {
-			g.Score.One = newScore
+			g.ScoreOne = newScore
 		}
 	case 2:
-		newScore := g.Score.Two - 1
+		newScore := g.ScoreTwo - 1
 		if newScore >= 0 {
-			g.Score.Two = newScore
+			g.ScoreTwo = newScore
 		}
 	default:
 		return ErrInvalidPlayerNumber
@@ -119,12 +142,12 @@ func (g *Game) ResetScore() {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
-	g.Score.One = 0
-	g.Score.Two = 0
+	g.ScoreOne = 0
+	g.ScoreTwo = 0
 }
 
 // SetPlayer sets the player number to the specified player.
-func (g *Game) SetPlayer(playerNum int, player *models.Player) error {
+func (g *Game) SetPlayer(playerNum int, player *Player) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
@@ -145,7 +168,7 @@ func (g *Game) SetPlayer(playerNum int, player *models.Player) error {
 }
 
 // SetTeam sets the team number to the specified team.
-func (g *Game) SetTeam(teamNum int, team *models.Team) error {
+func (g *Game) SetTeam(teamNum int, team *Team) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
