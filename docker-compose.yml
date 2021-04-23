@@ -1,61 +1,64 @@
-version: "3"
+version: '3'
 networks:
-  poolnet:
+    poolnet:
 
 services:
-  db:
-    container_name: pool-db
-    image: postgres:13.1-alpine
-    restart: always
-    environment:
-      PGDATA: /var/lib/postgresql/data/pgdata
-    env_file:
-      - ./apps/api/server/.env
-    ports:
-      - 5432:5432
-    volumes:
-      - postgres:/var/lib/postgresql/data
-    networks:
-      - poolnet
+    db:
+        container_name: pool-db
+        image: postgres:13.1-alpine
+        restart: always
+        environment:
+            PGDATA: /var/lib/postgresql/data/pgdata
+        env_file:
+            - ./apps/api/server/.env
+        ports:
+            - 5432:5432
+        volumes:
+            - postgres:/var/lib/postgresql/data
+        networks:
+            - poolnet
 
-  db-admin:
-    container_name: pool-db-admin
-    image: dpage/pgadmin4
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=pool@codephobia.com
-      - PGADMIN_DEFAULT_PASSWORD=admin
-      - PGADMIN_LISTEN_PORT=5050
-    ports:
-      - 5050:5050
-    volumes:
-      - ./.tmp/pgadmin:/var/lib/pgadmin
-    networks:
-      - poolnet
+    db-admin:
+        container_name: pool-db-admin
+        image: dpage/pgadmin4
+        environment:
+            - PGADMIN_DEFAULT_EMAIL=pool@codephobia.com
+            - PGADMIN_DEFAULT_PASSWORD=admin
+            - PGADMIN_LISTEN_PORT=5050
+        ports:
+            - 5050:5050
+        volumes:
+            - pgadmin:/var/lib/pgadmin
+        depends_on:
+            - db
+        networks:
+            - poolnet
 
-  api:
-    container_name: pool-api
-    image: pool-api:0.1.0
-    ports:
-      - 3000:3000
-    networks:
-      - poolnet
-    depends_on:
-      - db
+    api:
+        container_name: pool-api
+        image: pool-api:0.1.0
+        ports:
+            - 3000:3000
+        networks:
+            - poolnet
+        depends_on:
+            - db
 
-  overlay:
-    container_name: pool-overlay
-    build:
-      context: .
-      dockerfile: ./apps/overlay/Dockerfile
-    image: pool-overlay:0.1.0
-    ports:
-      - 4200:4200
-    command: npx nx serve overlay -- --host 0.0.0.0 --disableHostCheck --poll 1
-    volumes:
-      - ./apps/overlay:/workspace/apps/overlay
-      - ./libs:/workspace/libs
-    networks:
-      - poolnet
+    overlay:
+        container_name: pool-overlay
+        build:
+            context: .
+            dockerfile: ./apps/overlay/Dockerfile
+        image: pool-overlay:0.1.0
+        ports:
+            - 4200:4200
+        command: npx nx serve overlay -- --host 0.0.0.0 --disableHostCheck --poll 1
+        volumes:
+            - ./apps/overlay:/workspace/apps/overlay
+            - ./libs:/workspace/libs
+        networks:
+            - poolnet
 
 volumes:
-  postgres:
+    postgres:
+    pgadmin:

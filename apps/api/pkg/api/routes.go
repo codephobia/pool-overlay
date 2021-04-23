@@ -29,6 +29,9 @@ func (server *Server) InitRoutes() {
 	// web socket connection to overlay
 	server.AddRouteToAllVersions("/overlay", server.handleOverlay())
 
+	// overlay/toggle
+	server.AddRouteToAllVersions("/overlay/toggle", server.handleOverlayToggle())
+
 	// players
 	server.AddRouteToAllVersions("/players", server.handlePlayers())
 

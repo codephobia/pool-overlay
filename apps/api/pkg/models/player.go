@@ -17,7 +17,7 @@ type Player struct {
 	ID     uint   `json:"id,omitempty" gorm:"primarykey"`
 	Name   string `json:"name,omitempty" gorm:"size:100"`
 	FlagID uint   `json:"flag_id,omitempty"`
-	Flag   *Flag  `json:"flag,omitempty" gorm:"foreignKey:id"`
+	Flag   *Flag  `json:"flag,omitempty" gorm:"foreignKey:flag_id"`
 
 	CreatedAt *time.Time      `json:"created_at,omitempty"`
 	UpdatedAt *time.Time      `json:"updated_at,omitempty"`
@@ -27,7 +27,7 @@ type Player struct {
 // LoadByID loads a player by ID.
 func (p *Player) LoadByID(database *gorm.DB, id int) error {
 	result := database.
-		Select("id", "name").
+		Select("id", "name", "flag_id").
 		Where("id = ?", id).
 		Preload("Flag", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id", "country", "image_path")

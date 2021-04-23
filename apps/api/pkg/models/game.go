@@ -19,22 +19,25 @@ var (
 
 // Game is the current state of the game being played.
 type Game struct {
-	ID       uint       `json:"id,omitempty" gorm:"primarykey"`
-	Type     GameType   `json:"type"`
-	VsMode   GameVsMode `json:"vs_mode"`
-	RaceTo   int        `json:"race_to"`
-	ScoreOne int        `json:"score_one"`
-	ScoreTwo int        `json:"score_two"`
+	db *gorm.DB
 
-	PlayerOneID uint `json:"player_one_id,omitempty"`
-	PlayerTwoID uint `json:"player_two_id,omitempty"`
-	TeamOneID   uint `json:"team_one_id,omitempty"`
-	TeamTwoID   uint `json:"team_two_id,omitempty"`
+	ID        uint       `json:"id,omitempty" gorm:"primarykey"`
+	Type      GameType   `json:"type"`
+	VsMode    GameVsMode `json:"vs_mode"`
+	RaceTo    int        `json:"race_to"`
+	ScoreOne  int        `json:"score_one"`
+	ScoreTwo  int        `json:"score_two"`
+	Completed bool       `json:"completed"`
 
-	PlayerOne *Player `json:"player_one,omitempty" gorm:"foreignKey:id"`
-	PlayerTwo *Player `json:"player_two,omitempty" gorm:"foreignKey:id"`
-	TeamOne   *Team   `json:"team_one,omitempty" gorm:"foreignKey:id"`
-	TeamTwo   *Team   `json:"team_two,omitempty" gorm:"foreignKey:id"`
+	PlayerOneID *uint `json:"player_one_id,omitempty"`
+	PlayerTwoID *uint `json:"player_two_id,omitempty"`
+	TeamOneID   *uint `json:"team_one_id,omitempty"`
+	TeamTwoID   *uint `json:"team_two_id,omitempty"`
+
+	PlayerOne *Player `json:"player_one,omitempty" gorm:"foreignKey:player_one_id"`
+	PlayerTwo *Player `json:"player_two,omitempty" gorm:"foreignKey:player_two_id"`
+	TeamOne   *Team   `json:"team_one,omitempty" gorm:"foreignKey:team_one_id"`
+	TeamTwo   *Team   `json:"team_two,omitempty" gorm:"foreignKey:team_two_id"`
 
 	CreatedAt *time.Time      `json:"created_at,omitempty"`
 	UpdatedAt *time.Time      `json:"updated_at,omitempty"`
@@ -44,43 +47,104 @@ type Game struct {
 }
 
 // NewGame returns a new Game with default settings.
-func NewGame() *Game {
+func NewGame(db *gorm.DB) *Game {
 	return &Game{
+		db: db,
+
 		Type:   EightBall,
 		RaceTo: 5,
 		VsMode: OneVsOne,
 	}
 }
 
+func (g *Game) LoadLatest() *Game {
+	var latest Game
+	latest.db = g.db
+
+	result := g.db.
+		Where("completed = ?", false).
+		Order("id desc").
+		Limit(1).
+		Preload("PlayerOne", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "name", "flag_id").
+				Preload("Flag", func(db *gorm.DB) *gorm.DB {
+					return db.Select("id", "country", "image_path")
+				})
+		}).
+		Preload("PlayerTwo", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "name", "flag_id").
+				Preload("Flag", func(db *gorm.DB) *gorm.DB {
+					return db.Select("id", "country", "image_path")
+				})
+		}).
+		Preload("TeamOne", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "name").
+				Preload("Players", func(db *gorm.DB) *gorm.DB {
+					return db.
+						Select("id", "team_id", "player_id", "captain").
+						Preload("Player", func(db *gorm.DB) *gorm.DB {
+							return db.Select("id", "name", "flag_id").
+								Preload("Flag", func(db *gorm.DB) *gorm.DB {
+									return db.Select("id", "country", "image_path")
+								})
+						})
+				})
+		}).
+		Preload("TeamTwo", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "name").
+				Preload("Players", func(db *gorm.DB) *gorm.DB {
+					return db.
+						Select("id", "team_id", "player_id", "captain").
+						Preload("Player", func(db *gorm.DB) *gorm.DB {
+							return db.Select("id", "name", "flag_id").
+								Preload("Flag", func(db *gorm.DB) *gorm.DB {
+									return db.Select("id", "country", "image_path")
+								})
+						})
+				})
+		}).
+		Find(&latest)
+
+	if result.Error == nil && result.RowsAffected == 1 {
+		return &latest
+	}
+
+	return g
+}
+
 // SetType sets the Type of the current game.
-func (g *Game) SetType(t GameType) {
+func (g *Game) SetType(t GameType) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
 	g.Type = t
+
+	return g.Save(false)
 }
 
 // SetVsMode changes the current GameVsMode of the game.
-func (g *Game) SetVsMode(mode GameVsMode) {
+func (g *Game) SetVsMode(mode GameVsMode) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
 	g.VsMode = mode
 
-	// TODO: MIGHT WANT TO UNSET TEAMS / PLAYERS BASED ON MODE CHANGE
+	return g.Save(false)
 }
 
 // IncrementRaceTo increases the RaceTo of the game by one.
-func (g *Game) IncrementRaceTo() {
+func (g *Game) IncrementRaceTo() error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
 	g.RaceTo++
+
+	return g.Save(false)
 }
 
 // DecrementRaceTo decreases the RaceTo of the game by one. Minimum value will
 // always be 1.
-func (g *Game) DecrementRaceTo() {
+func (g *Game) DecrementRaceTo() error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
@@ -89,6 +153,8 @@ func (g *Game) DecrementRaceTo() {
 	if newRaceTo > 0 {
 		g.RaceTo = newRaceTo
 	}
+
+	return g.Save(false)
 }
 
 // IncrementScore increases the score for the specified player by one.
@@ -111,7 +177,7 @@ func (g *Game) IncrementScore(playerNum int) error {
 		return ErrInvalidPlayerNumber
 	}
 
-	return nil
+	return g.Save(false)
 }
 
 // DecrementScore decreases the score for the specified player by one.
@@ -134,16 +200,18 @@ func (g *Game) DecrementScore(playerNum int) error {
 		return ErrInvalidPlayerNumber
 	}
 
-	return nil
+	return g.Save(false)
 }
 
 // ResetScore resets the current game score.
-func (g *Game) ResetScore() {
+func (g *Game) ResetScore() error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
 	g.ScoreOne = 0
 	g.ScoreTwo = 0
+
+	return g.Save(false)
 }
 
 // SetPlayer sets the player number to the specified player.
@@ -153,18 +221,22 @@ func (g *Game) SetPlayer(playerNum int, player *Player) error {
 
 	switch playerNum {
 	case 1:
+		g.PlayerOneID = &player.ID
 		g.PlayerOne = player
 	case 2:
+		g.PlayerTwoID = &player.ID
 		g.PlayerTwo = player
 	default:
 		return ErrInvalidPlayerNumber
 	}
 
 	// Unset teams when adding a player.
+	g.TeamOneID = nil
 	g.TeamOne = nil
+	g.TeamTwoID = nil
 	g.TeamTwo = nil
 
-	return nil
+	return g.Save(false)
 }
 
 // SetTeam sets the team number to the specified team.
@@ -174,16 +246,41 @@ func (g *Game) SetTeam(teamNum int, team *Team) error {
 
 	switch teamNum {
 	case 1:
+		g.TeamOneID = &team.ID
 		g.TeamOne = team
 	case 2:
+		g.TeamTwoID = &team.ID
 		g.TeamTwo = team
 	default:
 		return ErrInvalidTeamNumber
 	}
 
 	// Unset players when adding a team.
+	g.PlayerOneID = nil
 	g.PlayerOne = nil
+	g.PlayerTwoID = nil
 	g.PlayerTwo = nil
 
-	return nil
+	return g.Save(false)
+}
+
+// Save saves the game to the database.
+func (g *Game) Save(completed bool) error {
+	if g.ID != 0 {
+		return g.db.Model(g).Updates(map[string]interface{}{
+			"type":      g.Type,
+			"vs_mode":   g.VsMode,
+			"race_to":   g.RaceTo,
+			"score_one": g.ScoreOne,
+			"score_two": g.ScoreTwo,
+			"completed": completed,
+
+			"player_one_id": g.PlayerOneID,
+			"player_two_id": g.PlayerTwoID,
+			"team_one_id":   g.TeamOneID,
+			"team_two_id":   g.TeamTwoID,
+		}).Error
+	}
+
+	return g.db.Create(g).Error
 }

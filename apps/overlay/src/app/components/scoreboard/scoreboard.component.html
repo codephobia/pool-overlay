@@ -1,36 +1,65 @@
-<div class="scoreboard" *ngIf="vm$ | async as vm">
-  <div class="players">
-    <div class="bar top"></div>
-    <div class="player-info">
-      <div class="player one">
-        <div class="divider"></div>
-        <div class="flag">
-          <img *ngIf="vm.game?.player_one?.flag?.image_path" src="./assets/flags/{{ vm.game?.player_one?.flag?.image_path }}">
+<div
+    class="scoreboard-wrapper"
+    [@scoreboardTransition]="!vm.hidden"
+    *ngIf="vm$ | async as vm"
+>
+    <div class="scoreboard" *ngIf="!vm.hidden">
+        <div class="players">
+            <div class="bar top"></div>
+            <div class="player-info">
+                <div class="player-wrapper one">
+                    <div class="player one">
+                        <div class="divider"></div>
+                        <div class="flag">
+                            <img
+                                *ngIf="vm.game?.player_one?.flag?.image_path"
+                                src="./assets/flags/{{
+                                    vm.game?.player_one?.flag?.image_path
+                                }}"
+                            />
+                        </div>
+                        <div class="divider"></div>
+                        <div class="player-name">
+                            {{ vm.game?.player_one?.name }}
+                        </div>
+                    </div>
+                </div>
+                <div class="scores-wrapper">
+                    <div class="scores">
+                        <div class="divider left"></div>
+                        <div class="score left">{{ vm.game?.score_one }}</div>
+                        <div class="divider left"></div>
+                        <div class="versus">vs</div>
+                        <div class="divider right"></div>
+                        <div class="score right">{{ vm.game?.score_two }}</div>
+                        <div class="divider right"></div>
+                    </div>
+                </div>
+                <div class="player-wrapper two">
+                    <div class="player two">
+                        <div class="player-name">
+                            {{ vm.game?.player_two?.name }}
+                        </div>
+                        <div class="divider"></div>
+                        <div class="flag">
+                            <img
+                                *ngIf="vm.game?.player_two?.flag?.image_path"
+                                src="./assets/flags/{{
+                                    vm.game?.player_two?.flag?.image_path
+                                }}"
+                            />
+                        </div>
+                        <div class="divider"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="bar bottom"></div>
         </div>
-        <div class="divider"></div>
-        <div class="player-name">{{ vm.game?.player_one?.name }}</div>
-      </div>
-      <div class="scores">
-        <div class="divider left"></div>
-        <div class="score left">{{ vm.game?.score_one }}</div>
-        <div class="divider left"></div>
-        <div class="versus">vs</div>
-        <div class="divider right"></div>
-        <div class="score right">{{ vm.game?.score_two }}</div>
-        <div class="divider right"></div>
-      </div>
-      <div class="player two">
-        <div class="player-name">{{ vm.game?.player_two?.name }}</div>
-        <div class="divider"></div>
-        <div class="flag">
-          <img *ngIf="vm.game?.player_two?.flag?.image_path" src="./assets/flags/{{ vm.game?.player_two?.flag?.image_path }}">
+        <div class="game-wrapper">
+            <div class="game">
+                {{ gameTypeName(vm.game?.type) }} - Race to
+                {{ vm.game?.race_to }}
+            </div>
         </div>
-        <div class="divider"></div>
-      </div>
     </div>
-    <div class="bar bottom"></div>
-  </div>
-  <div class="game">
-    {{ gameTypeName(vm.game?.type) }} - Race to {{ vm.game?.race_to }}
-  </div>
 </div>

@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/codephobia/pool-overlay/apps/api/pkg/events"
 	"github.com/codephobia/pool-overlay/apps/api/pkg/overlay"
 	"github.com/gorilla/websocket"
 )
@@ -12,6 +13,11 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin:     func(r *http.Request) bool { return true },
+}
+
+// OverlayToggleResp is the response from toggling the overlay.
+type OverlayToggleResp struct {
+	Hidden bool `json:"hidden"`
 }
 
 // Handler for overlay.
@@ -48,4 +54,38 @@ func (server *Server) handleOverlayGet(w http.ResponseWriter, r *http.Request) {
 	// init read / write for socket connection
 	go oc.WritePump()
 	go oc.ReadPump()
+}
+
+// Handler for overlay toggle.
+func (server *Server) handleOverlayToggle() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "GET":
+			server.handleOverlayToggleGet(w, r)
+		default:
+			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
+		}
+	})
+}
+
+// Overlay toggle handler for GET method.
+func (server *Server) handleOverlayToggleGet(w http.ResponseWriter, r *http.Request) {
+	hidden := server.state.ToggleHidden()
+
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.OverlayToggleEventType,
+		events.NewOverlayToggleEventPayload(hidden),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
+
+	server.handleSuccess(w, r, &OverlayToggleResp{
+		Hidden: hidden,
+	})
 }

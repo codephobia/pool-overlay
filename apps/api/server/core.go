@@ -39,7 +39,7 @@ func NewCore() (*Core, error) {
 	overlay := overlay.NewOverlay()
 
 	// Initialize game state.
-	state := state.NewState()
+	state := state.NewState(db)
 
 	// Initialize API Server.
 	apiConfig := &api.Config{

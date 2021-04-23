@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -80,7 +81,10 @@ func (server *Server) handleGameTypeGet(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// update game type
-	server.state.Game.SetType(models.GameType(gameType))
+	if err := server.state.Game.SetType(models.GameType(gameType)); err != nil {
+		// TODO: LOG THIS ERROR
+		server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+	}
 
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
@@ -126,7 +130,10 @@ func (server *Server) handleGameVsModeGet(w http.ResponseWriter, r *http.Request
 	}
 
 	// update game mode
-	server.state.Game.SetVsMode(models.GameVsMode(gameMode))
+	if err := server.state.Game.SetVsMode(models.GameVsMode(gameMode)); err != nil {
+		// TODO: LOG THIS ERROR
+		server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+	}
 
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
@@ -180,9 +187,15 @@ func (server *Server) handleGameRaceToGet(w http.ResponseWriter, r *http.Request
 
 	// update race to number
 	if direction == gameDirectionIncrement {
-		server.state.Game.IncrementRaceTo()
+		if err := server.state.Game.IncrementRaceTo(); err != nil {
+			// TODO: LOG THIS ERROR
+			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+		}
 	} else {
-		server.state.Game.DecrementRaceTo()
+		if err := server.state.Game.DecrementRaceTo(); err != nil {
+			// TODO: LOG THIS ERROR
+			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+		}
 	}
 
 	// Generate message to broadcast to overlay.
@@ -245,12 +258,22 @@ func (server *Server) handleGameScoreGet(w http.ResponseWriter, r *http.Request)
 	// update score
 	if direction == gameDirectionIncrement {
 		if err := server.state.Game.IncrementScore(playerNum); err != nil {
-			server.handleError(w, r, http.StatusUnprocessableEntity, err)
+			if errors.Is(err, models.ErrInvalidPlayerNumber) {
+				server.handleError(w, r, http.StatusUnprocessableEntity, err)
+			} else {
+				// TODO: LOG THIS ERROR
+				server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+			}
 			return
 		}
 	} else {
 		if err := server.state.Game.DecrementScore(playerNum); err != nil {
-			server.handleError(w, r, http.StatusUnprocessableEntity, err)
+			if errors.Is(err, models.ErrInvalidPlayerNumber) {
+				server.handleError(w, r, http.StatusUnprocessableEntity, err)
+			} else {
+				// TODO: LOG THIS ERROR
+				server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+			}
 			return
 		}
 	}
@@ -290,7 +313,10 @@ func (server *Server) handleGameScoreReset() http.Handler {
 // Game score reset handler for GET method.
 func (server *Server) handleGameScoreResetGet(w http.ResponseWriter, r *http.Request) {
 	// reset game score
-	server.state.Game.ResetScore()
+	if err := server.state.Game.ResetScore(); err != nil {
+		// TODO: LOG THIS ERROR
+		server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+	}
 
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
@@ -345,6 +371,7 @@ func (server *Server) handleGamePlayersGet(w http.ResponseWriter, r *http.Reques
 
 	var player models.Player
 	if err := player.LoadByID(server.db, playerID); err != nil {
+		// TODO: MAYBE CHANGE THIS TO ERRORS.IS
 		if err == models.ErrPlayerIDInvalid {
 			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
 			return
@@ -356,7 +383,12 @@ func (server *Server) handleGamePlayersGet(w http.ResponseWriter, r *http.Reques
 	}
 
 	if err := server.state.Game.SetPlayer(playerNum, &player); err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
+		if errors.Is(err, models.ErrInvalidPlayerNumber) {
+			server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
+		} else {
+			// TODO: LOG THIS ERROR
+			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+		}
 		return
 	}
 
@@ -421,7 +453,12 @@ func (server *Server) handleGameTeamsGet(w http.ResponseWriter, r *http.Request)
 	}
 
 	if err := server.state.Game.SetTeam(teamNum, &team); err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidTeamNumber)
+		if errors.Is(err, models.ErrInvalidTeamNumber) {
+			server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidTeamNumber)
+		} else {
+			// TODO: LOG THIS ERROR
+			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+		}
 		return
 	}
 
