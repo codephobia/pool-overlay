@@ -1,0 +1,33 @@
+# Use nxgo/cli as the base image
+FROM nxgo/cli
+
+# Create app directory
+WORKDIR /workspace
+
+# Copy package.json and the lock file
+COPY package.json package-lock.json ./
+
+# Install app dependencies
+RUN npm ci
+
+# Copy go mod files
+COPY go.mod go.sum ./
+
+# Download go modules
+RUN go mod download
+
+# Install gow for nx watch
+RUN go install github.com/mitranim/gow
+
+# Copy Nx files
+COPY nx.json workspace.json tsconfig.base.json ./
+
+# Set environment variables
+ENV PORT=1268
+ENV HOST=0.0.0.0
+
+# Expose default port
+EXPOSE 1268
+
+# Start server
+CMD nx serve api

@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -30,6 +31,8 @@ func (server *Server) handleIndex() http.Handler {
 func (server *Server) handleHealthCheck() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		server.SetupResponse(w, r)
+
+		log.Printf("[HEALTHCHECK]")
 
 		server.handleSuccess(w, r, "OK")
 	})

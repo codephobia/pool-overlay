@@ -8,7 +8,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/codephobia/pool-overlay/apps/api/pkg/models"
+	"github.com/codephobia/pool-overlay/libs/go/models"
 )
 
 // FlagSeed is used to load all flag seeds from the json file.

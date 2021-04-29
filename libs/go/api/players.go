@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/codephobia/pool-overlay/apps/api/pkg/models"
+	"github.com/codephobia/pool-overlay/libs/go/models"
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 )

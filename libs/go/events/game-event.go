@@ -1,6 +1,6 @@
 package events
 
-import "github.com/codephobia/pool-overlay/apps/api/pkg/models"
+import "github.com/codephobia/pool-overlay/libs/go/models"
 
 const GameEventType = "GAME_EVENT"
 

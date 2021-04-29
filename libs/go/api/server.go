@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/codephobia/pool-overlay/apps/api/pkg/overlay"
-	"github.com/codephobia/pool-overlay/apps/api/pkg/state"
+	"github.com/codephobia/pool-overlay/libs/go/overlay"
+	"github.com/codephobia/pool-overlay/libs/go/state"
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 )

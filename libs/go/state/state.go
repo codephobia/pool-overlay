@@ -3,7 +3,7 @@ package state
 import (
 	"sync"
 
-	"github.com/codephobia/pool-overlay/apps/api/pkg/models"
+	"github.com/codephobia/pool-overlay/libs/go/models"
 	"gorm.io/gorm"
 )
 

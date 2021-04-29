@@ -8,7 +8,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/codephobia/pool-overlay/apps/api/pkg/models"
+	"github.com/codephobia/pool-overlay/libs/go/models"
 )
 
 // PlayerSeed is used to load all player seeds from the json file.

@@ -9,8 +9,7 @@ services:
         restart: always
         environment:
             PGDATA: /var/lib/postgresql/data/pgdata
-        env_file:
-            - ./apps/api/server/.env
+        env_file: ./apps/api/.env
         ports:
             - 5432:5432
         volumes:
@@ -36,13 +35,23 @@ services:
 
     api:
         container_name: pool-api
+        build:
+            context: .
+            dockerfile: ./apps/api/Dockerfile
         image: pool-api:0.1.0
+        restart: always
+        env_file: ./apps/api/.env
+        environment:
+            POSTGRES_HOST: host.docker.internal
         ports:
-            - 3000:3000
+            - 1268:1268
         networks:
             - poolnet
         depends_on:
             - db
+        # volumes:
+        #     - ./apps/api:/workspace/apps/api
+        #     - ./libs/go:/workspace/libs/go
 
     overlay:
         container_name: pool-overlay
@@ -58,6 +67,8 @@ services:
             - ./libs:/workspace/libs
         networks:
             - poolnet
+        depends_on:
+            - api
 
 volumes:
     postgres:

@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/codephobia/pool-overlay/apps/api/pkg/events"
-	"github.com/codephobia/pool-overlay/apps/api/pkg/models"
-	"github.com/codephobia/pool-overlay/apps/api/pkg/overlay"
+	"github.com/codephobia/pool-overlay/libs/go/events"
+	"github.com/codephobia/pool-overlay/libs/go/models"
+	"github.com/codephobia/pool-overlay/libs/go/overlay"
 )
 
 const (

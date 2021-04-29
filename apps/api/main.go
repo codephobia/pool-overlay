@@ -7,9 +7,10 @@ import (
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// Load .env file. This is only used for local running outside of docker,
+	// which is why we ignore the error. In docker, we add the env vars via
+	// docker-compose which points to the same .env file.
+	godotenv.Load()
 
 	// Create new core.
 	core, err := NewCore()

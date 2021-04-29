@@ -5,18 +5,18 @@ import (
 	"log"
 	"os"
 
-	"github.com/codephobia/pool-overlay/apps/api/pkg/models"
-	"github.com/codephobia/pool-overlay/apps/api/pkg/seeds"
+	"github.com/codephobia/pool-overlay/libs/go/models"
+	"github.com/codephobia/pool-overlay/libs/go/seeds"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func main() {
-	// Load env vars.
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// Load .env file. This is only used for local running outside of docker,
+	// which is why we ignore the error. In docker, we add the env vars via
+	// docker-compose which points to the same .env file.
+	godotenv.Load()
 
 	// Connect to database.
 	dsn := fmt.Sprintf(

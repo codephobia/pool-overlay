@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/codephobia/pool-overlay/apps/api/pkg/events"
-	"github.com/codephobia/pool-overlay/apps/api/pkg/overlay"
+	"github.com/codephobia/pool-overlay/libs/go/events"
+	"github.com/codephobia/pool-overlay/libs/go/overlay"
 	"github.com/gorilla/websocket"
 )
 

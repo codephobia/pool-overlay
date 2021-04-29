@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/codephobia/pool-overlay/apps/api/pkg/api"
-	"github.com/codephobia/pool-overlay/apps/api/pkg/overlay"
-	"github.com/codephobia/pool-overlay/apps/api/pkg/state"
+	"github.com/codephobia/pool-overlay/libs/go/api"
+	"github.com/codephobia/pool-overlay/libs/go/overlay"
+	"github.com/codephobia/pool-overlay/libs/go/state"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
