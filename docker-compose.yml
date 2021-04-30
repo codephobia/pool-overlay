@@ -37,7 +37,7 @@ services:
         container_name: pool-api
         build:
             context: .
-            dockerfile: ./apps/api/Dockerfile.broken
+            dockerfile: ./apps/api/Dockerfile
         image: pool-api:0.1.0
         restart: always
         env_file: ./apps/api/.env
