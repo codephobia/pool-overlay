@@ -37,21 +37,21 @@ services:
         container_name: pool-api
         build:
             context: .
-            dockerfile: ./apps/api/Dockerfile
+            dockerfile: ./apps/api/Dockerfile.broken
         image: pool-api:0.1.0
         restart: always
         env_file: ./apps/api/.env
         environment:
-            POSTGRES_HOST: host.docker.internal
+            POSTGRES_HOST: db
         ports:
             - 1268:1268
         networks:
             - poolnet
         depends_on:
             - db
-        # volumes:
-        #     - ./apps/api:/workspace/apps/api
-        #     - ./libs/go:/workspace/libs/go
+        volumes:
+            - ./apps/api:/workspace/apps/api
+            - ./libs/go:/workspace/libs/go
 
     overlay:
         container_name: pool-overlay

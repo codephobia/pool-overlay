@@ -29,5 +29,6 @@ ENV HOST=0.0.0.0
 # Expose default port
 EXPOSE 1268
 
-# Start server
-CMD nx serve api
+ENTRYPOINT sh
+
+CMD sh -c "nx serve api"
