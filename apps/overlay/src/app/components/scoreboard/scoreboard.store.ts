@@ -2,10 +2,7 @@ import { Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
 import { switchMap } from 'rxjs/operators';
 
-import { GameType } from '../../models/game-type.enum';
-import { IGame } from '../../models/game.model';
-import { IPlayer } from '../../models/player.model';
-import { VsMode } from '../../models/vs-mode.enum';
+import { IGame } from '../../models';
 import { APIService } from '../../services/api.service';
 
 export interface ScoreboardState {
@@ -20,74 +17,26 @@ export class ScoreboardStore extends ComponentStore<ScoreboardState> {
     }
 
     // updaters
-    readonly setGame = this.updater((state, values: { game: IGame }) => ({ ...state, game: values.game }));
-
-    readonly setGameType = this.updater((state, type: GameType) => ({
+    public readonly setGame = this.updater((state, values: { game: IGame }) => ({
         ...state,
-        game: {
-            ...state.game,
-            type,
-        },
+        game: values.game
     }));
 
-    readonly setGameVsMode = this.updater((state, vs_mode: VsMode) => ({
-        ...state,
-        game: {
-            ...state.game,
-            vs_mode,
-        },
-    }));
-
-    readonly setGameRaceTo = this.updater((state, race_to: number) => ({
-        ...state,
-        game: {
-            ...state.game,
-            race_to,
-        },
-    }));
-
-    readonly setGameScore = this.updater((state, scores: { score_one: number, score_two: number }) => ({
-        ...state,
-        game: {
-            ...state.game,
-            score_one: scores.score_one,
-            score_two: scores.score_two,
-        },
-    }));
-
-    readonly setGamePlayerOne = this.updater((state, player_one: IPlayer) => ({
-        ...state,
-        game: {
-            ...state.game,
-            player_one,
-        },
-    }));
-
-    readonly setGamePlayerTwo = this.updater((state, player_two: IPlayer) => ({
-        ...state,
-        game: {
-            ...state.game,
-            player_two,
-        },
-    }));
-
-    readonly setHidden = this.updater((state, values: { hidden: boolean }) => ({
+    public readonly setHidden = this.updater((state, values: { hidden: boolean }) => ({
         ...state,
         hidden: values.hidden,
     }));
 
     // selectors
-    readonly game$ = this.select((state) => state.game);
-
-    readonly hidden$ = this.select((state) => state.hidden);
-
-    readonly vm$ = this.select(this.game$, this.hidden$, (game, hidden) => ({
+    public readonly game$ = this.select((state) => state.game);
+    public readonly hidden$ = this.select((state) => state.hidden);
+    public readonly vm$ = this.select(this.game$, this.hidden$, (game, hidden) => ({
         game,
         hidden,
     }));
 
     // effects
-    readonly getGame = this.effect((trigger$) => {
+    public readonly getGame = this.effect((trigger$) => {
         return trigger$.pipe(
             switchMap(() =>
                 this._apiService.getGame().pipe(

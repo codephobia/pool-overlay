@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { IGame } from '../models/game.model';
+import { IGame } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class APIService {

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { GameType, gameTypeToString } from '../../models/game-type.enum';
+import { GameType, gameTypeToString } from '../../models';
 import { SocketService } from '../../services/socket.service';
 import { scoreboardTransition } from './scoreboard.animation';
 import { ScoreboardStore } from './scoreboard.store';
