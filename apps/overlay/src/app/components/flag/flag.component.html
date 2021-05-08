@@ -1,0 +1,6 @@
+<div class="flag" [@flagTrigger]="trigger" *ngIf="imagePath" [class]="class">
+    <img
+        *ngFor="let img of [imagePath]"
+        src="./assets/flags/{{ imagePath }}"
+    />
+</div>

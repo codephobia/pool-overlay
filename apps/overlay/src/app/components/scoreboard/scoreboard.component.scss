@@ -2,10 +2,10 @@ $gradient-dark: #939598;
 $gradient-light: #e6e7e8;
 $flag-background-color: #18191e;
 $score-background-color: #18191e;
+$score-text-color: #ffffff;
 $versus-background-color: #99002c;
 $game-background-color: #1b3887;
 $player-name-text-color: #0c0104;
-$score-text-color: #ffffff;
 $versus-text-color: #ffffff;
 
 :host {
@@ -125,7 +125,7 @@ $versus-text-color: #ffffff;
                                     z-index: -1;
                                 }
 
-                                img {
+                                app-flag {
                                     position: absolute;
                                     z-index: 2;
                                     top: 0;
@@ -169,11 +169,11 @@ $versus-text-color: #ffffff;
                                         transform: skewX(-20deg);
                                     }
 
-                                    img {
+                                    app-flag {
                                         clip-path: polygon(
-                                            19px 0,
+                                            20px 0,
                                             100% 0,
-                                            calc(100% - 19px) 100%,
+                                            calc(100% - 20px) 100%,
                                             0 100%
                                         );
                                     }
@@ -206,12 +206,12 @@ $versus-text-color: #ffffff;
                                         transform: skewX(20deg);
                                     }
 
-                                    img {
+                                    app-flag {
                                         clip-path: polygon(
                                             0 0,
-                                            calc(100% - 19px) 0,
+                                            calc(100% - 20px) 0,
                                             100% 100%,
-                                            19px 100%
+                                            20px 100%
                                         );
                                     }
                                 }
@@ -275,10 +275,10 @@ $versus-text-color: #ffffff;
                                 margin: 0 8px;
                                 position: relative;
                                 z-index: 1;
-                                font-size: 28px;
-                                color: $score-text-color;
                                 justify-content: center;
                                 align-items: center;
+                                font-size: 28px;
+                                color: $score-text-color;
 
                                 &:before {
                                     position: absolute;

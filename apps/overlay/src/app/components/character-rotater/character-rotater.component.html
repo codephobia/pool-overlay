@@ -1,0 +1,5 @@
+<div class="character-rotater" [@characterRotater]="characters">
+    <div class="characters" *ngFor="let w of [characters]">
+        <span class="character" *ngFor="let char of charArr; let i = index; trackBy: trackBy">{{ char }}</span>
+    </div>
+</div>

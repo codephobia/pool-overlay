@@ -1,0 +1,28 @@
+:host {
+    .character-rotater {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        flex: 1 0 auto;
+
+        .characters {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+
+            .character {
+                display: inline-block;
+                position: relative;
+                transform: translateZ(25px);
+                transform-origin: 50% 50% 24px;
+                z-index: 2;
+            }
+        }
+    }
+}

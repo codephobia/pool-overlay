@@ -1,0 +1,35 @@
+.flag {
+    position: relative;
+    width: 115px;
+    height: 60px;
+
+    img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 115px;
+        height: 60px;
+    }
+
+    &.player-one {
+        img {
+            clip-path: polygon(
+                20px 0,
+                100% 0,
+                calc(100% - 20px) 100%,
+                0 100%
+            );
+        }
+    }
+
+    &.player-two {
+        img {
+            clip-path: polygon(
+                0 0,
+                calc(100% - 20px) 0,
+                100% 100%,
+                20px 100%
+            );
+        }
+    }
+}

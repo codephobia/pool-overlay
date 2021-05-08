@@ -1,4 +1,4 @@
 export enum VsMode {
-  OneVsOne,
-  ScotchDoubles,
+    OneVsOne,
+    ScotchDoubles,
 }
