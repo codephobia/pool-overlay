@@ -4,6 +4,8 @@ import (
 	"log"
 
 	"github.com/joho/godotenv"
+
+	_ "github.com/codephobia/pool-overlay/libs/go/apidocs"
 )
 
 func main() {

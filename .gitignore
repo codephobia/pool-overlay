@@ -46,3 +46,6 @@ Thumbs.db
 
 # Environment variables
 .env
+
+# Swagger
+swagger.json

@@ -41,11 +41,11 @@ func (server *Server) InitRoutes() {
 	// players/:playerID
 	server.AddRouteToAllVersions("/players/{playerID}", server.handlePlayerByID())
 
-	// game/update/type
-	server.AddRouteToAllVersions("/game/update/type", server.handleGameType())
-
 	// game
 	server.AddRouteToAllVersions("/game", server.handleGame())
+
+	// game/update/type
+	server.AddRouteToAllVersions("/game/update/type", server.handleGameType())
 
 	// game/update/vs-mode
 	server.AddRouteToAllVersions("/game/update/vs-mode", server.handleGameVsMode())
