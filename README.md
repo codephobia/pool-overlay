@@ -48,6 +48,6 @@ Everything is setup to run with docker containers and docker compose. The follow
 | -------- | -------------------------------------------------------------- | ----- | ------------------------------------- |
 | db       | The postgres database storing all player and game information. | 5432  |                                       |
 | db-admin | An admin interface for the database using pgadmin.             | 5050  |                                       |
-| api      | The REST API and Websocket connections used by the Overlay.    | 1268  | [Dockerfile](apps/api/Dockefile)      |
+| api      | The REST API and Websocket connections used by the Overlay.    | 1268  | [Dockerfile](apps/api/Dockerfile)     |
 | overlay  | An Angular application that displays the scoreboard in OBS.    | 4200  | [Dockerfile](apps/overlay/Dockerfile) |
 
