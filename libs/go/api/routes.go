@@ -38,7 +38,7 @@ func (server *Server) InitRoutes() {
 	// players/count
 	server.AddRouteToAllVersions("/players/count", server.handlePlayersCount())
 
-	// players/:playerID
+	// players/{playerID}
 	server.AddRouteToAllVersions("/players/{playerID}", server.handlePlayerByID())
 
 	// game
@@ -53,7 +53,7 @@ func (server *Server) InitRoutes() {
 	// game/update/race-to
 	server.AddRouteToAllVersions("/game/update/race-to", server.handleGameRaceTo())
 
-	// game/update/score/{playerNum}
+	// game/update/score
 	server.AddRouteToAllVersions("/game/update/score", server.handleGameScore())
 
 	// game/update/score/reset
