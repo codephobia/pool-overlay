@@ -62,6 +62,19 @@ func (server *Server) InitRoutes() {
 	// game/update/players
 	server.AddRouteToAllVersions("/game/update/players", server.handleGamePlayers())
 
+	// game/update/players/flag
+	server.AddRouteToAllVersions("/game/update/players/flag", server.handleGamePlayersFlag())
+
+	// game/update/players/name
+	server.AddRouteToAllVersions("/game/update/players/name", server.handleGamePlayersName())
+
+	// TODO: IMPLEMENT THIS
+	// game/update/players/save
+	// server.AddRouteToAllVersions("/game/update/players/save", server.handleGamePlayers())
+
+	// game/update/players/unset
+	server.AddRouteToAllVersions("/game/update/players/unset", server.handleGamePlayersUnset())
+
 	// game/update/teams
 	server.AddRouteToAllVersions("/game/update/teams", server.handleGameTeams())
 }

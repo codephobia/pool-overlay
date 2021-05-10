@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"regexp"
 	"sync"
 	"time"
 
@@ -239,6 +240,81 @@ func (g *Game) SetPlayer(playerNum int, player *Player) error {
 	return g.Save(false)
 }
 
+// UnsetPlayer unsets a player for the specified player num.
+func (g *Game) UnsetPlayer(playerNum int) error {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
+
+	switch playerNum {
+	case 1:
+		g.PlayerOneID = nil
+		g.PlayerOne = nil
+	case 2:
+		g.PlayerTwoID = nil
+		g.PlayerTwo = nil
+	default:
+		return ErrInvalidPlayerNumber
+	}
+
+	return g.Save(false)
+}
+
+// SetPlayerFlag sets the flag to the specified player.
+func (g *Game) SetPlayerFlag(playerNum int, flag *Flag) error {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
+
+	switch playerNum {
+	case 1:
+		// Handle if player has currently been unset.
+		if g.PlayerOne == nil {
+			g.PlayerOne = &Player{}
+		}
+
+		g.PlayerOne.FlagID = flag.ID
+		g.PlayerOne.Flag = flag
+	case 2:
+		// Handle if player has currently been unset.
+		if g.PlayerTwo == nil {
+			g.PlayerTwo = &Player{}
+		}
+
+		g.PlayerTwo.FlagID = flag.ID
+		g.PlayerTwo.Flag = flag
+	default:
+		return ErrInvalidPlayerNumber
+	}
+
+	return nil
+}
+
+// SetPlayerName sets the name to the specified player.
+func (g *Game) SetPlayerName(playerNum int, action string) error {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
+
+	switch playerNum {
+	case 1:
+		// Handle if player has currently been unset.
+		if g.PlayerOne == nil {
+			g.PlayerOne = &Player{}
+		}
+
+		g.PlayerOne.Name = updatePlayerName(g.PlayerOne.Name, action)
+	case 2:
+		// Handle if player has currently been unset.
+		if g.PlayerTwo == nil {
+			g.PlayerTwo = &Player{}
+		}
+
+		g.PlayerTwo.Name = updatePlayerName(g.PlayerTwo.Name, action)
+	default:
+		return ErrInvalidPlayerNumber
+	}
+
+	return nil
+}
+
 // SetTeam sets the team number to the specified team.
 func (g *Game) SetTeam(teamNum int, team *Team) error {
 	g.mutex.Lock()
@@ -283,4 +359,27 @@ func (g *Game) Save(completed bool) error {
 	}
 
 	return g.db.Create(g).Error
+}
+
+// Updates a player name based on the action.
+func updatePlayerName(current string, action string) string {
+	var valid = regexp.MustCompile(`^[a-zA-Z \-']$`)
+
+	switch {
+	// Append valid characters.
+	case valid.MatchString(action):
+		return current + action
+
+	// Remove the last character.
+	case action == "backspace":
+		length := len(current)
+		if length > 0 {
+			return current[:length-1]
+		}
+		fallthrough
+
+	// Don't make any changes.
+	default:
+		return current
+	}
 }

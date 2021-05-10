@@ -338,7 +338,7 @@ func (server *Server) handleGameScoreResetGet(w http.ResponseWriter, r *http.Req
 	})
 }
 
-// Handler for /game/update/player
+// Handler for /game/update/players
 func (server *Server) handleGamePlayers() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -350,7 +350,7 @@ func (server *Server) handleGamePlayers() http.Handler {
 	})
 }
 
-// Game player handler for GET method.
+// Game players handler for GET method.
 func (server *Server) handleGamePlayersGet(w http.ResponseWriter, r *http.Request) {
 	// get query vars
 	v := r.URL.Query()
@@ -383,6 +383,176 @@ func (server *Server) handleGamePlayersGet(w http.ResponseWriter, r *http.Reques
 	}
 
 	if err := server.state.Game.SetPlayer(playerNum, &player); err != nil {
+		if errors.Is(err, models.ErrInvalidPlayerNumber) {
+			server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
+		} else {
+			// TODO: LOG THIS ERROR
+			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+		}
+		return
+	}
+
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.GameEventType,
+		events.NewGameEventPayload(server.state.Game),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
+
+	// send response
+	server.handleSuccess(w, r, server.state.Game)
+}
+
+// Handler for /game/update/players/flag
+func (server *Server) handleGamePlayersFlag() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "GET":
+			server.handleGamePlayersFlagGet(w, r)
+		default:
+			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
+		}
+	})
+}
+
+// Game players flag handler for GET method.
+func (server *Server) handleGamePlayersFlagGet(w http.ResponseWriter, r *http.Request) {
+	// get query vars
+	v := r.URL.Query()
+
+	// get player num from query params
+	playerNum, err := strconv.Atoi(v.Get("playerNum"))
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
+		return
+	}
+
+	// get flag id from query params
+	flagID, err := strconv.Atoi(v.Get("flagID"))
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerID)
+		return
+	}
+
+	var flag models.Flag
+	if err := flag.LoadByID(server.db, flagID); err != nil {
+		if err == models.ErrFlagIDInvalid {
+			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+			return
+		}
+		if err == models.ErrFlagNotFound {
+			server.handleError(w, r, http.StatusNotFound, ErrPlayerNotFound)
+			return
+		}
+	}
+
+	if err := server.state.Game.SetPlayerFlag(playerNum, &flag); err != nil {
+		if errors.Is(err, models.ErrInvalidPlayerNumber) {
+			server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
+		} else {
+			// TODO: LOG THIS ERROR
+			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+		}
+		return
+	}
+
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.GameEventType,
+		events.NewGameEventPayload(server.state.Game),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
+
+	// send response
+	server.handleSuccess(w, r, server.state.Game)
+}
+
+// Handler for /game/update/players/name
+func (server *Server) handleGamePlayersName() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "GET":
+			server.handleGamePlayersNameGet(w, r)
+		default:
+			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
+		}
+	})
+}
+
+// Game players name handler for GET method.
+func (server *Server) handleGamePlayersNameGet(w http.ResponseWriter, r *http.Request) {
+	// get query vars
+	v := r.URL.Query()
+
+	// get player num from query params
+	playerNum, err := strconv.Atoi(v.Get("playerNum"))
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
+		return
+	}
+
+	// get action from query params
+	action := v.Get("action")
+
+	if err := server.state.Game.SetPlayerName(playerNum, action); err != nil {
+		server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+		return
+	}
+
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.GameEventType,
+		events.NewGameEventPayload(server.state.Game),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
+
+	// send response
+	server.handleSuccess(w, r, server.state.Game)
+}
+
+// Handler for /game/update/players/unset
+func (server *Server) handleGamePlayersUnset() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "GET":
+			server.handleGamePlayersUnsetGet(w, r)
+		default:
+			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
+		}
+	})
+}
+
+// Game players unset handler for GET method.
+func (server *Server) handleGamePlayersUnsetGet(w http.ResponseWriter, r *http.Request) {
+	// get query vars
+	v := r.URL.Query()
+
+	// get player num from query params
+	playerNum, err := strconv.Atoi(v.Get("playerNum"))
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
+		return
+	}
+
+	if err := server.state.Game.UnsetPlayer(playerNum); err != nil {
 		if errors.Is(err, models.ErrInvalidPlayerNumber) {
 			server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
 		} else {
