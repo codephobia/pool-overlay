@@ -8,6 +8,7 @@ import "github.com/codephobia/pool-overlay/libs/go/api"
 //   200: overlayToggleResp
 //   422: errorResp
 
+//nolint
 // Returns updated value for Hidden.
 // swagger:response overlayToggleResp
 type overlayToggleRespWrapper struct {

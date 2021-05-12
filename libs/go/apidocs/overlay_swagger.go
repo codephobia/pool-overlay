@@ -5,6 +5,7 @@ package apidocs
 // responses:
 //   101: overlayResp
 
+//nolint
 // Connection is upgraded and no response is given.
 // swagger:response overlayResp
 type overlayRespWrapper struct{}
