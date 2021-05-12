@@ -51,3 +51,11 @@ Everything is setup to run with docker containers and docker compose. The follow
 | api      | The REST API and Websocket connections used by the Overlay.    | 1268  | [Dockerfile](apps/api/Dockerfile)     |
 | overlay  | An Angular application that displays the scoreboard in OBS.    | 4200  | [Dockerfile](apps/overlay/Dockerfile) |
 
+## Github Action
+
+Github actions are setup on the repo to test linting.
+
+Lints the following:
+
+- [x] Go
+- [ ] Angular
