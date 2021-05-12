@@ -16,7 +16,9 @@ func main() {
 	// Load .env file. This is only used for local running outside of docker,
 	// which is why we ignore the error. In docker, we add the env vars via
 	// docker-compose which points to the same .env file.
-	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Printf("[INFO] skipping loading .env file")
+	}
 
 	// Connect to database.
 	dsn := fmt.Sprintf(
@@ -33,13 +35,15 @@ func main() {
 	}
 
 	// Make sure tables, indexes, etc are all created.
-	db.AutoMigrate(
+	if err := db.AutoMigrate(
 		&models.Flag{},
 		&models.Player{},
 		&models.Team{},
 		&models.TeamPlayer{},
 		&models.Game{},
-	)
+	); err != nil {
+		log.Printf("[ERROR] unable to auto migrate: %s", err)
+	}
 
 	// Load seeds from json files.
 	if err := seeds.Run(

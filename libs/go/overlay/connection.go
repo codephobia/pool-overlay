@@ -42,8 +42,12 @@ func (o *Connection) ReadPump() {
 	}()
 
 	o.conn.SetReadLimit(maxMessageSize)
-	o.conn.SetReadDeadline(time.Now().Add(pongWait))
-	o.conn.SetPongHandler(func(string) error { return o.conn.SetReadDeadline(time.Now().Add(pongWait)) })
+	if err := o.conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
+		log.Printf("[WARN] unable to set read deadline: %s", err)
+	}
+	o.conn.SetPongHandler(func(string) error {
+		return o.conn.SetReadDeadline(time.Now().Add(pongWait))
+	})
 
 	for {
 		_, _, err := o.conn.ReadMessage()
@@ -69,16 +73,24 @@ func (o *Connection) WritePump() {
 	for {
 		select {
 		case <-ticker.C:
-			o.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := o.conn.SetWriteDeadline(time.Now().Add(writeWait)); err != nil {
+				log.Printf("[WARN] unable to set write deadline: %s", err)
+			}
+
 			if err := o.conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
 				log.Printf("[ERROR] sending ping: %s", err)
 				return
 			}
 		case message, ok := <-o.Send:
-			o.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := o.conn.SetWriteDeadline(time.Now().Add(writeWait)); err != nil {
+				log.Printf("[WARN] unable to set write deadline: %s", err)
+			}
+
 			if !ok {
 				// close connection
-				o.conn.WriteMessage(websocket.CloseMessage, []byte{})
+				if err := o.conn.WriteMessage(websocket.CloseMessage, []byte{}); err != nil {
+					log.Printf("[WARN] unable to write message: %s", err)
+				}
 				return
 			}
 
@@ -87,7 +99,9 @@ func (o *Connection) WritePump() {
 				return
 			}
 
-			w.Write(message)
+			if _, err := w.Write(message); err != nil {
+				log.Printf("[WARN] unable to write message: %s", err)
+			}
 
 			if err := w.Close(); err != nil {
 				return

@@ -48,7 +48,9 @@ func (server *Server) handleSuccess(w http.ResponseWriter, r *http.Request, data
 
 	// return data
 	enc := json.NewEncoder(w)
-	enc.Encode(data)
+	if err := enc.Encode(data); err != nil {
+		log.Printf("[WARN] unable to encode data: %s", err)
+	}
 
 	// close request
 	(*r).Body.Close()
@@ -64,9 +66,11 @@ func (server *Server) handleError(w http.ResponseWriter, r *http.Request, status
 
 	// return error message
 	enc := json.NewEncoder(w)
-	enc.Encode(&ErrorResp{
+	if err := enc.Encode(&ErrorResp{
 		Err: err.Error(),
-	})
+	}); err != nil {
+		log.Printf("[WARN] unable to encode data: %s", err)
+	}
 
 	// close request
 	(*r).Body.Close()

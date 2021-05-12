@@ -12,12 +12,14 @@ func main() {
 	// Load .env file. This is only used for local running outside of docker,
 	// which is why we ignore the error. In docker, we add the env vars via
 	// docker-compose which points to the same .env file.
-	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Printf("[INFO] skipping loading .env file")
+	}
 
 	// Create new core.
 	core, err := NewCore()
 	if err != nil {
-		log.Fatalf("core: %s", err)
+		log.Fatalf("[FATAL] core: %s", err)
 	}
 
 	// Initialize core.
@@ -25,6 +27,6 @@ func main() {
 
 	// Start API server.
 	if err := core.server.Run(); err != nil {
-		log.Fatalf("server: %s", err)
+		log.Fatalf("[FATAL] server: %s", err)
 	}
 }
