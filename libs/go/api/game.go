@@ -1,9 +1,9 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
-	"strconv"
 
 	"github.com/codephobia/pool-overlay/libs/go/events"
 	"github.com/codephobia/pool-overlay/libs/go/models"
@@ -15,25 +15,82 @@ const (
 	gameDirectionDecrement = "decrement"
 )
 
+// GameTypePatchBody is the incoming body on a patch request for updating the
+// game type.
+type GameTypePatchBody struct {
+	Type models.GameType `json:"type"`
+}
+
 // GameTypeResp is a reponse containing the game type.
 type GameTypeResp struct {
 	Type models.GameType `json:"type"`
 }
 
+// GameVsModePatchBody is the incoming body on a patch request for updating the
+// game vs mode.
+type GameVsModePatchBody struct {
+	VsMode models.GameVsMode `json:"vsMode"`
+}
+
 // GameVsModeResp is a reponse containing the game type.
 type GameVsModeResp struct {
-	VsMode models.GameVsMode `json:"vs_mode"`
+	VsMode models.GameVsMode `json:"vsMode"`
+}
+
+// GameRaceToPatchBody is the incoming body on a patch request for updating the
+// game race to.
+type GameRaceToPatchBody struct {
+	Direction string `json:"direction"`
 }
 
 // GameRaceToResp is a reponse containing the game race to.
 type GameRaceToResp struct {
-	RaceTo int `json:"race_to"`
+	RaceTo int `json:"raceTo"`
+}
+
+// GameScorePatchBody is the incoming body on a patch request for updating the
+// game score for the specified player.
+type GameScorePatchBody struct {
+	PlayerNum int    `json:"playerNum"`
+	Direction string `json:"direction"`
 }
 
 // GameScoreResp is a reponse containing the game score.
 type GameScoreResp struct {
-	ScoreOne int `json:"score_one"`
-	ScoreTwo int `json:"score_two"`
+	ScoreOne int `json:"scoreOne"`
+	ScoreTwo int `json:"scoreTwo"`
+}
+
+// GamePlayersPatchBody is the incoming body on a patch request for updating the
+// player num to a specified player id.
+type GamePlayersPatchBody struct {
+	PlayerNum int `json:"playerNum"`
+	PlayerID  int `json:"playerID"`
+}
+
+// GamePlayersDeleteBody is the incoming body on a delete request for unsetting
+// the specified player num.
+type GamePlayersDeleteBody struct {
+	PlayerNum int `json:"playerNum"`
+}
+
+// GamePlayersFlagPatchBody is the incoming body on a patch request for updating
+// the player num to a specified flag id.
+type GamePlayersFlagPatchBody struct {
+	PlayerNum int `json:"playerNum"`
+	FlagID    int `json:"flagID"`
+}
+
+// GamePlayersNamePatchBody is the incoming body on a patch request for updating
+// the player name for the specified player num.
+type GamePlayersNamePatchBody struct {
+	PlayerNum int    `json:"playerNum"`
+	Name      string `json:"name"`
+}
+
+type GameTeamsPatchBody struct {
+	TeamNum int `json:"teamNum"`
+	TeamID  int `json:"teamID"`
 }
 
 // Handler for /game.
@@ -56,32 +113,38 @@ func (server *Server) handleGameGet(w http.ResponseWriter, r *http.Request) {
 	server.handleSuccess(w, r, server.state.Game)
 }
 
-// Handler for /game/update/type.
+// Handler for /game/type.
 func (server *Server) handleGameType() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
-		case "GET":
-			server.handleGameTypeGet(w, r)
+		case "OPTIONS":
+			server.HandleOptions(w, r)
+		case "PATCH":
+			server.handleGameTypePatch(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
 	})
 }
 
-// Game type handler for GET method.
-func (server *Server) handleGameTypeGet(w http.ResponseWriter, r *http.Request) {
-	// get query vars
-	v := r.URL.Query()
+// Game type handler for PATCH method.
+func (server *Server) handleGameTypePatch(w http.ResponseWriter, r *http.Request) {
+	// decode the body
+	var body GameTypePatchBody
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&body); err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
+		return
+	}
 
-	// get game type from query params
-	gameType, err := strconv.ParseUint(v.Get("type"), 10, 0)
-	if err != nil || !models.GameType(gameType).IsValid() {
+	// check that game type is valid
+	if !body.Type.IsValid() {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
 		return
 	}
 
 	// update game type
-	if err := server.state.Game.SetType(models.GameType(gameType)); err != nil {
+	if err := server.state.Game.SetType(body.Type); err != nil {
 		// TODO: LOG THIS ERROR
 		server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
 	}
@@ -100,37 +163,41 @@ func (server *Server) handleGameTypeGet(w http.ResponseWriter, r *http.Request) 
 	server.overlay.Broadcast <- message
 
 	// send response
-	server.handleSuccess(w, r, GameTypeResp{
-		Type: models.GameType(gameType),
-	})
+	server.handleSuccess(w, r, GameTypeResp(body))
 }
 
-// Handler for /game/update/vs-mode.
+// Handler for /game/vs-mode.
 func (server *Server) handleGameVsMode() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
-		case "GET":
-			server.handleGameVsModeGet(w, r)
+		case "OPTIONS":
+			server.HandleOptions(w, r)
+		case "PATCH":
+			server.handleGameVsModePatch(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
 	})
 }
 
-// Game vs-mode handler for GET method.
-func (server *Server) handleGameVsModeGet(w http.ResponseWriter, r *http.Request) {
-	// get query vars
-	v := r.URL.Query()
+// Game vs-mode handler for PATCH method.
+func (server *Server) handleGameVsModePatch(w http.ResponseWriter, r *http.Request) {
+	// decode the body
+	var body GameVsModePatchBody
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&body); err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
+		return
+	}
 
-	// get game mode from query params
-	gameMode, err := strconv.ParseUint(v.Get("mode"), 10, 0)
-	if err != nil || !models.GameVsMode(gameMode).IsValid() {
+	// check the vs mode is valid
+	if !body.VsMode.IsValid() {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameVsMode)
 		return
 	}
 
-	// update game mode
-	if err := server.state.Game.SetVsMode(models.GameVsMode(gameMode)); err != nil {
+	// update game vs mode
+	if err := server.state.Game.SetVsMode(body.VsMode); err != nil {
 		// TODO: LOG THIS ERROR
 		server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
 	}
@@ -149,44 +216,41 @@ func (server *Server) handleGameVsModeGet(w http.ResponseWriter, r *http.Request
 	server.overlay.Broadcast <- message
 
 	// send response
-	server.handleSuccess(w, r, GameVsModeResp{
-		VsMode: models.GameVsMode(gameMode),
-	})
+	server.handleSuccess(w, r, GameVsModeResp(body))
 }
 
-// Handler for /game/update/race-to.
+// Handler for /game/race-to.
 func (server *Server) handleGameRaceTo() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
-		case "GET":
-			server.handleGameRaceToGet(w, r)
+		case "OPTIONS":
+			server.HandleOptions(w, r)
+		case "PATCH":
+			server.handleGameRaceToPatch(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
 	})
 }
 
-// Game race-to handler for GET method.
-func (server *Server) handleGameRaceToGet(w http.ResponseWriter, r *http.Request) {
-	// get query vars
-	v := r.URL.Query()
-
-	// get game race to direction from query params
-	direction := v.Get("direction")
-
-	// valid directions
-	validDirections := make(map[string]struct{})
-	validDirections[gameDirectionIncrement] = struct{}{}
-	validDirections[gameDirectionDecrement] = struct{}{}
+// Game race-to handler for PATCH method.
+func (server *Server) handleGameRaceToPatch(w http.ResponseWriter, r *http.Request) {
+	// decode the body
+	var body GameRaceToPatchBody
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&body); err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
+		return
+	}
 
 	// validate direction
-	if _, ok := validDirections[direction]; !ok {
+	if body.Direction != gameDirectionIncrement && body.Direction != gameDirectionDecrement {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameDirection)
 		return
 	}
 
 	// update race to number
-	if direction == gameDirectionIncrement {
+	if body.Direction == gameDirectionIncrement {
 		if err := server.state.Game.IncrementRaceTo(); err != nil {
 			// TODO: LOG THIS ERROR
 			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
@@ -217,47 +281,41 @@ func (server *Server) handleGameRaceToGet(w http.ResponseWriter, r *http.Request
 	})
 }
 
-// Handler for /game/update/score
+// Handler for /game/score
 func (server *Server) handleGameScore() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
-		case "GET":
-			server.handleGameScoreGet(w, r)
+		case "OPTIONS":
+			server.HandleOptions(w, r)
+		case "PATCH":
+			server.handleGameScorePatch(w, r)
+		case "DELETE":
+			server.handleGameScoreDelete(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
 	})
 }
 
-// Game score handler for GET method.
-func (server *Server) handleGameScoreGet(w http.ResponseWriter, r *http.Request) {
-	// get query vars
-	v := r.URL.Query()
-
-	// get player num to from query params
-	playerNum, err := strconv.Atoi(v.Get("playerNum"))
-	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
+// Game score handler for PATCH method.
+func (server *Server) handleGameScorePatch(w http.ResponseWriter, r *http.Request) {
+	// decode the body
+	var body GameScorePatchBody
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&body); err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
 		return
 	}
 
-	// get game race to from query params
-	direction := v.Get("direction")
-
-	// valid directions
-	validDirections := make(map[string]struct{})
-	validDirections[gameDirectionIncrement] = struct{}{}
-	validDirections[gameDirectionDecrement] = struct{}{}
-
 	// validate direction
-	if _, ok := validDirections[direction]; !ok {
+	if body.Direction != gameDirectionIncrement && body.Direction != gameDirectionDecrement {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameDirection)
 		return
 	}
 
 	// update score
-	if direction == gameDirectionIncrement {
-		if err := server.state.Game.IncrementScore(playerNum); err != nil {
+	if body.Direction == gameDirectionIncrement {
+		if err := server.state.Game.IncrementScore(body.PlayerNum); err != nil {
 			if errors.Is(err, models.ErrInvalidPlayerNumber) {
 				server.handleError(w, r, http.StatusUnprocessableEntity, err)
 			} else {
@@ -267,7 +325,7 @@ func (server *Server) handleGameScoreGet(w http.ResponseWriter, r *http.Request)
 			return
 		}
 	} else {
-		if err := server.state.Game.DecrementScore(playerNum); err != nil {
+		if err := server.state.Game.DecrementScore(body.PlayerNum); err != nil {
 			if errors.Is(err, models.ErrInvalidPlayerNumber) {
 				server.handleError(w, r, http.StatusUnprocessableEntity, err)
 			} else {
@@ -298,20 +356,8 @@ func (server *Server) handleGameScoreGet(w http.ResponseWriter, r *http.Request)
 	})
 }
 
-// Handler for /game/update/score/reset
-func (server *Server) handleGameScoreReset() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case "GET":
-			server.handleGameScoreResetGet(w, r)
-		default:
-			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
-		}
-	})
-}
-
-// Game score reset handler for GET method.
-func (server *Server) handleGameScoreResetGet(w http.ResponseWriter, r *http.Request) {
+// Game score reset handler for DELETE method.
+func (server *Server) handleGameScoreDelete(w http.ResponseWriter, r *http.Request) {
 	// reset game score
 	if err := server.state.Game.ResetScore(); err != nil {
 		// TODO: LOG THIS ERROR
@@ -338,39 +384,34 @@ func (server *Server) handleGameScoreResetGet(w http.ResponseWriter, r *http.Req
 	})
 }
 
-// Handler for /game/update/players
+// Handler for /game/players
 func (server *Server) handleGamePlayers() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
-		case "GET":
-			server.handleGamePlayersGet(w, r)
+		case "OPTIONS":
+			server.HandleOptions(w, r)
+		case "PATCH":
+			server.handleGamePlayersPatch(w, r)
+		case "DELETE":
+			server.handleGamePlayersDelete(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
 	})
 }
 
-// Game players handler for GET method.
-func (server *Server) handleGamePlayersGet(w http.ResponseWriter, r *http.Request) {
-	// get query vars
-	v := r.URL.Query()
-
-	// get player num from query params
-	playerNum, err := strconv.Atoi(v.Get("playerNum"))
-	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
-		return
-	}
-
-	// get player id from query params
-	playerID, err := strconv.Atoi(v.Get("playerID"))
-	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerID)
+// Game players handler for PATCH method.
+func (server *Server) handleGamePlayersPatch(w http.ResponseWriter, r *http.Request) {
+	// decode the body
+	var body GamePlayersPatchBody
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&body); err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
 		return
 	}
 
 	var player models.Player
-	if err := player.LoadByID(server.db, playerID); err != nil {
+	if err := player.LoadByID(server.db, body.PlayerID); err != nil {
 		// TODO: MAYBE CHANGE THIS TO ERRORS.IS
 		if err == models.ErrPlayerIDInvalid {
 			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
@@ -382,7 +423,7 @@ func (server *Server) handleGamePlayersGet(w http.ResponseWriter, r *http.Reques
 		}
 	}
 
-	if err := server.state.Game.SetPlayer(playerNum, &player); err != nil {
+	if err := server.state.Game.SetPlayer(body.PlayerNum, &player); err != nil {
 		if errors.Is(err, models.ErrInvalidPlayerNumber) {
 			server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
 		} else {
@@ -409,39 +450,70 @@ func (server *Server) handleGamePlayersGet(w http.ResponseWriter, r *http.Reques
 	server.handleSuccess(w, r, server.state.Game)
 }
 
-// Handler for /game/update/players/flag
+// Game players handler for DELETE method.
+func (server *Server) handleGamePlayersDelete(w http.ResponseWriter, r *http.Request) {
+	// decode the body
+	var body GamePlayersDeleteBody
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&body); err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
+		return
+	}
+
+	// unset the current player
+	if err := server.state.Game.UnsetPlayer(body.PlayerNum); err != nil {
+		if errors.Is(err, models.ErrInvalidPlayerNumber) {
+			server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
+		} else {
+			// TODO: LOG THIS ERROR
+			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+		}
+		return
+	}
+
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.GameEventType,
+		events.NewGameEventPayload(server.state.Game),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
+
+	// send response
+	server.handleSuccess(w, r, server.state.Game)
+}
+
+// Handler for /game/players/flag
 func (server *Server) handleGamePlayersFlag() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
-		case "GET":
-			server.handleGamePlayersFlagGet(w, r)
+		case "OPTIONS":
+			server.HandleOptions(w, r)
+		case "PATCH":
+			server.handleGamePlayersFlagPatch(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
 	})
 }
 
-// Game players flag handler for GET method.
-func (server *Server) handleGamePlayersFlagGet(w http.ResponseWriter, r *http.Request) {
-	// get query vars
-	v := r.URL.Query()
-
-	// get player num from query params
-	playerNum, err := strconv.Atoi(v.Get("playerNum"))
-	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
-		return
-	}
-
-	// get flag id from query params
-	flagID, err := strconv.Atoi(v.Get("flagID"))
-	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerID)
+// Game players flag handler for PATCH method.
+func (server *Server) handleGamePlayersFlagPatch(w http.ResponseWriter, r *http.Request) {
+	// decode the body
+	var body GamePlayersFlagPatchBody
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&body); err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
 		return
 	}
 
 	var flag models.Flag
-	if err := flag.LoadByID(server.db, flagID); err != nil {
+	if err := flag.LoadByID(server.db, body.FlagID); err != nil {
 		if err == models.ErrFlagIDInvalid {
 			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
 			return
@@ -452,7 +524,7 @@ func (server *Server) handleGamePlayersFlagGet(w http.ResponseWriter, r *http.Re
 		}
 	}
 
-	if err := server.state.Game.SetPlayerFlag(playerNum, &flag); err != nil {
+	if err := server.state.Game.SetPlayerFlag(body.PlayerNum, &flag); err != nil {
 		if errors.Is(err, models.ErrInvalidPlayerNumber) {
 			server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
 		} else {
@@ -479,34 +551,31 @@ func (server *Server) handleGamePlayersFlagGet(w http.ResponseWriter, r *http.Re
 	server.handleSuccess(w, r, server.state.Game)
 }
 
-// Handler for /game/update/players/name
+// Handler for /game/players/name
 func (server *Server) handleGamePlayersName() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
-		case "GET":
-			server.handleGamePlayersNameGet(w, r)
+		case "OPTIONS":
+			server.HandleOptions(w, r)
+		case "PATCH":
+			server.handleGamePlayersNamePatch(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
 	})
 }
 
-// Game players name handler for GET method.
-func (server *Server) handleGamePlayersNameGet(w http.ResponseWriter, r *http.Request) {
-	// get query vars
-	v := r.URL.Query()
-
-	// get player num from query params
-	playerNum, err := strconv.Atoi(v.Get("playerNum"))
-	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
+// Game players name handler for PATCH method.
+func (server *Server) handleGamePlayersNamePatch(w http.ResponseWriter, r *http.Request) {
+	// decode the body
+	var body GamePlayersNamePatchBody
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&body); err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
 		return
 	}
 
-	// get action from query params
-	action := v.Get("action")
-
-	if err := server.state.Game.SetPlayerName(playerNum, action); err != nil {
+	if err := server.state.Game.SetPlayerName(body.PlayerNum, body.Name); err != nil {
 		server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
 		return
 	}
@@ -528,90 +597,32 @@ func (server *Server) handleGamePlayersNameGet(w http.ResponseWriter, r *http.Re
 	server.handleSuccess(w, r, server.state.Game)
 }
 
-// Handler for /game/update/players/unset
-func (server *Server) handleGamePlayersUnset() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case "GET":
-			server.handleGamePlayersUnsetGet(w, r)
-		default:
-			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
-		}
-	})
-}
-
-// Game players unset handler for GET method.
-func (server *Server) handleGamePlayersUnsetGet(w http.ResponseWriter, r *http.Request) {
-	// get query vars
-	v := r.URL.Query()
-
-	// get player num from query params
-	playerNum, err := strconv.Atoi(v.Get("playerNum"))
-	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
-		return
-	}
-
-	if err := server.state.Game.UnsetPlayer(playerNum); err != nil {
-		if errors.Is(err, models.ErrInvalidPlayerNumber) {
-			server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
-		} else {
-			// TODO: LOG THIS ERROR
-			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
-		}
-		return
-	}
-
-	// Generate message to broadcast to overlay.
-	message, err := overlay.NewEvent(
-		events.GameEventType,
-		events.NewGameEventPayload(server.state.Game),
-	).ToBytes()
-	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
-		return
-	}
-
-	// Broadcast update to overlay.
-	server.overlay.Broadcast <- message
-
-	// send response
-	server.handleSuccess(w, r, server.state.Game)
-}
-
-// Handler for /game/update/teams
+// Handler for /game/teams
 func (server *Server) handleGameTeams() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
-		case "GET":
-			server.handleGameTeamsGet(w, r)
+		case "OPTIONS":
+			server.HandleOptions(w, r)
+		case "PATCH":
+			server.handleGameTeamsPatch(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
 	})
 }
 
-// Game teams handler for GET method.
-func (server *Server) handleGameTeamsGet(w http.ResponseWriter, r *http.Request) {
-	// get query vars
-	v := r.URL.Query()
-
-	// get team num from query params
-	teamNum, err := strconv.Atoi(v.Get("teamNum"))
-	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
-		return
-	}
-
-	// get team id from query params
-	teamID, err := strconv.Atoi(v.Get("teamID"))
-	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerID)
+// Game teams handler for PATCH method.
+func (server *Server) handleGameTeamsPatch(w http.ResponseWriter, r *http.Request) {
+	// decode the body
+	var body GameTeamsPatchBody
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&body); err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
 		return
 	}
 
 	var team models.Team
-	if err := team.LoadByID(server.db, teamID); err != nil {
+	if err := team.LoadByID(server.db, body.TeamID); err != nil {
 		if err == models.ErrTeamIDInvalid {
 			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
 			return
@@ -622,7 +633,7 @@ func (server *Server) handleGameTeamsGet(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	if err := server.state.Game.SetTeam(teamNum, &team); err != nil {
+	if err := server.state.Game.SetTeam(body.TeamNum, &team); err != nil {
 		if errors.Is(err, models.ErrInvalidTeamNumber) {
 			server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidTeamNumber)
 		} else {

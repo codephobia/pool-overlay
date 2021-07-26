@@ -2,18 +2,18 @@ package apidocs
 
 import "github.com/codephobia/pool-overlay/libs/go/api"
 
-// swagger:route GET /game/update/type game GameUpdateType
+// swagger:route PATCH /game/type game GameType
 // Update the type of game on the game state.
 // responses:
 //   200: gameTypeResp
 //   422: errorResp
 //   500: errorResp
 
-// swagger:parameters GameUpdateType
-type GameUpdateTypeParam struct {
+// swagger:parameters GameType
+type GameTypeBody struct {
 	// The type of game.
 	//
-	// in: query
+	// in: body
 	// required: true
 	// min: 0
 	// max: 2
