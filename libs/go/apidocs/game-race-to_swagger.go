@@ -2,18 +2,18 @@ package apidocs
 
 import "github.com/codephobia/pool-overlay/libs/go/api"
 
-// swagger:route GET /game/update/race-to game GameUpdateRaceTo
+// swagger:route PATCH /game/race-to game GameRaceTo
 // Update the race to amount of the game on the game state.
 // responses:
 //   200: gameRaceToResp
 //   422: errorResp
 //   500: errorResp
 
-// swagger:parameters GameUpdateRaceTo
+// swagger:parameters GameRaceTo
 type GameUpdateRaceToParam struct {
 	// The direction to change the amount by.
 	//
-	// in: query
+	// in: body
 	// required: true
 	// example: increment
 	Direction string `json:"direction"`

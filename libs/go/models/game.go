@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"regexp"
 	"sync"
 	"time"
 
@@ -289,7 +288,7 @@ func (g *Game) SetPlayerFlag(playerNum int, flag *Flag) error {
 }
 
 // SetPlayerName sets the name to the specified player.
-func (g *Game) SetPlayerName(playerNum int, action string) error {
+func (g *Game) SetPlayerName(playerNum int, name string) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 
@@ -300,14 +299,14 @@ func (g *Game) SetPlayerName(playerNum int, action string) error {
 			g.PlayerOne = &Player{}
 		}
 
-		g.PlayerOne.Name = updatePlayerName(g.PlayerOne.Name, action)
+		g.PlayerOne.Name = name
 	case 2:
 		// Handle if player has currently been unset.
 		if g.PlayerTwo == nil {
 			g.PlayerTwo = &Player{}
 		}
 
-		g.PlayerTwo.Name = updatePlayerName(g.PlayerTwo.Name, action)
+		g.PlayerTwo.Name = name
 	default:
 		return ErrInvalidPlayerNumber
 	}
@@ -359,27 +358,4 @@ func (g *Game) Save(completed bool) error {
 	}
 
 	return g.db.Create(g).Error
-}
-
-// Updates a player name based on the action.
-func updatePlayerName(current string, action string) string {
-	var valid = regexp.MustCompile(`^[a-zA-Z \-']$`)
-
-	switch {
-	// Append valid characters.
-	case valid.MatchString(action):
-		return current + action
-
-	// Remove the last character.
-	case action == "backspace":
-		length := len(current)
-		if length > 0 {
-			return current[:length-1]
-		}
-		fallthrough
-
-	// Don't make any changes.
-	default:
-		return current
-	}
 }

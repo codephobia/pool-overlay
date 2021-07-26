@@ -1,6 +1,6 @@
 package apidocs
 
-// swagger:route GET /game/update/teams game GameUpdateTeams
+// swagger:route PATCH /game/teams game GameTeamsPatch
 // Sets a team number to a team ID.
 // responses:
 //   200: gameResp
@@ -8,11 +8,11 @@ package apidocs
 //   422: errorResp
 //   500: errorResp
 
-// swagger:parameters GameUpdateTeams
-type GameUpdateTeamsParam struct {
+// swagger:parameters GameTeamsPatch
+type GameTeamsPatchParam struct {
 	// The team number to set a team on.
 	//
-	// in: query
+	// in: body
 	// required: true
 	// min: 1
 	// max: 2
@@ -21,7 +21,7 @@ type GameUpdateTeamsParam struct {
 
 	// The ID of the team to set on the teamNum.
 	//
-	// in: query
+	// in: body
 	// required: true
 	// min: 1
 	// example: 1

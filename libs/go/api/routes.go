@@ -44,37 +44,31 @@ func (server *Server) InitRoutes() {
 	// game
 	server.AddRouteToAllVersions("/game", server.handleGame())
 
-	// game/update/type
-	server.AddRouteToAllVersions("/game/update/type", server.handleGameType())
+	// game/type
+	server.AddRouteToAllVersions("/game/type", server.handleGameType())
 
-	// game/update/vs-mode
-	server.AddRouteToAllVersions("/game/update/vs-mode", server.handleGameVsMode())
+	// game/vs-mode
+	server.AddRouteToAllVersions("/game/vs-mode", server.handleGameVsMode())
 
-	// game/update/race-to
-	server.AddRouteToAllVersions("/game/update/race-to", server.handleGameRaceTo())
+	// game/race-to
+	server.AddRouteToAllVersions("/game/race-to", server.handleGameRaceTo())
 
-	// game/update/score
-	server.AddRouteToAllVersions("/game/update/score", server.handleGameScore())
+	// game/score
+	server.AddRouteToAllVersions("/game/score", server.handleGameScore())
 
-	// game/update/score/reset
-	server.AddRouteToAllVersions("/game/update/score/reset", server.handleGameScoreReset())
+	// game/players
+	server.AddRouteToAllVersions("/game/players", server.handleGamePlayers())
 
-	// game/update/players
-	server.AddRouteToAllVersions("/game/update/players", server.handleGamePlayers())
+	// game/players/flag
+	server.AddRouteToAllVersions("/game/players/flag", server.handleGamePlayersFlag())
 
-	// game/update/players/flag
-	server.AddRouteToAllVersions("/game/update/players/flag", server.handleGamePlayersFlag())
-
-	// game/update/players/name
-	server.AddRouteToAllVersions("/game/update/players/name", server.handleGamePlayersName())
+	// game/players/name
+	server.AddRouteToAllVersions("/game/players/name", server.handleGamePlayersName())
 
 	// TODO: IMPLEMENT THIS
-	// game/update/players/save
-	// server.AddRouteToAllVersions("/game/update/players/save", server.handleGamePlayers())
+	// game/players/save
+	// server.AddRouteToAllVersions("/game/players/save", server.handleGamePlayers())
 
-	// game/update/players/unset
-	server.AddRouteToAllVersions("/game/update/players/unset", server.handleGamePlayersUnset())
-
-	// game/update/teams
-	server.AddRouteToAllVersions("/game/update/teams", server.handleGameTeams())
+	// game/teams
+	server.AddRouteToAllVersions("/game/teams", server.handleGameTeams())
 }

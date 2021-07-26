@@ -1,6 +1,6 @@
 package apidocs
 
-// swagger:route GET /game/update/players/flag game GameUpdatePlayersFlag
+// swagger:route PATCH /game/players/flag game GamePlayersFlag
 // Sets the flag for the specified player number.
 // responses:
 //   200: gameResp
@@ -8,11 +8,11 @@ package apidocs
 //   422: errorResp
 //   500: errorResp
 
-// swagger:parameters GameUpdatePlayersFlag
-type GameUpdatePlayersFlagParam struct {
+// swagger:parameters GamePlayersFlag
+type GamePlayersFlagParam struct {
 	// The player number to set a player on.
 	//
-	// in: query
+	// in: body
 	// required: true
 	// min: 1
 	// max: 2
@@ -21,7 +21,7 @@ type GameUpdatePlayersFlagParam struct {
 
 	// The ID of the flag to set on the playerNum.
 	//
-	// in: query
+	// in: body
 	// required: true
 	// min: 1
 	// example: 1

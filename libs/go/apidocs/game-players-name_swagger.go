@@ -1,27 +1,27 @@
 package apidocs
 
-// swagger:route GET /game/update/players/name game GameUpdatePlayersName
+// swagger:route PATCH /game/players/name game GamePlayersName
 // Sets the name for the specified player number.
 // responses:
 //   200: gameResp
 //   422: errorResp
 //   500: errorResp
 
-// swagger:parameters GameUpdatePlayersName
-type GameUpdatePlayersNameParam struct {
+// swagger:parameters GamePlayersName
+type GamePlayersNameParam struct {
 	// The player number to set a player on.
 	//
-	// in: query
+	// in: body
 	// required: true
 	// min: 1
 	// max: 2
 	// example: 1
 	PlayerNum int `json:"playerNum"`
 
-	// The action to apply to the character name.
+	// The new player name.
 	//
-	// in: query
+	// in: body
 	// required: true
-	// example: backspace
-	Action string `json:"action"`
+	// example: John
+	Name string `json:"name"`
 }
