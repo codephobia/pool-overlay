@@ -1,193 +1,184 @@
 {
-    "version": 1,
-    "projects": {
-        "overlay": {
-            "projectType": "application",
-            "schematics": {
-                "@schematics/angular:component": {
-                    "style": "scss"
-                }
-            },
-            "root": "apps/overlay",
-            "sourceRoot": "apps/overlay/src",
-            "prefix": "pool-overlay",
-            "architect": {
-                "build": {
-                    "builder": "@angular-devkit/build-angular:browser",
-                    "options": {
-                        "outputPath": "dist/apps/overlay",
-                        "index": "apps/overlay/src/index.html",
-                        "main": "apps/overlay/src/main.ts",
-                        "polyfills": "apps/overlay/src/polyfills.ts",
-                        "tsConfig": "apps/overlay/tsconfig.app.json",
-                        "aot": true,
-                        "assets": [
-                            "apps/overlay/src/favicon.ico",
-                            "apps/overlay/src/assets"
-                        ],
-                        "styles": [
-                            "apps/overlay/src/styles.scss"
-                        ],
-                        "scripts": []
-                    },
-                    "configurations": {
-                        "production": {
-                            "fileReplacements": [
-                                {
-                                    "replace": "apps/overlay/src/environments/environment.ts",
-                                    "with": "apps/overlay/src/environments/environment.prod.ts"
-                                }
-                            ],
-                            "optimization": true,
-                            "outputHashing": "all",
-                            "sourceMap": false,
-                            "namedChunks": false,
-                            "extractLicenses": true,
-                            "vendorChunk": false,
-                            "buildOptimizer": true,
-                            "budgets": [
-                                {
-                                    "type": "initial",
-                                    "maximumWarning": "2mb",
-                                    "maximumError": "5mb"
-                                },
-                                {
-                                    "type": "anyComponentStyle",
-                                    "maximumWarning": "6kb",
-                                    "maximumError": "10kb"
-                                }
-                            ]
-                        }
-                    },
-                    "outputs": [
-                        "{options.outputPath}"
-                    ]
-                },
-                "serve": {
-                    "builder": "@angular-devkit/build-angular:dev-server",
-                    "options": {
-                        "browserTarget": "overlay:build"
-                    },
-                    "configurations": {
-                        "production": {
-                            "browserTarget": "overlay:build:production"
-                        }
-                    }
-                },
-                "extract-i18n": {
-                    "builder": "@angular-devkit/build-angular:extract-i18n",
-                    "options": {
-                        "browserTarget": "overlay:build"
-                    }
-                },
-                "lint": {
-                    "builder": "@angular-devkit/build-angular:tslint",
-                    "options": {
-                        "tsConfig": [
-                            "apps/overlay/tsconfig.app.json",
-                            "apps/overlay/tsconfig.spec.json",
-                            "apps/overlay/tsconfig.editor.json"
-                        ],
-                        "exclude": [
-                            "**/node_modules/**",
-                            "!apps/overlay/**/*"
-                        ]
-                    }
-                },
-                "test": {
-                    "builder": "@nrwl/jest:jest",
-                    "options": {
-                        "jestConfig": "apps/overlay/jest.config.js",
-                        "passWithNoTests": true
-                    },
-                    "outputs": [
-                        "coverage/apps/overlay"
-                    ]
-                }
-            }
+  "version": 1,
+  "projects": {
+    "api": {
+      "projectType": "application",
+      "root": "apps/api",
+      "sourceRoot": "apps/api",
+      "architect": {
+        "build": {
+          "builder": "@nx-go/nx-go:build",
+          "options": {
+            "outputPath": "dist/apps/api/api",
+            "main": "./apps/api"
+          }
         },
-        "api": {
-            "projectType": "application",
-            "root": "apps/api",
-            "sourceRoot": "apps/api",
-            "architect": {
-                "build": {
-                    "builder": "@nx-go/nx-go:build",
-                    "options": {
-                        "outputPath": "dist/apps/api/api",
-                        "main": "./apps/api"
-                    }
-                },
-                "serve": {
-                    "builder": "@nx-go/nx-go:serve",
-                    "options": {
-                        "cwd": "apps/api",
-                        "main": "."
-                    }
-                },
-                "test": {
-                    "builder": "@nx-go/nx-go:test",
-                    "options": {
-                        "main": "./apps/api"
-                    }
-                },
-                "lint": {
-                    "builder": "@nx-go/nx-go:lint"
-                }
-            }
+        "serve": {
+          "builder": "@nx-go/nx-go:serve",
+          "options": {
+            "cwd": "apps/api",
+            "main": "."
+          }
         },
-        "go": {
-            "projectType": "library",
-            "root": "libs/go",
-            "sourceRoot": "libs/go",
-            "architect": {
-                "test": {
-                    "builder": "@nx-go/nx-go:test"
-                },
-                "lint": {
-                    "builder": "@nx-go/nx-go:lint"
-                }
-            }
+        "test": {
+          "builder": "@nx-go/nx-go:test",
+          "options": {
+            "main": "./apps/api"
+          }
         },
-        "seed": {
-            "projectType": "application",
-            "root": "apps/seed",
-            "sourceRoot": "apps/seed",
-            "architect": {
-                "build": {
-                    "builder": "@nx-go/nx-go:build",
-                    "options": {
-                        "outputPath": "dist/apps/seed/seed",
-                        "main": "./apps/seed"
-                    }
-                },
-                "serve": {
-                    "builder": "@nx-go/nx-go:serve",
-                    "options": {
-                        "cwd": "./apps/seed",
-                        "main": "."
-                    }
-                },
-                "test": {
-                    "builder": "@nx-go/nx-go:test"
-                },
-                "lint": {
-                    "builder": "@nx-go/nx-go:lint"
-                }
-            }
+        "lint": {
+          "builder": "@nx-go/nx-go:lint"
         }
+      }
     },
-    "cli": {
-        "defaultCollection": "@nrwl/angular"
-    },
-    "schematics": {
-        "@nrwl/angular:application": {
-            "unitTestRunner": "jest",
-            "e2eTestRunner": "cypress"
+    "go": {
+      "projectType": "library",
+      "root": "libs/go",
+      "sourceRoot": "libs/go",
+      "architect": {
+        "test": {
+          "builder": "@nx-go/nx-go:test"
         },
-        "@nrwl/angular:library": {
-            "unitTestRunner": "jest"
+        "lint": {
+          "builder": "@nx-go/nx-go:lint"
         }
+      }
     },
-    "defaultProject": "overlay"
+    "overlay": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "apps/overlay",
+      "sourceRoot": "apps/overlay/src",
+      "prefix": "pool-overlay",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/apps/overlay",
+            "index": "apps/overlay/src/index.html",
+            "main": "apps/overlay/src/main.ts",
+            "polyfills": "apps/overlay/src/polyfills.ts",
+            "tsConfig": "apps/overlay/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "apps/overlay/src/favicon.ico",
+              "apps/overlay/src/assets"
+            ],
+            "styles": ["apps/overlay/src/styles.scss"],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/overlay/src/environments/environment.ts",
+                  "with": "apps/overlay/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          },
+          "outputs": ["{options.outputPath}"]
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "overlay:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "overlay:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "overlay:build"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "apps/overlay/tsconfig.app.json",
+              "apps/overlay/tsconfig.spec.json",
+              "apps/overlay/tsconfig.editor.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/overlay/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/overlay/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/apps/overlay"]
+        }
+      }
+    },
+    "seed": {
+      "projectType": "application",
+      "root": "apps/seed",
+      "sourceRoot": "apps/seed",
+      "architect": {
+        "build": {
+          "builder": "@nx-go/nx-go:build",
+          "options": {
+            "outputPath": "dist/apps/seed/seed",
+            "main": "./apps/seed"
+          }
+        },
+        "serve": {
+          "builder": "@nx-go/nx-go:serve",
+          "options": {
+            "cwd": "./apps/seed",
+            "main": "."
+          }
+        },
+        "test": {
+          "builder": "@nx-go/nx-go:test"
+        },
+        "lint": {
+          "builder": "@nx-go/nx-go:lint"
+        }
+      }
+    }
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/angular"
+  },
+  "schematics": {
+    "@nrwl/angular:application": {
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
+    },
+    "@nrwl/angular:library": {
+      "unitTestRunner": "jest"
+    }
+  },
+  "defaultProject": "overlay"
 }
