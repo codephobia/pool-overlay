@@ -4,4 +4,15 @@ import { Component } from '@angular/core';
     selector: 'pool-overlay-side-nav',
     templateUrl: './side-nav.component.html',
 })
-export class SideNavComponent { }
+export class SideNavComponent {
+    public buttons = [{
+        title: 'Players',
+        link: '#',
+    }, {
+        title: 'Teams',
+        link: '#',
+    }, {
+        title: 'Games',
+        link: '#',
+    }];
+}
