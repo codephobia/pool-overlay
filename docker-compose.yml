@@ -70,6 +70,22 @@ services:
         depends_on:
             - api
 
+    dashboard:
+        container_name: pool-dashboard
+        build:
+            context: .
+            dockerfile: ./apps/dashboard/Dockerfile
+        image: pool-dashboard:0.1.0
+        ports:
+            - 4201:4200
+        command: npx nx serve dashboard -- --host 0.0.0.0 --disableHostCheck --poll 1
+        volumes:
+            - ./apps/dashboard:/workspace/apps/dashboard
+            - ./libs:/workspace/libs
+        networks:
+            - poolnet
+        depends_on:
+            - api
 volumes:
     postgres:
     pgadmin:
