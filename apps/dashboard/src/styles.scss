@@ -1,3 +1,36 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+
+.shimmer-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow-x: hidden;
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: -100%;
+        bottom: 0;
+        left: -100%;
+        background-image: linear-gradient(
+            to right,
+            rgba(white, 0) 33.3%,
+            rgba(white, 0.1),
+            rgba(white, 0) 66.6%
+        );
+        animation: shimmer 1s infinite linear;
+    }
+}
+
+@keyframes shimmer {
+    from {
+        transform: translateX(-33.3%);
+    }
+    to {
+        transform: translateX(33.3%);
+    }
+}

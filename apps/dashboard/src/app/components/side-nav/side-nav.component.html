@@ -1,7 +1,7 @@
 <div class="w-52 h-screen bg-blue-900 drop-shadow">
     <ul class="p-2.5 flex flex-col gap-2.5">
         <li class="h-10 flex flex-row" *ngFor="let button of buttons">
-            <a class="pl-2.5 pr-2.5 bg-white bg-opacity-50 rounded flex-grow leading-10 text-gray-900 hover:bg-blue-600 hover:text-white" [href]="button.link">{{ button.title }}</a>
+            <a class="pl-2.5 pr-2.5 bg-white bg-opacity-50 rounded flex-grow leading-10 text-gray-900 hover:bg-blue-600 hover:text-white" [routerLink]="button.link">{{ button.title }}</a>
         </li>
     </ul>
 </div>

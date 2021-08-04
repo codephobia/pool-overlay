@@ -1,9 +1,11 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
 
+import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './components/app/app.component';
 import { SideNavComponent } from './components/side-nav/side-nav.component';
+import { ENV_CONFIG } from './models/environment-config.model';
+import { environment } from '../environments/environment';
 
 const COMPONENTS = [
     AppComponent,
@@ -16,9 +18,12 @@ const COMPONENTS = [
     ],
     imports: [
         BrowserModule,
-        RouterModule.forRoot([], { initialNavigation: 'enabledBlocking' }),
+        AppRoutingModule,
     ],
-    providers: [],
+    providers: [{
+        provide: ENV_CONFIG,
+        useValue: { environment },
+    }],
     bootstrap: [AppComponent],
 })
 export class AppModule { }

@@ -1,0 +1,23 @@
+<div class="flex flex-col flex-grow">
+    <ng-container *ngIf="loaded else loading">
+        <div class="flex flex-row h-20 px-5 gap-5" *ngFor="let player of players; even as isEven; odd as isOdd" [ngClass]="{ 'bg-gray-600': isEven, 'bg-gray-700': isOdd }">
+            <div class="w-14 flex flex-col justify-center items-center">
+                <img *ngIf="player?.flag" class="w-14 h-auto" src="./assets/flags/{{ player?.flag?.image_path }}" [alt]="player?.flag?.country">
+            </div>
+            <div class="flex flex-col flex-grow justify-center">
+                <p class="text-white">{{ player?.name }}</p>
+            </div>
+            <div class="flex flex-col justify-center">
+                <div class="flex flex-row gap-2.5">
+                    <a class="text-gray-50 bg-blue-700 rounded py-2.5 px-5" routerLink="./edit/{{ player?.id }}">Edit</a>
+                    <button type="button" class="text-white bg-red-700 rounded py-2.5 px-5">Delete</button>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <ng-template #loading>
+        <div class="relative flex flex-row h-20 px-5 gap-5" *ngFor="let player of [1,2,3,4,5]; even as isEven; odd as isOdd" [ngClass]="{ 'bg-gray-600': isEven, 'bg-gray-700': isOdd }">
+            <div class="shimmer-overlay"></div>
+        </div>
+    </ng-template>
+</div>

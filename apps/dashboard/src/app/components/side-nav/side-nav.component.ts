@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
 export class SideNavComponent {
     public buttons = [{
         title: 'Players',
-        link: '#',
+        link: 'players',
     }, {
         title: 'Teams',
         link: '#',

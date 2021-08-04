@@ -1,0 +1,14 @@
+<div class="py-2.5 px-5 flex flex-col">
+    <div class="pb-5 flex flex-row justify-between">
+        <h1 class="text-gray-50 uppercase text-4xl">Players</h1>
+        <a class="text-gray-50 bg-blue-700 rounded py-2.5 px-5" routerLink="./create">Create Player</a>
+    </div>
+    <div *ngIf="vm$ | async as vm">
+        <!-- pagination -->
+        <pool-overlay-players-list
+            [loaded]="vm.loaded"
+            [players]="vm.players"
+        ></pool-overlay-players-list>
+        <!-- pagination -->
+    </div>
+</div>
