@@ -1,3 +1,14 @@
 {
-  "singleQuote": true
+    "singleQuote": true,
+    "overrides": [
+        {
+            "files": [
+                "apps/**/*.html",
+                "libs/**/*.html"
+            ],
+            "options": {
+                "printWidth": 200
+            }
+        }
+    ]
 }

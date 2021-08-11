@@ -66,7 +66,7 @@ func (server *Server) handlePlayersGet(w http.ResponseWriter, r *http.Request) {
 
 	offset := pageNum*playersPerPage - playersPerPage
 	playersResult := server.db.
-		Select("id", "name").
+		Select("id", "name", "flag_id").
 		Order("name").
 		Limit(playersPerPage).
 		Offset(offset).
