@@ -13,6 +13,6 @@ export class PlayersListPageComponent implements OnInit {
     ) { }
 
     public ngOnInit(): void {
-        this.playersListStore.getPlayers();
+        this.playersListStore.getPlayers(1);
     }
 }

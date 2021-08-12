@@ -32,4 +32,14 @@ export class PlayersService {
         const url = `${this.apiURL}/${this.endpoint}/count`;
         return this.http.get<ICount>(url);
     }
+
+    public create(player: Omit<IPlayer, 'id'>) {
+        const url = `${this.apiURL}/${this.endpoint}`;
+        return this.http.post<IPlayer>(url, player);
+    }
+
+    public update(player: IPlayer) {
+        const url = `${this.apiURL}/${this.endpoint}`;
+        return this.http.patch<IPlayer>(url, player);
+    }
 }

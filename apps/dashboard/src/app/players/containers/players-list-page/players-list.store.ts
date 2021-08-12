@@ -53,11 +53,10 @@ export class PlayersListStore extends ComponentStore<PlayersListState> {
         })
     );
 
-    // TODO: ADD PAGE NUMBER TO GETPLAYERS
     // TODO: ADD PLAYER COUNT TO STATE AND GETPLAYERS CALL
 
-    public readonly getPlayers = this.effect(trigger$ => trigger$.pipe(
-        switchMap(() => this.playersService.find(1).pipe(
+    public readonly getPlayers = this.effect<number>(page$ => page$.pipe(
+        switchMap(page => this.playersService.find(page).pipe(
             tapResponse(
                 players => {
                     this.setPlayers(players)
