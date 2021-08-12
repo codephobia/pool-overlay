@@ -22,7 +22,7 @@ const routes: Routes = [
                 component: PlayerCreatePageComponent,
             },
             {
-                path: 'edit/:id',
+                path: 'edit/:playerId',
                 component: PlayerEditPageComponent,
             },
         ],

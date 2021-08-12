@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
 
 import { IFlag, IPlayer } from '@pool-overlay/models';
+import { forkJoin } from 'rxjs';
 import { exhaustMap, switchMap, tap } from 'rxjs/operators';
 import { FlagsService } from './flags.service';
 import { PlayersService } from './players.service';
@@ -18,7 +19,7 @@ export enum PlayerFormStatus {
 export interface PlayerFormState {
     status: PlayerFormStatus;
     error: string | null;
-    player: IPlayer | Omit<IPlayer, 'id'> | null;
+    player: IPlayer | null;
     flags: IFlag[];
 }
 
@@ -46,7 +47,7 @@ export class PlayerFormStore extends ComponentStore<PlayerFormState> {
         error,
     }));
 
-    public readonly setPlayer = this.updater<IPlayer | Omit<IPlayer, 'id'> | null>((state, player) => ({
+    public readonly setPlayer = this.updater<IPlayer | null>((state, player) => ({
         ...state,
         player,
     }));
@@ -73,24 +74,38 @@ export class PlayerFormStore extends ComponentStore<PlayerFormState> {
         })
     );
 
-    public readonly getPlayerById = this.effect<number>(id$ => id$.pipe(
-        switchMap(id => this.playersService.findByID(id).pipe(
-            tapResponse(
-                player => {
-                    this.setPlayer(player);
-                },
-                error => console.error(error)
-            )
-        ))
-    ));
-
     public readonly getFlags = this.effect(trigger$ => trigger$.pipe(
         switchMap(() => this.flagsService.find().pipe(
             tapResponse(
                 flags => {
                     this.setFlags(flags);
+                    this.setStatus(PlayerFormStatus.LOADED);
                 },
-                error => console.error(error)
+                (error: HttpErrorResponse) => {
+                    this.setStatus(PlayerFormStatus.ERROR);
+                    this.setError(error.message);
+                    console.error(error);
+                }
+            )
+        ))
+    ));
+
+    public readonly getPlayerAndFlags = this.effect<number>(playerId$ => playerId$.pipe(
+        switchMap(playerId => forkJoin({
+            player: this.playersService.findByID(playerId),
+            flags: this.flagsService.find(),
+        }).pipe(
+            tapResponse(
+                ({ player, flags }) => {
+                    this.setPlayer(player);
+                    this.setFlags(flags);
+                    this.setStatus(PlayerFormStatus.LOADED);
+                },
+                (error: HttpErrorResponse) => {
+                    this.setStatus(PlayerFormStatus.ERROR);
+                    this.setError(error.message);
+                    console.error(error);
+                }
             )
         ))
     ));
@@ -105,9 +120,9 @@ export class PlayerFormStore extends ComponentStore<PlayerFormState> {
                 () => {
                     this.setStatus(PlayerFormStatus.SUCCESS);
                 },
-                error => {
-                    this.setStatus(PlayerFormStatus.LOADED);
-                    // this.setError(error);
+                (error: HttpErrorResponse) => {
+                    this.setStatus(PlayerFormStatus.ERROR);
+                    this.setError(error.message);
                     console.error(error)
                 }
             )
@@ -115,12 +130,20 @@ export class PlayerFormStore extends ComponentStore<PlayerFormState> {
     ));
 
     public readonly updatePlayer = this.effect<IPlayer>(player$ => player$.pipe(
+        tap(() => {
+            this.setStatus(PlayerFormStatus.LOADED);
+            this.setError(null);
+        }),
         exhaustMap(player => this.playersService.update(player).pipe(
             tapResponse(
                 () => {
                     this.setStatus(PlayerFormStatus.SUCCESS);
                 },
-                error => console.error(error)
+                (error: HttpErrorResponse) => {
+                    this.setStatus(PlayerFormStatus.ERROR);
+                    this.setError(error.message);
+                    console.error(error)
+                }
             )
         ))
     ));

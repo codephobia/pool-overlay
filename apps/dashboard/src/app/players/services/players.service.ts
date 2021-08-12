@@ -40,6 +40,6 @@ export class PlayersService {
 
     public update(player: IPlayer) {
         const url = `${this.apiURL}/${this.endpoint}`;
-        return this.http.patch<IPlayer>(url, player);
+        return this.http.put<IPlayer>(url, player);
     }
 }

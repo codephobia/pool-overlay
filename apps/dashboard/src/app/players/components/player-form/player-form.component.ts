@@ -24,18 +24,7 @@ export class PlayerFormComponent {
     }
 
     @Input()
-    public flags: IFlag[] = [
-        {
-            id: 1,
-            country: 'USA',
-            image_path: 'us.png',
-        },
-        {
-            id: 2,
-            country: 'Canada',
-            image_path: 'ca.png',
-        },
-    ];
+    public flags: IFlag[] = [];
 
     @Output()
     public onSubmit = new EventEmitter<{ player: IPlayer | Omit<IPlayer, 'id'> }>();

@@ -24,6 +24,13 @@ type Player struct {
 	DeletedAt *gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
 }
 
+func NewPlayer(name string, flagID uint) *Player {
+	return &Player{
+		Name:   name,
+		FlagID: flagID,
+	}
+}
+
 // LoadByID loads a player by ID.
 func (p *Player) LoadByID(database *gorm.DB, id int) error {
 	result := database.
@@ -43,4 +50,19 @@ func (p *Player) LoadByID(database *gorm.DB, id int) error {
 	}
 
 	return nil
+}
+
+func (p *Player) Create(database *gorm.DB) error {
+	return database.Create(p).Error
+}
+
+func (p *Player) Update(database *gorm.DB) error {
+	if p.ID == 0 {
+		return ErrPlayerIDInvalid
+	}
+
+	return database.Model(p).Updates(map[string]interface{}{
+		"name":    p.Name,
+		"flag_id": p.FlagID,
+	}).Error
 }
