@@ -56,6 +56,18 @@ func (server *Server) handleSuccess(w http.ResponseWriter, r *http.Request, data
 	(*r).Body.Close()
 }
 
+// handle204Success handles a success response with a 204 header.
+func (server *Server) handle204Success(w http.ResponseWriter, r *http.Request) {
+	server.SetupResponse(w, r)
+
+	// add headers to response
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNoContent)
+
+	// close request
+	(*r).Body.Close()
+}
+
 // HandleError handles an error response
 func (server *Server) handleError(w http.ResponseWriter, r *http.Request, status int, err error) {
 	server.SetupResponse(w, r)

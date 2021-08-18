@@ -10,6 +10,8 @@ import (
 func (server *Server) handleFlags() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
+		case "OPTIONS":
+			server.HandleOptions(w, r)
 		case "GET":
 			server.handleFlagsGet(w, r)
 		default:

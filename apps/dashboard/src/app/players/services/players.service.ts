@@ -38,8 +38,13 @@ export class PlayersService {
         return this.http.post<IPlayer>(url, player);
     }
 
-    public update(player: IPlayer) {
-        const url = `${this.apiURL}/${this.endpoint}`;
-        return this.http.put<IPlayer>(url, player);
+    public update({ id, ...player }: IPlayer) {
+        const url = `${this.apiURL}/${this.endpoint}/${id}`;
+        return this.http.patch<IPlayer>(url, player);
+    }
+
+    public delete(playerId: number) {
+        const url = `${this.apiURL}/${this.endpoint}/${playerId}`;
+        return this.http.delete<void>(url);
     }
 }

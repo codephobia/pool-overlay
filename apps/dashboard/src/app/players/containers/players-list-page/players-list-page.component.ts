@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+
 import { PlayersListStore } from './players-list.store';
 
 @Component({
@@ -14,5 +15,9 @@ export class PlayersListPageComponent implements OnInit {
 
     public ngOnInit(): void {
         this.playersListStore.getPlayers(1);
+    }
+
+    public deletePlayerById({ playerId }: { playerId: number }): void {
+        this.playersListStore.deletePlayerById(playerId);
     }
 }

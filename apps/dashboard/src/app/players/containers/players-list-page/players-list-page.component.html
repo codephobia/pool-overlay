@@ -5,10 +5,7 @@
     </div>
     <div *ngIf="vm$ | async as vm">
         <!-- pagination -->
-        <pool-overlay-players-list
-            [loaded]="vm.loaded"
-            [players]="vm.players"
-        ></pool-overlay-players-list>
+        <pool-overlay-players-list [loaded]="vm.loaded" [players]="vm.players" (deletePlayer)="deletePlayerById($event)"></pool-overlay-players-list>
         <!-- pagination -->
     </div>
 </div>

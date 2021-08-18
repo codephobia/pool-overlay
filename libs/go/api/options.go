@@ -11,6 +11,7 @@ func (server *Server) SetupResponse(w http.ResponseWriter, r *http.Request) {
 
 // HandleOptions returns a 200 status code for preflight checks.
 func (server *Server) HandleOptions(w http.ResponseWriter, r *http.Request) {
+	server.SetupResponse(w, r)
 	w.WriteHeader(http.StatusOK)
 	(*r).Body.Close()
 }

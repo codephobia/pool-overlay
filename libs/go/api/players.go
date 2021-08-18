@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"math"
 	"net/http"
 	"strconv"
@@ -14,19 +15,36 @@ const (
 	playersPerPage = 10
 )
 
+// PlayersPostBody is an incoming body on a POST request for creating a player.
+type PlayersPostBody struct {
+	Name   string `json:"name"`
+	FlagID uint   `json:"flag_id"`
+}
+
+// PlayersPatchBody is an incoming body on a PATCH request for updating a
+// player.
+type PlayersPatchBody struct {
+	Name   string `json:"name"`
+	FlagID uint   `json:"flag_id"`
+}
+
 // Handler for /players.
 func (server *Server) handlePlayers() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
+		case "OPTIONS":
+			server.HandleOptions(w, r)
 		case "GET":
 			server.handlePlayersGet(w, r)
+		case "POST":
+			server.handlePlayersPost(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
 	})
 }
 
-// Players handler for GET method.
+// Players handler for GET method. Returns a page of players.
 func (server *Server) handlePlayersGet(w http.ResponseWriter, r *http.Request) {
 	// get query vars
 	v := r.URL.Query()
@@ -83,10 +101,38 @@ func (server *Server) handlePlayersGet(w http.ResponseWriter, r *http.Request) {
 	server.handleSuccess(w, r, players)
 }
 
+// Players handler for POST method. Creates a new player.
+func (server *Server) handlePlayersPost(w http.ResponseWriter, r *http.Request) {
+	// decode the body
+	var body PlayersPostBody
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&body); err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
+		return
+	}
+
+	// create a new player from the body
+	player := &models.Player{
+		Name:   body.Name,
+		FlagID: body.FlagID,
+	}
+
+	// add new player to the database
+	if err := player.Create(server.db); err != nil {
+		server.handleError(w, r, http.StatusInternalServerError, err)
+		return
+	}
+
+	// return results
+	server.handleSuccess(w, r, player)
+}
+
 // Handler for /players/count.
 func (server *Server) handlePlayersCount() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
+		case "OPTIONS":
+			server.HandleOptions(w, r)
 		case "GET":
 			server.handlePlayersCountGet(w, r)
 		default:
@@ -115,8 +161,14 @@ func (server *Server) handlePlayersCountGet(w http.ResponseWriter, r *http.Reque
 func (server *Server) handlePlayerByID() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
+		case "OPTIONS":
+			server.HandleOptions(w, r)
 		case "GET":
 			server.handlePlayerByIDGet(w, r)
+		case "PATCH":
+			server.handlePlayerByIDPatch(w, r)
+		case "DELETE":
+			server.handlePlayerByIDDelete(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
@@ -155,4 +207,78 @@ func (server *Server) handlePlayerByIDGet(w http.ResponseWriter, r *http.Request
 
 	// return results
 	server.handleSuccess(w, r, player)
+}
+
+// PlayerByID handler for PATCH method. Updates an existing player.
+func (server *Server) handlePlayerByIDPatch(w http.ResponseWriter, r *http.Request) {
+	// get param for player id from url
+	params := mux.Vars(r)
+	playerID, ok := params["playerID"]
+	if !ok || len(playerID) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidPlayerID)
+		return
+	}
+
+	// convert player id to int
+	id, err := strconv.ParseUint(playerID, 10, 32)
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidPlayerID)
+		return
+	}
+
+	// decode the body
+	var body PlayersPatchBody
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&body); err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
+		return
+	}
+
+	// create a new player from the body
+	player := &models.Player{
+		ID:     uint(id),
+		Name:   body.Name,
+		FlagID: body.FlagID,
+	}
+
+	// update player in the database
+	if err := player.Update(server.db); err != nil {
+		server.handleError(w, r, http.StatusInternalServerError, err)
+		return
+	}
+
+	// return results
+	server.handleSuccess(w, r, player)
+}
+
+// PlayerByID handler for DELETE method. Deletes an existing player.
+func (server *Server) handlePlayerByIDDelete(w http.ResponseWriter, r *http.Request) {
+	// get param for player id from url
+	params := mux.Vars(r)
+	playerID, ok := params["playerID"]
+	if !ok || len(playerID) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidPlayerID)
+		return
+	}
+
+	// convert player id to int
+	id, err := strconv.ParseUint(playerID, 10, 32)
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidPlayerID)
+		return
+	}
+
+	// create new player with id
+	player := &models.Player{
+		ID: uint(id),
+	}
+
+	// delete player from database
+	if err := player.Delete(server.db); err != nil {
+		server.handleError(w, r, http.StatusInternalServerError, err)
+		return
+	}
+
+	// return 204
+	server.handle204Success(w, r)
 }

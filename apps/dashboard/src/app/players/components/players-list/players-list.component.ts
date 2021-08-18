@@ -1,4 +1,4 @@
-import { Input } from '@angular/core';
+import { EventEmitter, Input, Output } from '@angular/core';
 import { Component } from '@angular/core';
 
 import { IPlayer } from '@pool-overlay/models';
@@ -13,4 +13,15 @@ export class PlayersListComponent {
 
     @Input()
     public players: IPlayer[] = [];
+
+    @Output()
+    public deletePlayer = new EventEmitter<{ playerId: number }>();
+
+    public deletePlayerById(playerId: number | undefined): void {
+        if (!playerId) {
+            return;
+        }
+
+        this.deletePlayer.emit({ playerId });
+    }
 }

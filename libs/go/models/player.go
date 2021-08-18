@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	ErrPlayerIDInvalid = errors.New("invalid player id")
-	ErrPlayerNotFound  = errors.New("player not found")
+	ErrPlayerIDInvalid    = errors.New("invalid player id")
+	ErrPlayerNotFound     = errors.New("player not found")
+	ErrPlayerHasIDAlready = errors.New("player already has an id")
 )
 
 // Player is a pool player.
@@ -22,13 +23,6 @@ type Player struct {
 	CreatedAt *time.Time      `json:"created_at,omitempty"`
 	UpdatedAt *time.Time      `json:"updated_at,omitempty"`
 	DeletedAt *gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
-}
-
-func NewPlayer(name string, flagID uint) *Player {
-	return &Player{
-		Name:   name,
-		FlagID: flagID,
-	}
 }
 
 // LoadByID loads a player by ID.
@@ -52,10 +46,16 @@ func (p *Player) LoadByID(database *gorm.DB, id int) error {
 	return nil
 }
 
+// Create adds the player to the database.
 func (p *Player) Create(database *gorm.DB) error {
+	if p.ID != 0 {
+		return ErrPlayerHasIDAlready
+	}
+
 	return database.Create(p).Error
 }
 
+// Update updates the current player in the database.
 func (p *Player) Update(database *gorm.DB) error {
 	if p.ID == 0 {
 		return ErrPlayerIDInvalid
@@ -65,4 +65,13 @@ func (p *Player) Update(database *gorm.DB) error {
 		"name":    p.Name,
 		"flag_id": p.FlagID,
 	}).Error
+}
+
+// Delete removes the current player from the database.
+func (p *Player) Delete(database *gorm.DB) error {
+	if p.ID == 0 {
+		return ErrPlayerIDInvalid
+	}
+
+	return database.Delete(p).Error
 }
