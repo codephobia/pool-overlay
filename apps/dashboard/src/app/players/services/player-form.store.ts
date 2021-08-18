@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
 
 import { IFlag, IPlayer } from '@pool-overlay/models';
@@ -26,6 +27,7 @@ export interface PlayerFormState {
 @Injectable()
 export class PlayerFormStore extends ComponentStore<PlayerFormState> {
     constructor(
+        private router: Router,
         private playersService: PlayersService,
         private flagsService: FlagsService,
     ) {
@@ -119,6 +121,7 @@ export class PlayerFormStore extends ComponentStore<PlayerFormState> {
             tapResponse(
                 () => {
                     this.setStatus(PlayerFormStatus.SUCCESS);
+                    this.router.navigate(['/players']);
                 },
                 (error: HttpErrorResponse) => {
                     this.setStatus(PlayerFormStatus.ERROR);
@@ -138,6 +141,7 @@ export class PlayerFormStore extends ComponentStore<PlayerFormState> {
             tapResponse(
                 () => {
                     this.setStatus(PlayerFormStatus.SUCCESS);
+                    this.router.navigate(['/players']);
                 },
                 (error: HttpErrorResponse) => {
                     this.setStatus(PlayerFormStatus.ERROR);

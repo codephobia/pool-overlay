@@ -1,0 +1,12 @@
+<div class="flex flex-col flex-grow">
+    <h1 class="flex flex-row flex-none px-5 py-2.5 bg-red-700 text-white">Confirm Delete</h1>
+    <div class="flex flex-row flex-grow p-5">
+        <p>
+            Are you sure you want to delete&nbsp;<strong>{{ playerName }}</strong> ?
+        </p>
+    </div>
+    <div class="flex flex-row flex-none justify-between px-5 py-2.5 bg-gray-700">
+        <button type="button" (click)="close(false)" class="bg-blue-700 px-5 py-2.5 rounded text-white">Cancel</button>
+        <button type="button" (click)="close(true)" class="bg-red-700 px-5 py-2.5 rounded text-white">Delete</button>
+    </div>
+</div>

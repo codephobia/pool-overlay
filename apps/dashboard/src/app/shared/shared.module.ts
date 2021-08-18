@@ -3,9 +3,11 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { OutletComponent } from './components/outlet/outlet.component';
+import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 
 const COMPONENTS = [
     OutletComponent,
+    ConfirmDialogComponent,
 ];
 
 @NgModule({

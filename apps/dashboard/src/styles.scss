@@ -1,6 +1,6 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 .shimmer-overlay {
     position: absolute;
@@ -10,7 +10,7 @@
     left: 0;
     overflow-x: hidden;
     &::after {
-        content: "";
+        content: '';
         position: absolute;
         top: 0;
         right: -100%;
@@ -33,4 +33,40 @@
     to {
         transform: translateX(33.3%);
     }
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+// material overrides
+.cdk-overlay-pane {
+    &.no-padding {
+        .mat-dialog-container {
+            padding: 0;
+        }
+    }
+
+    &.no-scrolling {
+        .mat-dialog-container {
+            overflow-y: hidden;
+        }
+    }
+
+    .mat-dialog-container > * {
+        display: flex;
+        flex-direction: column;
+        flex: 1 0 auto;
+        height: 100%;
+    }
+}
+
+.cdk-overlay-backdrop {
+    background: rgba(0, 0, 0, 0.6) !important;
 }
