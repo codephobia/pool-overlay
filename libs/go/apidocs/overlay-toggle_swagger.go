@@ -2,7 +2,7 @@ package apidocs
 
 import "github.com/codephobia/pool-overlay/libs/go/api"
 
-// swagger:route GET /overlay/toggle overlay-toggle OverlayToggle
+// swagger:route GET /overlay/toggle overlay OverlayToggle
 // Toggles showing / hiding of the overlay.
 // responses:
 //   200: overlayToggleResp

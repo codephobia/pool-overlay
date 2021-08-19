@@ -107,7 +107,7 @@ func (server *Server) handlePlayersPost(w http.ResponseWriter, r *http.Request) 
 	var body PlayersPostBody
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&body); err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidPlayerDetails)
 		return
 	}
 
@@ -220,7 +220,7 @@ func (server *Server) handlePlayerByIDPatch(w http.ResponseWriter, r *http.Reque
 	}
 
 	// convert player id to int
-	id, err := strconv.ParseUint(playerID, 10, 32)
+	id, err := strconv.Atoi(playerID)
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidPlayerID)
 		return
@@ -230,16 +230,26 @@ func (server *Server) handlePlayerByIDPatch(w http.ResponseWriter, r *http.Reque
 	var body PlayersPatchBody
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&body); err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidPlayerDetails)
 		return
 	}
 
-	// create a new player from the body
-	player := &models.Player{
-		ID:     uint(id),
-		Name:   body.Name,
-		FlagID: body.FlagID,
+	// get player by id
+	var player models.Player
+	if err := player.LoadByID(server.db, id); err != nil {
+		if err == models.ErrPlayerIDInvalid {
+			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+			return
+		}
+		if err == models.ErrPlayerNotFound {
+			server.handleError(w, r, http.StatusNotFound, ErrPlayerNotFound)
+			return
+		}
 	}
+
+	// update player details from the body
+	player.Name = body.Name
+	player.FlagID = body.FlagID
 
 	// update player in the database
 	if err := player.Update(server.db); err != nil {
@@ -262,15 +272,23 @@ func (server *Server) handlePlayerByIDDelete(w http.ResponseWriter, r *http.Requ
 	}
 
 	// convert player id to int
-	id, err := strconv.ParseUint(playerID, 10, 32)
+	id, err := strconv.Atoi(playerID)
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidPlayerID)
 		return
 	}
 
-	// create new player with id
-	player := &models.Player{
-		ID: uint(id),
+	// get player by id
+	var player models.Player
+	if err := player.LoadByID(server.db, id); err != nil {
+		if err == models.ErrPlayerIDInvalid {
+			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+			return
+		}
+		if err == models.ErrPlayerNotFound {
+			server.handleError(w, r, http.StatusNotFound, ErrPlayerNotFound)
+			return
+		}
 	}
 
 	// delete player from database

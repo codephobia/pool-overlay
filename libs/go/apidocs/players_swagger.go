@@ -2,15 +2,15 @@ package apidocs
 
 import "github.com/codephobia/pool-overlay/libs/go/models"
 
-// swagger:route GET /players players Players
+// swagger:route GET /players players PlayersGet
 // An array of existing players in the database.
 // responses:
-//   200: playersResp
+//   200: playersGetResp
 //   422: errorResp
 //   500: errorResp
 
-// swagger:parameters Players
-type PlayersParam struct {
+// swagger:parameters PlayersGet
+type PlayersGetParam struct {
 	// The page of players to return.
 	//
 	// in: query
@@ -22,9 +22,50 @@ type PlayersParam struct {
 }
 
 // A page of players in the database.
-// swagger:response playersResp
-type PlayersRespWrapper struct {
+// swagger:response playersGetResp
+type PlayersGetRespWrapper struct {
 	// in: body
 	// maxItems: 10
 	Body []models.Player
+}
+
+// swagger:route POST /players players PlayersPost
+// Add a new player to the database.
+// responses:
+//   200: playersPostResp
+//   422: errorResp
+//   500: errorResp
+
+// PlayerPostData is the body content for a new player.
+type PlayerPostData struct {
+	// The new player name.
+	//
+	// in: body
+	// required: true
+	// example: Joe
+	Name string `json:"name"`
+
+	// The new player flag id.
+	//
+	// in: body
+	// required: true
+	// example: 1
+	FlagID uint `json:"flag_id"`
+}
+
+// swagger:parameters PlayersPost
+type PlayersPostParam struct {
+	// The player details.
+	//
+	// in: body
+	// required: true
+	// example: { "name": "Joe", "flag_id": 1 }
+	Player PlayerPostData
+}
+
+// The newly created player with id.
+// swagger:response playersPostResp
+type PlayersPostRespWrapper struct {
+	// in: body
+	Body models.Player
 }

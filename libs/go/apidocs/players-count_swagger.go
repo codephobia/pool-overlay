@@ -4,7 +4,7 @@ import (
 	"github.com/codephobia/pool-overlay/libs/go/api"
 )
 
-// swagger:route GET /players/count players-count PlayersCount
+// swagger:route GET /players/count players PlayersCount
 // The number of players in the database.
 // responses:
 //   200: playersCountResp

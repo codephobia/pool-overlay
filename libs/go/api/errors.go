@@ -15,6 +15,8 @@ var (
 	ErrInvalidPlayerID = errors.New("invalid player id")
 	// ErrPlayerNotFound - Player not found.
 	ErrPlayerNotFound = errors.New("player not found")
+	// ErrInvalidPlayerDetails - Invalid player details.
+	ErrInvalidPlayerDetails = errors.New("invalid player details")
 	// ErrInvalidTeamID - Invalid team id.
 	ErrInvalidTeamID = errors.New("invalid team id")
 	// ErrTeamNotFound - Team not found.
