@@ -6,6 +6,9 @@ import { Component } from '@angular/core';
 })
 export class SideNavComponent {
     public buttons = [{
+        title: 'Overlay',
+        link: 'overlay',
+    }, {
         title: 'Players',
         link: 'players',
     }, {

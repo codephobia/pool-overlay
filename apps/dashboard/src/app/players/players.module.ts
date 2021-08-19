@@ -8,7 +8,6 @@ import { SharedModule } from '../shared/shared.module';
 import { PlayersRoutingModule } from './players-routing.module';
 import { PlayersListPageComponent } from './containers/players-list-page/players-list-page.component';
 import { PlayersListComponent } from './components/players-list/players-list.component';
-import { PlayersService } from './services/players.service';
 import { FlagsService } from './services/flags.service';
 import { PlayersListStore } from './containers/players-list-page/players-list.store';
 import { PlayerCreatePageComponent } from './containers/player-create/player-create-page.component';
@@ -24,7 +23,6 @@ const COMPONENTS = [
 ];
 
 const SERVICES = [
-    PlayersService,
     FlagsService,
     PlayersListStore,
 ];

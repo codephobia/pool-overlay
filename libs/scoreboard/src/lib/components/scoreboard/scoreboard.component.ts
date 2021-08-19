@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { GameType, gameTypeToString } from '../../models';
+import { GameType, gameTypeToString } from '@pool-overlay/models';
 import { SocketService } from '../../services/socket.service';
 import { scoreboardTransition } from './scoreboard.animation';
 import { ScoreboardStore } from './scoreboard.store';
@@ -28,8 +28,8 @@ export class ScoreboardComponent implements OnInit {
         this._scoreboardStore.getGame();
     }
 
-    public gameTypeName(gameType: GameType | null): string {
-        if (gameType === null) {
+    public gameTypeName(gameType: GameType | null | undefined): string {
+        if (gameType === null || gameType === undefined) {
             return '';
         }
 

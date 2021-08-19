@@ -1,0 +1,74 @@
+<div class="flex flex-col gap-10" *ngIf="vm$ | async as vm">
+    <div class="flex flex-row justify-center items-center gap-10">
+        <div class="flex flex-col gap-2.5">
+            <h2 class="mb-2.5 text-white">Player 1</h2>
+            <div class="flex flex-row gap-5">
+                <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="updatePlayer(1, vm.game?.player_one?.id)">{{ vm.game?.player_one?.name }}</button>
+                <div class="flex flex-col gap-2.5">
+                    <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="updateScore(1, increment)">Up</button>
+                    <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="updateScore(1, decrement)">Down</button>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col gap-2.5 items-end">
+            <h2 class="mb-2.5 text-white">Player 2</h2>
+            <div class="flex flex-row gap-5">
+                <div class="flex flex-col gap-2.5">
+                    <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="updateScore(2, increment)">Up</button>
+                    <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="updateScore(2, decrement)">Down</button>
+                </div>
+                <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="updatePlayer(2, vm.game?.player_two?.id)">{{ vm.game?.player_two?.name }}</button>
+            </div>
+        </div>
+    </div>
+    <div class="flex flex-row justify-center items-start gap-10">
+        <div>
+            <h2 class="mb-2.5 text-white">Score</h2>
+            <div>
+                <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="resetScore()">Reset</button>
+            </div>
+        </div>
+        <div>
+            <h2 class="mb-2.5 text-white">Game Type</h2>
+            <div class="flex flex-row gap-2.5">
+                <button
+                    type="button"
+                    class="px-5 py-2.5 rounded text-white"
+                    [ngClass]="{ 'bg-gray-700': vm.game?.type !== eightBall, 'bg-blue-700': vm.game?.type === eightBall }"
+                    (click)="updateGameType(eightBall)"
+                >
+                    8 Ball
+                </button>
+                <button
+                    type="button"
+                    class="px-5 py-2.5 rounded text-white"
+                    [ngClass]="{ 'bg-gray-700': vm.game?.type !== nineBall, 'bg-blue-700': vm.game?.type === nineBall }"
+                    (click)="updateGameType(nineBall)"
+                >
+                    9 Ball
+                </button>
+                <button
+                    type="button"
+                    class="px-5 py-2.5 rounded text-white"
+                    [ngClass]="{ 'bg-gray-700': vm.game?.type !== tenBall, 'bg-blue-700': vm.game?.type === tenBall }"
+                    (click)="updateGameType(tenBall)"
+                >
+                    10 Ball
+                </button>
+            </div>
+        </div>
+        <div>
+            <h2 class="mb-2.5 text-white">Race To</h2>
+            <div class="flex flex-col gap-2.5">
+                <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="updateRaceTo(increment)">Up</button>
+                <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="updateRaceTo(decrement)">Down</button>
+            </div>
+        </div>
+        <div>
+            <h2 class="mb-2.5 text-white">Overlay</h2>
+            <div>
+                <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="toggleOverlay()">{{ vm.hidden ? 'Show' : 'Hide' }}</button>
+            </div>
+        </div>
+    </div>
+</div>

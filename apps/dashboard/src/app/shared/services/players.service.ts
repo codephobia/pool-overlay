@@ -9,6 +9,7 @@ import { ICount } from '../../models/count.model';
 @Injectable()
 export class PlayersService {
     private apiURL: string;
+    private apiVersion: string;
     private endpoint = 'players';
 
     constructor(
@@ -16,35 +17,36 @@ export class PlayersService {
         private http: HttpClient,
     ) {
         this.apiURL = config.environment.apiURL;
+        this.apiVersion = config.environment.apiVersion;
     }
 
     public find(page = 1): Observable<IPlayer[]> {
-        const url = `${this.apiURL}/${this.endpoint}?page=${page}`;
+        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}?page=${page}`;
         return this.http.get<IPlayer[]>(url);
     }
 
     public findByID(id: number): Observable<IPlayer> {
-        const url = `${this.apiURL}/${this.endpoint}/${id}`;
+        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/${id}`;
         return this.http.get<IPlayer>(url);
     }
 
     public count(): Observable<ICount> {
-        const url = `${this.apiURL}/${this.endpoint}/count`;
+        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/count`;
         return this.http.get<ICount>(url);
     }
 
     public create(player: Omit<IPlayer, 'id'>) {
-        const url = `${this.apiURL}/${this.endpoint}`;
+        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}`;
         return this.http.post<IPlayer>(url, player);
     }
 
     public update({ id, ...player }: IPlayer) {
-        const url = `${this.apiURL}/${this.endpoint}/${id}`;
+        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/${id}`;
         return this.http.patch<IPlayer>(url, player);
     }
 
     public delete(playerId: number) {
-        const url = `${this.apiURL}/${this.endpoint}/${playerId}`;
+        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/${playerId}`;
         return this.http.delete<void>(url);
     }
 }

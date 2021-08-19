@@ -39,9 +39,7 @@
             "architect": {
                 "build": {
                     "builder": "@angular-devkit/build-angular:browser",
-                    "outputs": [
-                        "{options.outputPath}"
-                    ],
+                    "outputs": ["{options.outputPath}"],
                     "options": {
                         "outputPath": "dist/apps/dashboard",
                         "index": "apps/dashboard/src/index.html",
@@ -121,9 +119,7 @@
                 },
                 "test": {
                     "builder": "@nrwl/jest:jest",
-                    "outputs": [
-                        "coverage/apps/dashboard"
-                    ],
+                    "outputs": ["coverage/apps/dashboard"],
                     "options": {
                         "jestConfig": "apps/dashboard/jest.config.js",
                         "passWithNoTests": true
@@ -152,9 +148,7 @@
             "architect": {
                 "test": {
                     "builder": "@nrwl/jest:jest",
-                    "outputs": [
-                        "coverage/libs/models"
-                    ],
+                    "outputs": ["coverage/libs/models"],
                     "options": {
                         "jestConfig": "libs/models/jest.config.js",
                         "passWithNoTests": true
@@ -195,9 +189,7 @@
                             "apps/overlay/src/favicon.ico",
                             "apps/overlay/src/assets"
                         ],
-                        "styles": [
-                            "apps/overlay/src/styles.scss"
-                        ],
+                        "styles": ["apps/overlay/src/styles.scss"],
                         "scripts": []
                     },
                     "configurations": {
@@ -229,9 +221,7 @@
                             ]
                         }
                     },
-                    "outputs": [
-                        "{options.outputPath}"
-                    ]
+                    "outputs": ["{options.outputPath}"]
                 },
                 "serve": {
                     "builder": "@angular-devkit/build-angular:dev-server",
@@ -258,10 +248,7 @@
                             "apps/overlay/tsconfig.spec.json",
                             "apps/overlay/tsconfig.editor.json"
                         ],
-                        "exclude": [
-                            "**/node_modules/**",
-                            "!apps/overlay/**/*"
-                        ]
+                        "exclude": ["**/node_modules/**", "!apps/overlay/**/*"]
                     }
                 },
                 "test": {
@@ -270,9 +257,32 @@
                         "jestConfig": "apps/overlay/jest.config.js",
                         "passWithNoTests": true
                     },
-                    "outputs": [
-                        "coverage/apps/overlay"
-                    ]
+                    "outputs": ["coverage/apps/overlay"]
+                }
+            }
+        },
+        "scoreboard": {
+            "projectType": "library",
+            "root": "libs/scoreboard",
+            "sourceRoot": "libs/scoreboard/src",
+            "prefix": "pool-overlay",
+            "architect": {
+                "test": {
+                    "builder": "@nrwl/jest:jest",
+                    "outputs": ["coverage/libs/scoreboard"],
+                    "options": {
+                        "jestConfig": "libs/scoreboard/jest.config.js",
+                        "passWithNoTests": true
+                    }
+                },
+                "lint": {
+                    "builder": "@nrwl/linter:eslint",
+                    "options": {
+                        "lintFilePatterns": [
+                            "libs/scoreboard/src/**/*.ts",
+                            "libs/scoreboard/src/**/*.html"
+                        ]
+                    }
                 }
             }
         },

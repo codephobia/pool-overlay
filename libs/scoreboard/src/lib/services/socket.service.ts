@@ -4,8 +4,8 @@ type EventHandlers = { [key: string]: (payload: any) => void };
 
 @Injectable()
 export class SocketService {
-    private _connTimer: ReturnType<typeof setInterval> = null;
-    private _conn: WebSocket;
+    private _connTimer: ReturnType<typeof setInterval> | null = null;
+    private _conn: WebSocket | null = null;
     private _eventHandlers: EventHandlers = {};
 
     public connect(): void {
@@ -49,7 +49,7 @@ export class SocketService {
         }
     }
 
-    private _onError(err: Error): void {
-        console.log(err);
+    private _onError(ev: Event): void {
+        console.log(ev);
     }
 }

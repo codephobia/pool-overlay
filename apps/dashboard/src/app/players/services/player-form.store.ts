@@ -7,7 +7,7 @@ import { IFlag, IPlayer } from '@pool-overlay/models';
 import { forkJoin } from 'rxjs';
 import { exhaustMap, switchMap, tap } from 'rxjs/operators';
 import { FlagsService } from './flags.service';
-import { PlayersService } from './players.service';
+import { PlayersService } from '../../shared/services/players.service';
 
 export enum PlayerFormStatus {
     LOADING,

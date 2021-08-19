@@ -10,8 +10,8 @@ import { characterRotater } from './character-rotater.animation';
 })
 export class CharacterRotaterComponent {
     @Input()
-    public set characters(characters: string | number | null) {
-        if (characters === null) {
+    public set characters(characters: string | number | null | undefined) {
+        if (characters === null || characters === undefined) {
             return;
         }
 

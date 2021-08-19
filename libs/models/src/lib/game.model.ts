@@ -8,6 +8,6 @@ export interface IGame {
     race_to: number;
     score_one: number;
     score_two: number;
-    player_one: IPlayer;
-    player_two: IPlayer;
+    player_one?: IPlayer;
+    player_two?: IPlayer;
 }

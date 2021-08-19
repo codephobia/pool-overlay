@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
-import { concatMap, switchMap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 
 import { IPlayer } from '@pool-overlay/models';
 import { PlayersService } from '../../../shared/services/players.service';
 
-export interface PlayersListState {
+export interface PlayerModalState {
     loaded: boolean;
     page: number;
     players: IPlayer[];
 }
 
 @Injectable()
-export class PlayersListStore extends ComponentStore<PlayersListState> {
+export class PlayerModalStore extends ComponentStore<PlayerModalState> {
     constructor(
         private playersService: PlayersService,
     ) {
@@ -39,17 +39,6 @@ export class PlayersListStore extends ComponentStore<PlayersListState> {
         players,
     }));
 
-    public readonly deletePlayer = this.updater<number>((state, playerId) => {
-        const playerIndex = state.players.findIndex(player => player.id === playerId);
-        const newPlayers = [...state.players];
-        newPlayers.splice(playerIndex, 1);
-
-        return {
-            ...state,
-            players: newPlayers,
-        };
-    });
-
     public readonly loaded$ = this.select(state => state.loaded);
     public readonly page$ = this.select(state => state.page);
     public readonly players$ = this.select(state => state.players);
@@ -64,24 +53,11 @@ export class PlayersListStore extends ComponentStore<PlayersListState> {
         })
     );
 
-    // TODO: ADD PLAYER COUNT TO STATE AND GETPLAYERS CALL
-
     public readonly getPlayers = this.effect<number>(page$ => page$.pipe(
         switchMap(page => this.playersService.find(page).pipe(
             tapResponse(
                 players => {
                     this.setPlayers(players)
-                },
-                error => console.error(error)
-            ),
-        )),
-    ));
-
-    public readonly deletePlayerById = this.effect<number>(playerId$ => playerId$.pipe(
-        concatMap(playerId => this.playersService.delete(playerId).pipe(
-            tapResponse(
-                () => {
-                    this.deletePlayer(playerId);
                 },
                 error => console.error(error)
             ),

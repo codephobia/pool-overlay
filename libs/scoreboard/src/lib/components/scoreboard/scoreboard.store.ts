@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
 import { switchMap } from 'rxjs/operators';
 
-import { IGame } from '../../models';
+import { IGame } from '@pool-overlay/models';
 import { APIService } from '../../services/api.service';
 
 export interface ScoreboardState {

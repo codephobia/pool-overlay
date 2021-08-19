@@ -5,7 +5,7 @@ import { flagTrigger } from './flag.animation';
 type PlayerClass = 'player-one' | 'player-two';
 
 interface Trigger {
-    value: string | null;
+    value: string | null | undefined;
     params: {
         offsetEnter: string;
         offsetLeave: string;
@@ -20,7 +20,7 @@ interface Trigger {
 })
 export class FlagComponent {
     @Input()
-    public imagePath: string | null = null;
+    public imagePath: string | null | undefined = null;
 
     @Input()
     public class: PlayerClass = 'player-one';

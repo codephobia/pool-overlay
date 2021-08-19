@@ -10,24 +10,15 @@
         "importHelpers": true,
         "target": "es2015",
         "module": "esnext",
-        "typeRoots": [
-            "node_modules/@types"
-        ],
-        "lib": [
-            "es2017",
-            "dom"
-        ],
+        "typeRoots": ["node_modules/@types"],
+        "lib": ["es2017", "dom"],
         "skipLibCheck": true,
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
-            "@pool-overlay/models": [
-                "libs/models/src/index.ts"
-            ]
+            "@pool-overlay/models": ["libs/models/src/index.ts"],
+            "@pool-overlay/scoreboard": ["libs/scoreboard/src/index.ts"]
         }
     },
-    "exclude": [
-        "node_modules",
-        "tmp"
-    ]
+    "exclude": ["node_modules", "tmp"]
 }

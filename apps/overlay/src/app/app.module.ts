@@ -3,21 +3,22 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { ScoreboardModule } from '@pool-overlay/scoreboard';
 import { AppComponent } from './components/app/app.component';
-import { ScoreboardComponent } from './components/scoreboard/scoreboard.component';
-import { CharacterRotaterComponent } from './components/character-rotater/character-rotater.component';
-import { FlagComponent } from './components/flag/flag.component';
+import { environment } from '../environments/environment';
 
 const COMPONENTS = [
     AppComponent,
-    ScoreboardComponent,
-    CharacterRotaterComponent,
-    FlagComponent,
 ];
 
 @NgModule({
     declarations: COMPONENTS,
-    imports: [BrowserModule, HttpClientModule, BrowserAnimationsModule],
+    imports: [
+        BrowserModule,
+        HttpClientModule,
+        BrowserAnimationsModule,
+        ScoreboardModule.withConfig({ environment }),
+    ],
     providers: [],
     bootstrap: [AppComponent],
 })
