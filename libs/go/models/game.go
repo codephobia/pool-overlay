@@ -127,7 +127,9 @@ func (g *Game) Reset() error {
 	g.mutex.Unlock()
 
 	// reset the score
-	g.ResetScore()
+	if err := g.ResetScore(); err != nil {
+		return err
+	}
 
 	// save the new game so that it will reload
 	return g.Save(false)
