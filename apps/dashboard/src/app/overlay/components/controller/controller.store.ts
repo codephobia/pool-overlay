@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
-import { switchMap, tap } from 'rxjs/operators';
+import { concatMap, switchMap, tap } from 'rxjs/operators';
 
 import { GameService } from '../../services/game.service';
 import { GameType, IGame } from '@pool-overlay/models';
@@ -174,5 +174,16 @@ export class ControllerStore extends ComponentStore<ControllerState> {
                 () => { this.setPending(false); },
             )
         ))
+    ));
+
+    public readonly save = this.effect(trigger$ => trigger$.pipe(
+        tap(() => { this.setPending(true); }),
+        concatMap(() => this.gameService.save().pipe(
+            tapResponse(
+                () => { },
+                error => console.error(error),
+                () => { this.setPending(false); },
+            )
+        )),
     ));
 }

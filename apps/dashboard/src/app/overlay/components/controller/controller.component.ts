@@ -81,4 +81,8 @@ export class ControllerComponent implements OnInit {
     public updateRaceTo(direction: Direction): void {
         this.store.updateRaceTo(direction);
     }
+
+    public save(): void {
+        this.store.save();
+    }
 }

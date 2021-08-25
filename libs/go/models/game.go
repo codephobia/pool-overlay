@@ -112,6 +112,27 @@ func (g *Game) LoadLatest() *Game {
 	return g
 }
 
+// Reset will reset a game to a new one, while keeping some information about
+// the existing one.
+func (g *Game) Reset() error {
+	// lock
+	g.mutex.Lock()
+
+	// unset id so that on save it creates a new one in the database
+	g.ID = 0
+	// mark as incomplete
+	g.Completed = false
+
+	// unlock
+	g.mutex.Unlock()
+
+	// reset the score
+	g.ResetScore()
+
+	// save the new game so that it will reload
+	return g.Save(false)
+}
+
 // SetType sets the Type of the current game.
 func (g *Game) SetType(t GameType) error {
 	g.mutex.Lock()

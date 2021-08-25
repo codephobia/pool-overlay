@@ -101,6 +101,8 @@ func (server *Server) handleGame() http.Handler {
 			server.HandleOptions(w, r)
 		case "GET":
 			server.handleGameGet(w, r)
+		case "POST":
+			server.handleGamePost(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
@@ -111,6 +113,37 @@ func (server *Server) handleGame() http.Handler {
 func (server *Server) handleGameGet(w http.ResponseWriter, r *http.Request) {
 	// send response
 	server.handleSuccess(w, r, server.state.Game)
+}
+
+// Game handler for POST method.
+func (server *Server) handleGamePost(w http.ResponseWriter, r *http.Request) {
+	// Save existing game.
+	if err := server.state.Game.Save(true); err != nil {
+		server.handleError(w, r, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Reset game to create a new one with same players / settings.
+	if err := server.state.Game.Reset(); err != nil {
+		server.handleError(w, r, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.GameEventType,
+		events.NewGameEventPayload(server.state.Game),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
+
+	// send response
+	server.handle204Success(w, r)
 }
 
 // Handler for /game/type.

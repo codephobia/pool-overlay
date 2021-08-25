@@ -68,10 +68,6 @@ func (server *Server) InitRoutes() {
 	// game/players/name
 	server.AddRouteToAllVersions("/game/players/name", server.handleGamePlayersName())
 
-	// TODO: IMPLEMENT THIS
-	// game/players/save
-	// server.AddRouteToAllVersions("/game/players/save", server.handleGamePlayers())
-
 	// game/teams
 	server.AddRouteToAllVersions("/game/teams", server.handleGameTeams())
 }
