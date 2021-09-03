@@ -9,16 +9,18 @@ import (
 
 	"github.com/codephobia/pool-overlay/libs/go/overlay"
 	"github.com/codephobia/pool-overlay/libs/go/state"
+	"github.com/codephobia/pool-overlay/libs/go/telestrator"
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 )
 
 // Server is an api server.
 type Server struct {
-	config  *Config
-	db      *gorm.DB
-	overlay *overlay.Overlay
-	state   *state.State
+	config      *Config
+	db          *gorm.DB
+	overlay     *overlay.Overlay
+	telestrator *telestrator.Telestrator
+	state       *state.State
 
 	httpServer *http.Server
 	router     *mux.Router
@@ -26,12 +28,13 @@ type Server struct {
 }
 
 // NewServer returns a new api server.
-func NewServer(config *Config, db *gorm.DB, overlay *overlay.Overlay, state *state.State) *Server {
+func NewServer(config *Config, db *gorm.DB, overlay *overlay.Overlay, telestrator *telestrator.Telestrator, state *state.State) *Server {
 	return &Server{
-		config:  config,
-		db:      db,
-		overlay: overlay,
-		state:   state,
+		config:      config,
+		db:          db,
+		overlay:     overlay,
+		telestrator: telestrator,
+		state:       state,
 
 		router:  mux.NewRouter().StrictSlash(true),
 		version: make(map[string]*mux.Router),

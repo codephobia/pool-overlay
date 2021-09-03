@@ -11,6 +11,7 @@ import { CanvasComponent } from './components/canvas/canvas.component';
 import { DrawingDirective } from './directives/drawing.directive';
 import { ControlsComponent } from './components/controls/controls.component';
 import { DrawingService } from './services/drawing.service';
+import { SocketService } from './services/socket.service';
 
 const COMPONENTS = [
     HomePageComponent,
@@ -25,6 +26,7 @@ const DIRECTIVES = [
 
 const SERVICES = [
     DrawingService,
+    SocketService,
 ];
 
 @NgModule({

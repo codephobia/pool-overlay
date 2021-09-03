@@ -1,4 +1,4 @@
-package overlay
+package telestrator
 
 import (
 	"log"
@@ -58,10 +58,7 @@ func (o *Connection) ReadPump() {
 			break
 		}
 
-		log.Printf("message received")
-		if o.overlay.OnMessageReceived != nil {
-			o.overlay.OnMessageReceived(o.overlay, o, message)
-		}
+		o.overlay.OnMessageReceived(o, message)
 	}
 }
 

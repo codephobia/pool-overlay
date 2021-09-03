@@ -1,5 +1,6 @@
 import { ElementRef, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { SocketService } from './socket.service';
 
 export interface Click {
     color: string;
@@ -31,6 +32,10 @@ export class DrawingService {
         5,
     ];
     private _lineWidth = new BehaviorSubject<number>(this._lineWidths[0]);
+
+    constructor(
+        private _socketService: SocketService,
+    ) { }
 
     public init(canvas: ElementRef<HTMLCanvasElement> | null): void {
         this._canvas = canvas;
@@ -67,13 +72,23 @@ export class DrawingService {
     }
 
     public undo(): void {
+        if (!this._clicks.length) {
+            return;
+        }
+
         this._removeLastLine();
         this._redraw();
+        this._socketService.send('UNDO');
     }
 
     public clear(): void {
+        if (!this._clicks.length) {
+            return;
+        }
+
         this._clicks = [];
         this._redraw();
+        this._socketService.send('CLEAR');
     }
 
     public mousedown(event: MouseEvent): void {
@@ -94,6 +109,7 @@ export class DrawingService {
         };
 
         this._clicks.push(click);
+        this._socketService.send('CLICK', click);
     }
 
     public mouseup(): void {
@@ -121,7 +137,13 @@ export class DrawingService {
         };
 
         this._clicks.push(click);
+        this._socketService.send('CLICK', click);
 
+        this._redraw();
+    }
+
+    public addClickEvent(event: { type: string, payload: Click }): void {
+        this._clicks.concat(event.payload);
         this._redraw();
     }
 

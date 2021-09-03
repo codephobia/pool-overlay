@@ -1,26 +1,22 @@
-package overlay
+package telestrator
 
 import (
 	"sync"
 )
 
+// BroadcastExcept contains a payload and a connection to skip during broadcast.
 type BroadcastExcept struct {
 	Connection *Connection
 	Message    []byte
 }
 
-type OnMessageReceivedFunc func(*Overlay, *Connection, []byte)
-
 // Overlay managed multiple websocket connections to the overlay.
 type Overlay struct {
 	Connections map[*Connection]struct{}
 
-	Broadcast       chan []byte
 	BroadcastExcept chan BroadcastExcept
 	Register        chan *Connection
 	Unregister      chan *Connection
-
-	OnMessageReceived func(*Overlay, *Connection, []byte)
 
 	lock sync.Mutex
 }
@@ -30,17 +26,12 @@ func NewOverlay() *Overlay {
 	return &Overlay{
 		Connections: make(map[*Connection]struct{}),
 
-		Broadcast:       make(chan []byte),
 		BroadcastExcept: make(chan BroadcastExcept),
 		Register:        make(chan *Connection),
 		Unregister:      make(chan *Connection),
 
 		lock: sync.Mutex{},
 	}
-}
-
-func (o *Overlay) AssignOnMessageReceived(onMessageReceived OnMessageReceivedFunc) {
-	o.OnMessageReceived = onMessageReceived
 }
 
 // Init starts an Overlay. Should be run in a separate go routine.
@@ -54,10 +45,6 @@ func (o *Overlay) Init() {
 		// unregister connection with the overlay
 		case connection := <-o.Unregister:
 			o.UnregisterConnection(connection)
-
-		// broadcast event to all connections
-		case message := <-o.Broadcast:
-			o.SendConnections(message)
 
 		case except := <-o.BroadcastExcept:
 			o.SendConnectionsExcept(except.Connection, except.Message)
@@ -77,20 +64,6 @@ func (o *Overlay) UnregisterConnection(connection *Connection) {
 	o.lock.Lock()
 	o.ConnectionClose(connection)
 	o.lock.Unlock()
-}
-
-// SendConnections sends all connections an event.
-func (o *Overlay) SendConnections(message []byte) {
-	o.lock.Lock()
-	defer o.lock.Unlock()
-
-	for connection := range o.Connections {
-		select {
-		case connection.Send <- message:
-		default:
-			o.ConnectionClose(connection)
-		}
-	}
 }
 
 // SendConnectionsExcept sends all connections except one an event.
@@ -123,4 +96,14 @@ func (o *Overlay) ConnectionClose(connection *Connection) {
 
 	// remove connection from overlay
 	delete(o.Connections, connection)
+}
+
+// OnMessageReceived takes an incoming message and broadcasts it to everyone
+// else connected.
+func (o *Overlay) OnMessageReceived(connection *Connection, message []byte) {
+	// broadcast the message out to all other connections
+	o.BroadcastExcept <- BroadcastExcept{
+		Connection: connection,
+		Message:    message,
+	}
 }

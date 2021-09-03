@@ -5,18 +5,20 @@ import (
 	"os"
 
 	"github.com/codephobia/pool-overlay/libs/go/api"
-	"github.com/codephobia/pool-overlay/libs/go/overlay"
+	overlayPkg "github.com/codephobia/pool-overlay/libs/go/overlay"
 	"github.com/codephobia/pool-overlay/libs/go/state"
+	"github.com/codephobia/pool-overlay/libs/go/telestrator"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 // Core is the main application.
 type Core struct {
-	db      *gorm.DB
-	server  *api.Server
-	overlay *overlay.Overlay
-	state   *state.State
+	db          *gorm.DB
+	server      *api.Server
+	overlay     *overlayPkg.Overlay
+	telestrator *telestrator.Telestrator
+	state       *state.State
 }
 
 // NewCore returns a new Core.
@@ -35,8 +37,11 @@ func NewCore() (*Core, error) {
 		return nil, err
 	}
 
-	// Initialize Overlay.
-	overlay := overlay.NewOverlay()
+	// Initialize Scoreboard Overlay.
+	overlay := overlayPkg.NewOverlay()
+
+	// Initialize Telestrator Overlay.
+	telestrator := telestrator.NewTelestrator()
 
 	// Initialize game state.
 	state := state.NewState(db)
@@ -51,20 +56,24 @@ func NewCore() (*Core, error) {
 			Previous: "1",
 		},
 	}
-	server := api.NewServer(apiConfig, db, overlay, state)
+	server := api.NewServer(apiConfig, db, overlay, telestrator, state)
 
 	return &Core{
-		db:      db,
-		server:  server,
-		overlay: overlay,
-		state:   state,
+		db:          db,
+		server:      server,
+		overlay:     overlay,
+		telestrator: telestrator,
+		state:       state,
 	}, nil
 }
 
 // Init initializes components in the core.
 func (c *Core) Init() {
-	// Initialize Overlay.
+	// Initialize Scoreboard Overlay.
 	go c.overlay.Init()
+
+	// Initialize Telestrator Overlay.
+	go c.telestrator.Overlay.Init()
 
 	// Initialize API Server.
 	c.server.Init()
