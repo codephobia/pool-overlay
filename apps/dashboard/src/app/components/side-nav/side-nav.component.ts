@@ -12,9 +12,6 @@ export class SideNavComponent {
         title: 'Players',
         link: 'players',
     }, {
-        title: 'Teams',
-        link: '#',
-    }, {
         title: 'Games',
         link: '#',
     }, {
