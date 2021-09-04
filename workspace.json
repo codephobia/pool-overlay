@@ -39,7 +39,9 @@
             "architect": {
                 "build": {
                     "builder": "@angular-devkit/build-angular:browser",
-                    "outputs": ["{options.outputPath}"],
+                    "outputs": [
+                        "{options.outputPath}"
+                    ],
                     "options": {
                         "outputPath": "dist/apps/dashboard",
                         "index": "apps/dashboard/src/index.html",
@@ -119,7 +121,9 @@
                 },
                 "test": {
                     "builder": "@nrwl/jest:jest",
-                    "outputs": ["coverage/apps/dashboard"],
+                    "outputs": [
+                        "coverage/apps/dashboard"
+                    ],
                     "options": {
                         "jestConfig": "apps/dashboard/jest.config.js",
                         "passWithNoTests": true
@@ -148,7 +152,9 @@
             "architect": {
                 "test": {
                     "builder": "@nrwl/jest:jest",
-                    "outputs": ["coverage/libs/models"],
+                    "outputs": [
+                        "coverage/libs/models"
+                    ],
                     "options": {
                         "jestConfig": "libs/models/jest.config.js",
                         "passWithNoTests": true
@@ -189,7 +195,9 @@
                             "apps/overlay/src/favicon.ico",
                             "apps/overlay/src/assets"
                         ],
-                        "styles": ["apps/overlay/src/styles.scss"],
+                        "styles": [
+                            "apps/overlay/src/styles.scss"
+                        ],
                         "scripts": []
                     },
                     "configurations": {
@@ -221,7 +229,9 @@
                             ]
                         }
                     },
-                    "outputs": ["{options.outputPath}"]
+                    "outputs": [
+                        "{options.outputPath}"
+                    ]
                 },
                 "serve": {
                     "builder": "@angular-devkit/build-angular:dev-server",
@@ -248,7 +258,10 @@
                             "apps/overlay/tsconfig.spec.json",
                             "apps/overlay/tsconfig.editor.json"
                         ],
-                        "exclude": ["**/node_modules/**", "!apps/overlay/**/*"]
+                        "exclude": [
+                            "**/node_modules/**",
+                            "!apps/overlay/**/*"
+                        ]
                     }
                 },
                 "test": {
@@ -257,7 +270,9 @@
                         "jestConfig": "apps/overlay/jest.config.js",
                         "passWithNoTests": true
                     },
-                    "outputs": ["coverage/apps/overlay"]
+                    "outputs": [
+                        "coverage/apps/overlay"
+                    ]
                 }
             }
         },
@@ -269,7 +284,9 @@
             "architect": {
                 "test": {
                     "builder": "@nrwl/jest:jest",
-                    "outputs": ["coverage/libs/scoreboard"],
+                    "outputs": [
+                        "coverage/libs/scoreboard"
+                    ],
                     "options": {
                         "jestConfig": "libs/scoreboard/jest.config.js",
                         "passWithNoTests": true
@@ -310,6 +327,105 @@
                 },
                 "lint": {
                     "builder": "@nx-go/nx-go:lint"
+                }
+            }
+        },
+        "telestrator": {
+            "projectType": "application",
+            "root": "apps/telestrator",
+            "sourceRoot": "apps/telestrator/src",
+            "prefix": "pool-overlay",
+            "architect": {
+                "build": {
+                    "builder": "@angular-devkit/build-angular:browser",
+                    "outputs": [
+                        "{options.outputPath}"
+                    ],
+                    "options": {
+                        "outputPath": "dist/apps/telestrator",
+                        "index": "apps/telestrator/src/index.html",
+                        "main": "apps/telestrator/src/main.ts",
+                        "polyfills": "apps/telestrator/src/polyfills.ts",
+                        "tsConfig": "apps/telestrator/tsconfig.app.json",
+                        "inlineStyleLanguage": "scss",
+                        "assets": [
+                            "apps/telestrator/src/favicon.ico",
+                            "apps/telestrator/src/assets"
+                        ],
+                        "styles": [
+                            "apps/telestrator/src/styles.scss"
+                        ],
+                        "scripts": []
+                    },
+                    "configurations": {
+                        "production": {
+                            "budgets": [
+                                {
+                                    "type": "initial",
+                                    "maximumWarning": "500kb",
+                                    "maximumError": "1mb"
+                                },
+                                {
+                                    "type": "anyComponentStyle",
+                                    "maximumWarning": "2kb",
+                                    "maximumError": "4kb"
+                                }
+                            ],
+                            "fileReplacements": [
+                                {
+                                    "replace": "apps/telestrator/src/environments/environment.ts",
+                                    "with": "apps/telestrator/src/environments/environment.prod.ts"
+                                }
+                            ],
+                            "outputHashing": "all"
+                        },
+                        "development": {
+                            "buildOptimizer": false,
+                            "optimization": false,
+                            "vendorChunk": true,
+                            "extractLicenses": false,
+                            "sourceMap": true,
+                            "namedChunks": true
+                        }
+                    },
+                    "defaultConfiguration": "production"
+                },
+                "serve": {
+                    "builder": "@angular-devkit/build-angular:dev-server",
+                    "configurations": {
+                        "production": {
+                            "browserTarget": "telestrator:build:production"
+                        },
+                        "development": {
+                            "browserTarget": "telestrator:build:development"
+                        }
+                    },
+                    "defaultConfiguration": "development"
+                },
+                "extract-i18n": {
+                    "builder": "@angular-devkit/build-angular:extract-i18n",
+                    "options": {
+                        "browserTarget": "telestrator:build"
+                    }
+                },
+                "lint": {
+                    "builder": "@nrwl/linter:eslint",
+                    "options": {
+                        "lintFilePatterns": [
+                            "apps/telestrator/src/**/*.ts",
+                            "apps/telestrator/src/**/*.html"
+                        ]
+                    }
+                },
+                "test": {
+                    "builder": "@nrwl/jest:jest",
+                    "outputs": [
+                        "coverage/apps/telestrator"
+                    ],
+                    "options": {
+                        "jestConfig": "apps/telestrator/jest.config.js",
+                        "passWithNoTests": true
+                    }
                 }
             }
         }

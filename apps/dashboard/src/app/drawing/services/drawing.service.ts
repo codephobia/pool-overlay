@@ -7,6 +7,7 @@ export interface Click {
     width: number;
     x: number;
     y: number;
+    scale: number;
     drag: boolean;
 }
 
@@ -31,7 +32,7 @@ export class DrawingService {
         3,
         5,
     ];
-    private _lineWidth = new BehaviorSubject<number>(this._lineWidths[0]);
+    private _lineWidth = new BehaviorSubject<number>(this._lineWidths[1]);
 
     constructor(
         private _socketService: SocketService,
@@ -82,10 +83,6 @@ export class DrawingService {
     }
 
     public clear(): void {
-        if (!this._clicks.length) {
-            return;
-        }
-
         this._clicks = [];
         this._redraw();
         this._socketService.send('CLEAR');
@@ -99,12 +96,14 @@ export class DrawingService {
 
         const x = event.pageX - this._canvas!.nativeElement.getBoundingClientRect().left;
         const y = event.pageY - this._canvas!.nativeElement.getBoundingClientRect().top;
+        const scale = 1920 / this._canvas!.nativeElement.getBoundingClientRect().width;
         const drag = false;
         const click: Click = {
             color: this._color.value,
             width: this._lineWidth.value,
             x,
             y,
+            scale,
             drag
         };
 
@@ -127,12 +126,14 @@ export class DrawingService {
 
         const x = event.pageX - this._canvas!.nativeElement.getBoundingClientRect().left;
         const y = event.pageY - this._canvas!.nativeElement.getBoundingClientRect().top;
+        const scale = 1920 / this._canvas!.nativeElement.getBoundingClientRect().width;
         const drag = true;
         const click: Click = {
             color: this._color.value,
             width: this._lineWidth.value,
             x,
             y,
+            scale,
             drag
         };
 
