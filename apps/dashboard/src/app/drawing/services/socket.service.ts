@@ -7,8 +7,11 @@ export class SocketService {
     private _connTimer: ReturnType<typeof setInterval> | null = null;
     private _conn: WebSocket | null = null;
     private _eventHandlers: EventHandlers = {};
+    private _attemptReconnect = true;
 
     public connect(): void {
+        this._attemptReconnect = true;
+
         try {
             this._conn = new WebSocket('ws://localhost:1268/latest/telestrator');
             this._conn.onopen = this._onOpen.bind(this);
@@ -27,13 +30,23 @@ export class SocketService {
     }
 
     public send(type: string, payload?: any): void {
-        if (!this._conn) {
+        if (!this._conn || this._conn.readyState !== WebSocket.OPEN) {
             return;
         }
 
         payload = payload ?? {};
         const message = JSON.stringify({ type, payload });
         this._conn.send(message);
+    }
+
+    public disconnect(): void {
+        if (!this._conn || this._conn.readyState === WebSocket.CLOSING || this._conn.readyState === WebSocket.CLOSED) {
+            return;
+        }
+
+        this._attemptReconnect = false;
+        this.send('CLEAR');
+        this._conn.close();
     }
 
     private _onOpen(): void {
@@ -44,7 +57,7 @@ export class SocketService {
     }
 
     private _onClose(): void {
-        if (!this._connTimer) {
+        if (!this._connTimer && this._attemptReconnect) {
             this._connTimer = setInterval(this.connect.bind(this), 5000);
         }
     }

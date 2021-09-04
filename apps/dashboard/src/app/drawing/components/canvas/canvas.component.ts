@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 
 import { DrawingService } from '../../services/drawing.service';
 import { SocketService } from '../../services/socket.service';
@@ -12,7 +12,7 @@ import { SocketService } from '../../services/socket.service';
         }
     `],
 })
-export class CanvasComponent {
+export class CanvasComponent implements OnDestroy {
     constructor(
         private _drawingService: DrawingService,
         private _socketService: SocketService,
@@ -21,5 +21,9 @@ export class CanvasComponent {
         this._socketService.bind('UNDO', this._drawingService.undo.bind(this._drawingService));
         this._socketService.bind('CLEAR', this._drawingService.clear.bind(this._drawingService));
         this._socketService.connect();
+    }
+
+    public ngOnDestroy(): void {
+        this._socketService.disconnect();
     }
 }

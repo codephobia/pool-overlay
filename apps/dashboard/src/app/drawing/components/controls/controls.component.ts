@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { faCircle, faEraser, faPen, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { faCircle as faCircleRing } from '@fortawesome/free-regular-svg-icons';
 
@@ -9,7 +9,7 @@ import { DrawingService } from '../../services/drawing.service';
     templateUrl: './controls.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ControlsComponent implements OnDestroy {
+export class ControlsComponent {
     public faPen = faPen;
     public faEraser = faEraser;
     public faUndo = faUndo;
@@ -38,9 +38,5 @@ export class ControlsComponent implements OnDestroy {
 
     public clear(): void {
         this.drawingService.clear();
-    }
-
-    public ngOnDestroy(): void {
-        this.clear();
     }
 }
