@@ -188,14 +188,14 @@ func (g *Game) IncrementScore(playerNum int) error {
 	switch playerNum {
 	case 1:
 		newScore := g.ScoreOne + 1
-		if newScore <= g.RaceTo {
-			g.ScoreOne = newScore
-		}
+		// if newScore <= g.RaceTo {
+		g.ScoreOne = newScore
+		// }
 	case 2:
 		newScore := g.ScoreTwo + 1
-		if newScore <= g.RaceTo {
-			g.ScoreTwo = newScore
-		}
+		// if newScore <= g.RaceTo {
+		g.ScoreTwo = newScore
+		// }
 	default:
 		return ErrInvalidPlayerNumber
 	}
