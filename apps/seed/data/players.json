@@ -2,11 +2,15 @@
     {
         "id": 1,
         "name": "codephobia",
-        "flag_id": 1
+        "flag_id": 1,
+        "fargo_id": 0,
+        "fargo_rating": 0
     },
     {
         "id": 2,
         "name": "Atota",
-        "flag_id": 2
+        "flag_id": 2,
+        "fargo_id": 0,
+        "fargo_rating": 0
     }
 ]

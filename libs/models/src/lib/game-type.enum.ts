@@ -1,15 +1,15 @@
 export enum GameType {
-  EightBall,
-  NineBall,
-  TenBall,
+    EightBall,
+    NineBall,
+    TenBall,
 }
 
 const GameTypeName = [
-  '8 Ball',
-  '9 Ball',
-  '10 Ball',
+    '8 Ball',
+    '9 Ball',
+    '10 Ball',
 ];
 
 export function gameTypeToString(gameType: GameType): string {
-  return GameTypeName[gameType];
+    return GameTypeName[gameType];
 }

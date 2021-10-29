@@ -47,7 +47,7 @@ func (s *PlayerSeed) Seeds() []Seed {
 			Name: "CreatePlayer" + player.Name,
 			Run: (func(player models.Player) func(db *gorm.DB) error {
 				return func(db *gorm.DB) error {
-					return CreatePlayer(db, player.ID, player.Name, player.FlagID)
+					return CreatePlayer(db, player.ID, player.Name, player.FlagID, player.FargoID, player.FargoRating)
 				}
 			})(player),
 		}
@@ -59,7 +59,7 @@ func (s *PlayerSeed) Seeds() []Seed {
 }
 
 // CreatePlayer adds a player to the database.
-func CreatePlayer(db *gorm.DB, id uint, name string, flagID uint) error {
+func CreatePlayer(db *gorm.DB, id uint, name string, flagID uint, fargoID uint, fargoRating uint) error {
 	var players []models.Player
 	db.Where("id = ?", id).Find(&players)
 
@@ -70,9 +70,11 @@ func CreatePlayer(db *gorm.DB, id uint, name string, flagID uint) error {
 
 	return db.Create(
 		&models.Player{
-			ID:     id,
-			Name:   name,
-			FlagID: flagID,
+			ID:          id,
+			Name:        name,
+			FlagID:      flagID,
+			FargoID:     fargoID,
+			FargoRating: fargoRating,
 		},
 	).Error
 }

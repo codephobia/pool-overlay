@@ -50,6 +50,20 @@ type PlayerPatchData struct {
 	// required: true
 	// example: 1
 	FlagID uint `json:"flag_id"`
+
+	// The new player Fargo id.
+	//
+	// in: body
+	// required: true
+	// example: 1
+	FargoID uint `json:"fargo_id"`
+
+	// The new player Fargo rating.
+	//
+	// in: body
+	// required: true
+	// example: 1
+	FargoRating uint `json:"fargo_rating"`
 }
 
 // swagger:parameters PlayersByIdPatch
@@ -65,7 +79,7 @@ type PlayersByIdPatchParam struct {
 	//
 	// in: body
 	// required: true
-	// example: { "name": "Joe", "flag_id": 1 }
+	// example: { "name": "Joe", "flag_id": 1, "fargo_id": 1, "fargo_rating": 1 }
 	Player PlayerPatchData
 }
 

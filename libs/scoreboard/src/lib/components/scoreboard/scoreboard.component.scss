@@ -7,6 +7,8 @@ $versus-background-color: #99002c;
 $game-background-color: #1b3887;
 $player-name-text-color: #0c0104;
 $versus-text-color: #ffffff;
+$fargo-background-color: #313236;
+$fargo-text-color: #ffffff;
 
 :host {
     flex: none;
@@ -68,7 +70,8 @@ $versus-text-color: #ffffff;
                         display: flex;
                         flex-direction: row;
                         flex: 1 0 auto;
-                        width: 449px;
+                        // width: 449px;
+                        width: 532px;
                         z-index: 1;
                         overflow: hidden;
                         margin: 0 -11px;
@@ -151,6 +154,54 @@ $versus-text-color: #ffffff;
                                 color: $player-name-text-color;
                             }
 
+                            .fargo-rating {
+                                display: flex;
+                                flex-direction: column;
+                                flex: 1 0 auto;
+                                background-color: $fargo-background-color;
+                                width: 64px;
+                                margin: 0 8px;
+                                position: relative;
+                                z-index: 1;
+                                justify-content: center;
+                                align-items: center;
+                                font-size: 22px;
+                                color: $fargo-text-color;
+
+                                .title {
+                                    position: absolute;
+                                    top: 4px;
+                                    left: 0px;
+                                    width: 64px;
+                                    color: $fargo-text-color;
+                                    font-size: 10px;
+                                    text-align: center;
+                                    text-transform: uppercase;
+                                }
+
+                                &:before {
+                                    position: absolute;
+                                    top: 0;
+                                    bottom: 0;
+                                    content: '';
+                                    background-color: inherit;
+                                    width: 19px;
+                                    transform-origin: 100%;
+                                    z-index: -1;
+                                }
+
+                                &:after {
+                                    position: absolute;
+                                    top: 0;
+                                    bottom: 0;
+                                    content: '';
+                                    background-color: inherit;
+                                    width: 19px;
+                                    transform-origin: 100%;
+                                    z-index: -1;
+                                }
+                            }
+
                             &.one {
                                 left: 11px;
 
@@ -187,6 +238,22 @@ $versus-text-color: #ffffff;
                                         0 100%
                                     );
                                 }
+
+                                .fargo-rating {
+                                    .title {
+                                        margin-left: 8px;
+                                    }
+
+                                    &:before {
+                                        right: calc(100% - 11px);
+                                        transform: skewX(-20deg);
+                                    }
+
+                                    &:after {
+                                        left: calc(100% - 11px);
+                                        transform: skewX(-20deg);
+                                    }
+                                }
                             }
 
                             &.two {
@@ -222,6 +289,22 @@ $versus-text-color: #ffffff;
                                         100% 100%,
                                         22px 100%
                                     );
+                                }
+
+                                .fargo-rating {
+                                    .title {
+                                        margin-left: -8px;
+                                    }
+
+                                    &:before {
+                                        left: calc(100% - 11px);
+                                        transform: skewX(20deg);
+                                    }
+
+                                    &:after {
+                                        right: calc(100% - 11px);
+                                        transform: skewX(20deg);
+                                    }
                                 }
                             }
                         }
