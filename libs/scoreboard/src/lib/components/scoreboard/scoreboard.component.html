@@ -1,8 +1,4 @@
-<div
-    class="scoreboard-wrapper"
-    [@scoreboardTransition]="!vm.hidden"
-    *ngIf="vm$ | async as vm"
->
+<div class="scoreboard-wrapper" [@scoreboardTransition]="!vm.hidden" *ngIf="vm$ | async as vm">
     <div class="scoreboard" *ngIf="!vm.hidden">
         <div class="players">
             <div class="bar top"></div>
@@ -11,17 +7,16 @@
                     <div class="player one">
                         <div class="divider"></div>
                         <div class="flag">
-                            <app-flag
-                                class="player-one"
-                                [imagePath]="vm.game?.player_one?.flag?.image_path"
-                            ></app-flag>
+                            <app-flag class="player-one" [imagePath]="vm.game?.player_one?.flag?.image_path"></app-flag>
                         </div>
                         <div class="divider"></div>
                         <div class="player-name">
-                            <app-character-rotater
-                                *ngIf="vm.game?.player_one?.name"
-                                [characters]="vm.game?.player_one?.name"
-                            ></app-character-rotater>
+                            <app-character-rotater *ngIf="vm.game?.player_one?.name" [characters]="vm.game?.player_one?.name"></app-character-rotater>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="fargo-rating">
+                            <div class="title">Fargo</div>
+                            <app-character-rotater [characters]="vm.game?.player_one?.fargo_rating"></app-character-rotater>
                         </div>
                     </div>
                 </div>
@@ -29,37 +24,30 @@
                     <div class="scores">
                         <div class="divider left"></div>
                         <div class="score left">
-                            <app-character-rotater
-                                *ngIf="vm.game?.score_one !== null"
-                                [characters]="vm.game?.score_one"
-                            ></app-character-rotater>
+                            <app-character-rotater *ngIf="vm.game?.score_one !== null" [characters]="vm.game?.score_one"></app-character-rotater>
                         </div>
                         <div class="divider left"></div>
                         <div class="versus">vs</div>
                         <div class="divider right"></div>
                         <div class="score right">
-                            <app-character-rotater
-                                *ngIf="vm.game?.score_two !== null"
-                                [characters]="vm.game?.score_two"
-                            ></app-character-rotater>
+                            <app-character-rotater *ngIf="vm.game?.score_two !== null" [characters]="vm.game?.score_two"></app-character-rotater>
                         </div>
                         <div class="divider right"></div>
                     </div>
                 </div>
                 <div class="player-wrapper two">
                     <div class="player two">
+                        <div class="fargo-rating">
+                            <div class="title">Fargo</div>
+                            <app-character-rotater [characters]="vm.game?.player_two?.fargo_rating"></app-character-rotater>
+                        </div>
+                        <div class="divider"></div>
                         <div class="player-name">
-                            <app-character-rotater
-                                *ngIf="vm.game?.player_two?.name"
-                                [characters]="vm.game?.player_two?.name"
-                            ></app-character-rotater>
+                            <app-character-rotater *ngIf="vm.game?.player_two?.name" [characters]="vm.game?.player_two?.name"></app-character-rotater>
                         </div>
                         <div class="divider"></div>
                         <div class="flag">
-                            <app-flag
-                                class="player-two"
-                                [imagePath]="vm.game?.player_two?.flag?.image_path"
-                            ></app-flag>
+                            <app-flag class="player-two" [imagePath]="vm.game?.player_two?.flag?.image_path"></app-flag>
                         </div>
                         <div class="divider"></div>
                     </div>

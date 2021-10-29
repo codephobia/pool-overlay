@@ -66,13 +66,13 @@ func (g *Game) LoadLatest() *Game {
 		Order("id desc").
 		Limit(1).
 		Preload("PlayerOne", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id", "name", "flag_id").
+			return db.Select("id", "name", "flag_id", "fargo_id", "fargo_rating").
 				Preload("Flag", func(db *gorm.DB) *gorm.DB {
 					return db.Select("id", "country", "image_path")
 				})
 		}).
 		Preload("PlayerTwo", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id", "name", "flag_id").
+			return db.Select("id", "name", "flag_id", "fargo_id", "fargo_rating").
 				Preload("Flag", func(db *gorm.DB) *gorm.DB {
 					return db.Select("id", "country", "image_path")
 				})

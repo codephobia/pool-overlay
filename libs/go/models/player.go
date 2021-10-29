@@ -15,10 +15,12 @@ var (
 
 // Player is a pool player.
 type Player struct {
-	ID     uint   `json:"id,omitempty" gorm:"primarykey"`
-	Name   string `json:"name,omitempty" gorm:"size:100"`
-	FlagID uint   `json:"flag_id,omitempty"`
-	Flag   *Flag  `json:"flag,omitempty" gorm:"foreignKey:flag_id"`
+	ID          uint   `json:"id,omitempty" gorm:"primarykey"`
+	Name        string `json:"name,omitempty" gorm:"size:100"`
+	FlagID      uint   `json:"flag_id,omitempty"`
+	Flag        *Flag  `json:"flag,omitempty" gorm:"foreignKey:flag_id"`
+	FargoID     uint   `json:"fargo_id"`
+	FargoRating uint   `json:"fargo_rating"`
 
 	CreatedAt *time.Time      `json:"created_at,omitempty"`
 	UpdatedAt *time.Time      `json:"updated_at,omitempty"`
@@ -28,12 +30,15 @@ type Player struct {
 // LoadByID loads a player by ID.
 func (p *Player) LoadByID(database *gorm.DB, id int) error {
 	result := database.
-		Select("id", "name", "flag_id").
+		Select("id", "name", "flag_id", "fargo_id", "fargo_rating").
 		Where("id = ?", id).
 		Preload("Flag", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id", "country", "image_path")
 		}).
 		Find(p)
+
+	// could use:
+	// errors.Is(err, gorm.ErrRecordNotFound)
 
 	if result.Error != nil {
 		return ErrPlayerIDInvalid
@@ -62,8 +67,10 @@ func (p *Player) Update(database *gorm.DB) error {
 	}
 
 	return database.Model(p).Updates(map[string]interface{}{
-		"name":    p.Name,
-		"flag_id": p.FlagID,
+		"name":         p.Name,
+		"flag_id":      p.FlagID,
+		"fargo_id":     p.FargoID,
+		"fargo_rating": p.FargoRating,
 	}).Error
 }
 

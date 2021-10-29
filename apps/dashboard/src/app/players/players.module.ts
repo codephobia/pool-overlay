@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { SharedModule } from '../shared/shared.module';
 import { PlayersRoutingModule } from './players-routing.module';
@@ -33,6 +34,7 @@ const SERVICES = [
         HttpClientModule,
         ReactiveFormsModule,
         MatDialogModule,
+        FontAwesomeModule,
         SharedModule,
         PlayersRoutingModule,
     ],
