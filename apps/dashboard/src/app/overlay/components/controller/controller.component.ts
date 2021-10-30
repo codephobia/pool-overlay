@@ -82,6 +82,10 @@ export class ControllerComponent implements OnInit {
         this.store.updateRaceTo(direction);
     }
 
+    public toggleFargoHotHandicap(use: boolean): void {
+        this.store.toggleFargoHotHandicap(use);
+    }
+
     public save(): void {
         this.store.save();
     }

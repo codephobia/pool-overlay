@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/codephobia/pool-overlay/libs/go/utils"
 	"gorm.io/gorm"
 )
 
@@ -39,6 +40,10 @@ type Game struct {
 	TeamOne   *Team   `json:"team_one,omitempty" gorm:"foreignKey:team_one_id"`
 	TeamTwo   *Team   `json:"team_two,omitempty" gorm:"foreignKey:team_two_id"`
 
+	UseFargoHotHandicap bool              `json:"use_fargo_hot_handicap"`
+	FargoHotHandicapID  *uint             `json:"fargo_hot_handicap_id,omitempty"`
+	FargoHotHandicap    *FargoHotHandicap `json:"fargo_hot_handicap" gorm:"foreignKey:fargo_hot_handicap_id"`
+
 	CreatedAt *time.Time      `json:"created_at,omitempty"`
 	UpdatedAt *time.Time      `json:"updated_at,omitempty"`
 	DeletedAt *gorm.DeletedAt `json:"deleted_at,omitempty" gorm:"index"`
@@ -54,6 +59,8 @@ func NewGame(db *gorm.DB) *Game {
 		Type:   EightBall,
 		RaceTo: 5,
 		VsMode: OneVsOne,
+
+		UseFargoHotHandicap: false,
 	}
 }
 
@@ -102,6 +109,9 @@ func (g *Game) LoadLatest() *Game {
 								})
 						})
 				})
+		}).
+		Preload("FargoHotHandicap", func(db *gorm.DB) *gorm.DB {
+			return db.Select("race_to", "difference_start", "difference_end", "wins_higher", "wins_lower")
 		}).
 		Find(&latest)
 
@@ -259,6 +269,13 @@ func (g *Game) SetPlayer(playerNum int, player *Player) error {
 	g.TeamTwoID = nil
 	g.TeamTwo = nil
 
+	// Update fargo hot handicap if we are using it.
+	if g.UseFargoHotHandicap {
+		if err := g.updateFargoHotHandicap(); err != nil {
+			return err
+		}
+	}
+
 	return g.Save(false)
 }
 
@@ -276,6 +293,13 @@ func (g *Game) UnsetPlayer(playerNum int) error {
 		g.PlayerTwo = nil
 	default:
 		return ErrInvalidPlayerNumber
+	}
+
+	// Update fargo hot handicap if we are using it.
+	if g.UseFargoHotHandicap {
+		if err := g.updateFargoHotHandicap(); err != nil {
+			return err
+		}
 	}
 
 	return g.Save(false)
@@ -362,6 +386,69 @@ func (g *Game) SetTeam(teamNum int, team *Team) error {
 	return g.Save(false)
 }
 
+// SetUseFargoHotHandicap updates if we are using fargo hot handicap for the
+// current game.
+func (g *Game) SetUseFargoHotHandicap(use bool) error {
+	g.UseFargoHotHandicap = use
+
+	if use {
+		if g.PlayerOne != nil && g.PlayerTwo != nil {
+			if err := g.updateFargoHotHandicap(); err != nil {
+				return err
+			}
+		}
+	} else {
+		g.FargoHotHandicapID = nil
+		g.FargoHotHandicap = nil
+	}
+
+	return g.Save(false)
+}
+
+// TODO: MAKE SURE WE ONLY ALLOW HANDICAP FROM RACE TO 2-7
+// SOMETHING IN HERE IS CAUSING AN ERROR.
+
+// Updates the handicap to be used for the current game.
+// We don't need to call game.Save here because anything that calls this will
+// end up saving the game anyway.
+func (g *Game) updateFargoHotHandicap() error {
+	// If both players are not set, unset the fargo hot handicap.
+	if g.PlayerOne == nil || g.PlayerTwo == nil {
+		g.FargoHotHandicapID = nil
+		g.FargoHotHandicap = nil
+
+		return nil
+	}
+
+	// get the handicaps for the current race to.
+	var handicaps FargoHotHandicaps
+	if err := handicaps.LoadByRaceTo(g.db, g.RaceTo); err != nil {
+		return err
+	}
+
+	// Figure out difference in handicap between both players.
+	diff := utils.Abs(int(g.PlayerOne.FargoRating - g.PlayerTwo.FargoRating))
+
+	// Loop through handicaps to find the appropriate handicap based on fargo
+	// difference.
+	var currentHandicap FargoHotHandicap
+	for _, handicap := range handicaps {
+		currentHandicap = handicap
+
+		// Check if this is the last handicap or the difference end is less than
+		// or equal to the rating difference.
+		if handicap.DifferenceEnd == nil || int(*handicap.DifferenceEnd) >= diff {
+			break
+		}
+	}
+
+	// Set the fargo handicap to the game.
+	g.FargoHotHandicapID = &currentHandicap.ID
+	g.FargoHotHandicap = &currentHandicap
+
+	return nil
+}
+
 // Save saves the game to the database.
 func (g *Game) Save(completed bool) error {
 	if g.ID != 0 {
@@ -377,6 +464,9 @@ func (g *Game) Save(completed bool) error {
 			"player_two_id": g.PlayerTwoID,
 			"team_one_id":   g.TeamOneID,
 			"team_two_id":   g.TeamTwoID,
+
+			"use_fargo_hot_handicap": g.UseFargoHotHandicap,
+			"fargo_hot_handicap_id":  g.FargoHotHandicapID,
 		}).Error
 	}
 

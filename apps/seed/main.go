@@ -41,6 +41,7 @@ func main() {
 		&models.Team{},
 		&models.TeamPlayer{},
 		&models.Game{},
+		&models.FargoHotHandicap{},
 	); err != nil {
 		log.Printf("[ERROR] unable to auto migrate: %s", err)
 	}
@@ -52,6 +53,7 @@ func main() {
 		seeds.NewPlayerSeed("data", "players.json"),
 		seeds.NewTeamSeed("data", "teams.json"),
 		seeds.NewTeamPlayerSeed("data", "team_players.json"),
+		seeds.NewFargoHotHandicapSeed("data", "fargo-hot-handicaps.json"),
 	); err != nil {
 		panic(err)
 	}

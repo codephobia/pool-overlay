@@ -55,6 +55,14 @@ export class ControllerStore extends ComponentStore<ControllerState> {
         },
     }));
 
+    public readonly setFargoHotHandicap = this.updater<boolean>((state, useFargoHotHandicap) => ({
+        ...state,
+        game: {
+            ...(state.game as IGame),
+            useFargoHotHandicap,
+        },
+    }));
+
     public readonly setHidden = this.updater<boolean>((state, hidden) => ({
         ...state,
         hidden,
@@ -169,6 +177,19 @@ export class ControllerStore extends ComponentStore<ControllerState> {
             tapResponse(
                 ({ hidden }) => {
                     this.setHidden(hidden);
+                },
+                error => console.error(error),
+                () => { this.setPending(false); },
+            )
+        ))
+    ));
+
+    public readonly toggleFargoHotHandicap = this.effect<boolean>(useFargoHotHandicap$ => useFargoHotHandicap$.pipe(
+        tap(() => { this.setPending(true); }),
+        switchMap(useFargoHotHandicap => this.gameService.setFargoHotHandicap(useFargoHotHandicap).pipe(
+            tapResponse(
+                ({ useFargoHotHandicap }) => {
+                    this.setFargoHotHandicap(useFargoHotHandicap);
                 },
                 error => console.error(error),
                 () => { this.setPending(false); },

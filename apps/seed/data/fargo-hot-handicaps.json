@@ -1,0 +1,260 @@
+[
+    {
+        "id": 1,
+        "race_to": 2,
+        "difference_start": 0,
+        "difference_end": 67,
+        "wins_higher": 2,
+        "wins_lower": 2
+    },
+    {
+        "id": 2,
+        "race_to": 2,
+        "difference_start": 68,
+        "difference_end": 112,
+        "wins_higher": 3,
+        "wins_lower": 2
+    },
+    {
+        "id": 3,
+        "race_to": 2,
+        "difference_start": 113,
+        "wins_higher": 4,
+        "wins_lower": 2
+    },
+    {
+        "id": 4,
+        "race_to": 3,
+        "difference_start": 0,
+        "difference_end": 67,
+        "wins_higher": 3,
+        "wins_lower": 3
+    },
+    {
+        "id": 5,
+        "race_to": 3,
+        "difference_start": 68,
+        "difference_end": 112,
+        "wins_higher": 3,
+        "wins_lower": 2
+    },
+    {
+        "id": 6,
+        "race_to": 3,
+        "difference_start": 113,
+        "difference_end": 147,
+        "wins_higher": 4,
+        "wins_lower": 2
+    },
+    {
+        "id": 7,
+        "race_to": 3,
+        "difference_start": 148,
+        "wins_higher": 5,
+        "wins_lower": 2
+    },
+    {
+        "id": 8,
+        "race_to": 4,
+        "difference_start": 0,
+        "difference_end": 45,
+        "wins_higher": 4,
+        "wins_lower": 4
+    },
+    {
+        "id": 9,
+        "race_to": 4,
+        "difference_start": 46,
+        "difference_end": 80,
+        "wins_higher": 4,
+        "wins_lower": 3
+    },
+    {
+        "id": 10,
+        "race_to": 4,
+        "difference_start": 81,
+        "difference_end": 147,
+        "wins_higher": 5,
+        "wins_lower": 3
+    },
+    {
+        "id": 11,
+        "race_to": 4,
+        "difference_start": 148,
+        "difference_end": 175,
+        "wins_higher": 5,
+        "wins_lower": 2
+    },
+    {
+        "id": 12,
+        "race_to": 4,
+        "difference_start": 176,
+        "wins_higher": 6,
+        "wins_lower": 2
+    },
+    {
+        "id": 13,
+        "race_to": 5,
+        "difference_start": 0,
+        "difference_end": 34,
+        "wins_higher": 5,
+        "wins_lower": 5
+    },
+    {
+        "id": 14,
+        "race_to": 5,
+        "difference_start": 35,
+        "difference_end": 62,
+        "wins_higher": 5,
+        "wins_lower": 4
+    },
+    {
+        "id": 15,
+        "race_to": 5,
+        "difference_start": 63,
+        "difference_end": 108,
+        "wins_higher": 6,
+        "wins_lower": 4
+    },
+    {
+        "id": 16,
+        "race_to": 5,
+        "difference_start": 109,
+        "difference_end": 131,
+        "wins_higher": 6,
+        "wins_lower": 3
+    },
+    {
+        "id": 17,
+        "race_to": 5,
+        "difference_start": 132,
+        "difference_end": 151,
+        "wins_higher": 7,
+        "wins_lower": 3
+    },
+    {
+        "id": 18,
+        "race_to": 5,
+        "difference_start": 152,
+        "wins_higher": 8,
+        "wins_lower": 3
+    },
+    {
+        "id": 19,
+        "race_to": 6,
+        "difference_start": 0,
+        "difference_end": 27,
+        "wins_higher": 6,
+        "wins_lower": 6
+    },
+    {
+        "id": 20,
+        "race_to": 6,
+        "difference_start": 28,
+        "difference_end": 51,
+        "wins_higher": 6,
+        "wins_lower": 5
+    },
+    {
+        "id": 21,
+        "race_to": 6,
+        "difference_start": 52,
+        "difference_end": 85,
+        "wins_higher": 7,
+        "wins_lower": 5
+    },
+    {
+        "id": 22,
+        "race_to": 6,
+        "difference_start": 86,
+        "difference_end": 106,
+        "wins_higher": 7,
+        "wins_lower": 4
+    },
+    {
+        "id": 23,
+        "race_to": 6,
+        "difference_start": 107,
+        "difference_end": 151,
+        "wins_higher": 8,
+        "wins_lower": 4
+    },
+    {
+        "id": 24,
+        "race_to": 6,
+        "difference_start": 152,
+        "difference_end": 169,
+        "wins_higher": 8,
+        "wins_lower": 3
+    },
+    {
+        "id": 25,
+        "race_to": 6,
+        "difference_start": 170,
+        "wins_higher": 9,
+        "wins_lower": 3
+    },
+    {
+        "id": 26,
+        "race_to": 7,
+        "difference_start": 0,
+        "difference_end": 23,
+        "wins_higher": 7,
+        "wins_lower": 7
+    },
+    {
+        "id": 27,
+        "race_to": 7,
+        "difference_start": 24,
+        "difference_end": 43,
+        "wins_higher": 7,
+        "wins_lower": 6
+    },
+    {
+        "id": 28,
+        "race_to": 7,
+        "difference_start": 44,
+        "difference_end": 71,
+        "wins_higher": 8,
+        "wins_lower": 6
+    },
+    {
+        "id": 29,
+        "race_to": 7,
+        "difference_start": 72,
+        "difference_end": 89,
+        "wins_higher": 8,
+        "wins_lower": 5
+    },
+    {
+        "id": 30,
+        "race_to": 7,
+        "difference_start": 90,
+        "difference_end": 123,
+        "wins_higher": 9,
+        "wins_lower": 5
+    },
+    {
+        "id": 31,
+        "race_to": 7,
+        "difference_start": 124,
+        "difference_end": 139,
+        "wins_higher": 9,
+        "wins_lower": 4
+    },
+    {
+        "id": 32,
+        "race_to": 7,
+        "difference_start": 140,
+        "difference_end": 185,
+        "wins_higher": 10,
+        "wins_lower": 4
+    },
+    {
+        "id": 33,
+        "race_to": 7,
+        "difference_start": 186,
+        "wins_higher": 10,
+        "wins_lower": 3
+    }
+]

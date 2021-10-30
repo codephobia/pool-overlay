@@ -23,6 +23,14 @@
     </div>
     <div class="flex flex-row justify-center items-start gap-10">
         <div>
+            <h2 class="mb-2.5 text-white">Fargo Hot Handicap</h2>
+            <div>
+                <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="toggleFargoHotHandicap(!vm.game?.use_fargo_hot_handicap)">
+                    {{ vm.game?.use_fargo_hot_handicap ? 'Handicapped' : 'Not Handicapped' }}
+                </button>
+            </div>
+        </div>
+        <div>
             <h2 class="mb-2.5 text-white">Score</h2>
             <div>
                 <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="resetScore()">Reset</button>
