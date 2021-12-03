@@ -9,6 +9,8 @@ $player-name-text-color: #0c0104;
 $versus-text-color: #ffffff;
 $fargo-background-color: #313236;
 $fargo-text-color: #ffffff;
+$handicap-background-color: #99002c;
+$handicap-text-color: #ffffff;
 
 :host {
     flex: none;
@@ -21,6 +23,196 @@ $fargo-text-color: #ffffff;
             flex: none;
             align-items: center;
             font-family: 'Cascadia Mono', Roboto, 'Helvetica Neue', sans-serif;
+
+            .handicap {
+                position: relative;
+                margin: 50px 0 0;
+                display: flex;
+                flex-direction: column;
+                flex: none;
+                justify-content: center;
+                align-items: center;
+                overflow: hidden;
+                z-index: 1;
+
+                .bar {
+                    display: flex;
+                    flex-direction: row;
+                    flex: none;
+                    height: 3px;
+                    background-image: linear-gradient(
+                        90deg,
+                        $gradient-dark,
+                        $gradient-light,
+                        $gradient-dark
+                    );
+                    clip-path: polygon(
+                        1px 0,
+                        calc(100% - 1px) 0,
+                        100% 100%,
+                        0 100%
+                    );
+
+                    &.top {
+                        margin: 0 22px;
+                        width: calc(100% - 44px);
+                    }
+                }
+
+                .player-info {
+                    display: flex;
+                    flex-direction: row;
+                    flex: 1 0 auto;
+                    padding: 0 11px;
+                    position: relative;
+
+                    .player-wrapper {
+                        display: flex;
+                        flex-direction: column;
+                        flex: 1 0 auto;
+
+                        .player {
+                            display: flex;
+                            flex-direction: row;
+                            flex: 1 0 auto;
+                            height: 60px;
+
+                            .divider {
+                                position: relative;
+                                flex: none;
+                                z-index: 2;
+                                width: 3px;
+                                height: 60px;
+                                background-image: linear-gradient(
+                                    180deg,
+                                    $gradient-dark,
+                                    $gradient-light,
+                                    $gradient-dark
+                                );
+                            }
+
+                            .race-to {
+                                display: flex;
+                                flex-direction: column;
+                                flex: 1 0 auto;
+                                background-color: $handicap-background-color;
+                                width: 64px;
+                                margin: 0 8px;
+                                position: relative;
+                                z-index: 1;
+                                justify-content: center;
+                                align-items: center;
+                                font-size: 28px;
+                                color: $handicap-text-color;
+
+                                &:before {
+                                    position: absolute;
+                                    top: 0;
+                                    bottom: 0;
+                                    content: '';
+                                    background-color: inherit;
+                                    width: 19px;
+                                    transform-origin: 100%;
+                                    z-index: -1;
+                                }
+
+                                &:after {
+                                    position: absolute;
+                                    top: 0;
+                                    bottom: 0;
+                                    content: '';
+                                    background-color: inherit;
+                                    width: 19px;
+                                    transform-origin: 100%;
+                                    z-index: -1;
+                                }
+                            }
+
+                            &.one {
+                                .divider {
+                                    transform: skewX(-20deg);
+                                }
+                                .race-to {
+                                    &:before {
+                                        right: calc(100% - 11px);
+                                        transform: skewX(-20deg);
+                                    }
+
+                                    &:after {
+                                        left: calc(100% - 11px);
+                                        transform: skewX(-20deg);
+                                    }
+                                }
+                            }
+                            &.two {
+                                .divider {
+                                    transform: skewX(20deg);
+                                }
+                                .race-to {
+                                    &:before {
+                                        left: calc(100% - 11px);
+                                        transform: skewX(20deg);
+                                    }
+
+                                    &:after {
+                                        right: calc(100% - 11px);
+                                        transform: skewX(20deg);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    .level {
+                        display: flex;
+                        flex-direction: column;
+                        flex: 1 0 auto;
+                        position: relative;
+                        z-index: 2;
+                        overflow: hidden;
+                        margin: 0 -11px;
+                        width: 54px;
+                        height: 60px;
+                        background-color: $handicap-background-color;
+                        clip-path: polygon(
+                            22px 0,
+                            calc(100% - 22px) 0,
+                            100% 100%,
+                            0 100%
+                        );
+                        align-items: center;
+                        justify-content: center;
+
+                        &.hot {
+                            &:before {
+                                position: absolute;
+                                font-size: 10px;
+                                content: '🌶️🌶️🌶️';
+                                writing-mode: vertical-rl;
+                                text-orientation: upright;
+                            }
+                        }
+                        &.medium {
+                            &:before {
+                                position: absolute;
+                                font-size: 10px;
+                                content: '🌶️🌶️';
+                                writing-mode: vertical-rl;
+                                text-orientation: upright;
+                            }
+                        }
+                        &.mild {
+                            &:before {
+                                position: absolute;
+                                font-size: 10px;
+                                content: '🌶️';
+                                writing-mode: vertical-rl;
+                                text-orientation: upright;
+                            }
+                        }
+                    }
+                }
+            }
 
             .players {
                 display: flex;

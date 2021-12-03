@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"log"
 	"sync"
 	"time"
 
@@ -405,7 +406,6 @@ func (g *Game) SetUseFargoHotHandicap(use bool) error {
 	return g.Save(false)
 }
 
-// TODO: MAKE SURE WE ONLY ALLOW HANDICAP FROM RACE TO 2-7
 // SOMETHING IN HERE IS CAUSING AN ERROR.
 
 // Updates the handicap to be used for the current game.
@@ -426,8 +426,12 @@ func (g *Game) updateFargoHotHandicap() error {
 		return err
 	}
 
+	log.Printf("handicaps length: %d", len(handicaps))
+
 	// Figure out difference in handicap between both players.
 	diff := utils.Abs(int(g.PlayerOne.FargoRating - g.PlayerTwo.FargoRating))
+
+	log.Printf("handicap diff: %d", diff)
 
 	// Loop through handicaps to find the appropriate handicap based on fargo
 	// difference.
@@ -435,12 +439,16 @@ func (g *Game) updateFargoHotHandicap() error {
 	for _, handicap := range handicaps {
 		currentHandicap = handicap
 
+		log.Printf("current handicap id: %d", currentHandicap.ID)
+
 		// Check if this is the last handicap or the difference end is less than
 		// or equal to the rating difference.
 		if handicap.DifferenceEnd == nil || int(*handicap.DifferenceEnd) >= diff {
 			break
 		}
 	}
+
+	log.Printf("handicap id: %+v", currentHandicap.ID)
 
 	// Set the fargo handicap to the game.
 	g.FargoHotHandicapID = &currentHandicap.ID
@@ -451,6 +459,8 @@ func (g *Game) updateFargoHotHandicap() error {
 
 // Save saves the game to the database.
 func (g *Game) Save(completed bool) error {
+	log.Printf("%+v", g)
+
 	if g.ID != 0 {
 		return g.db.Model(g).Updates(map[string]interface{}{
 			"type":      g.Type,

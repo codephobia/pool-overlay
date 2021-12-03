@@ -41,6 +41,10 @@ const scoreboardAnimation = animation([
                 style({ width: '*' }),
                 animate('0.5s ease-in-out', style({ width: '22px' })),
             ], { optional: true }),
+            query(':leave .handicap', [
+                style({ height: '*' }),
+                animate('0.5s ease-in-out', style({ height: '0px' })),
+            ], { optional: true }),
         ]),
         group([
             query(':leave .scores-wrapper', [

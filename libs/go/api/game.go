@@ -732,9 +732,8 @@ func (server *Server) handleGameFargoHotHandicapPatch(w http.ResponseWriter, r *
 	}
 
 	// Update the game fargo hot handicap option.
-	// TODO: probably should pass the actual error
 	if err := server.state.Game.SetUseFargoHotHandicap(body.UseFargoHotHandicap); err != nil {
-		server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
+		server.handleError(w, r, http.StatusInternalServerError, err)
 		return
 	}
 

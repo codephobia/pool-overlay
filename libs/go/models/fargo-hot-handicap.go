@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrRaceToInvalid  = errors.New("invalid race to id")
+	ErrRaceToInvalid  = errors.New("invalid race to amount")
 	ErrRaceToNotFound = errors.New("handicap for race to not found")
 )
 
@@ -26,8 +26,12 @@ type FargoHotHandicap struct {
 
 // LoadByRaceTo loads handicaps for the supplied race to.
 func (f *FargoHotHandicaps) LoadByRaceTo(database *gorm.DB, raceTo int) error {
+	if raceTo < 2 || raceTo > 7 {
+		return ErrRaceToInvalid
+	}
+
 	result := database.
-		Select("race_to", "difference_start", "difference_end", "wins_higher", "wins_lower").
+		Select("id", "race_to", "difference_start", "difference_end", "wins_higher", "wins_lower").
 		Where("race_to = ?", raceTo).
 		Order("difference_start asc").
 		Find(f)
@@ -36,7 +40,7 @@ func (f *FargoHotHandicaps) LoadByRaceTo(database *gorm.DB, raceTo int) error {
 		return ErrRaceToInvalid
 	}
 
-	if result.RowsAffected != 1 {
+	if result.RowsAffected == 0 {
 		return ErrRaceToNotFound
 	}
 

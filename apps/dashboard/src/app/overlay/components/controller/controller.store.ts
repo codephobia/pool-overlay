@@ -55,11 +55,11 @@ export class ControllerStore extends ComponentStore<ControllerState> {
         },
     }));
 
-    public readonly setFargoHotHandicap = this.updater<boolean>((state, useFargoHotHandicap) => ({
+    public readonly setFargoHotHandicap = this.updater<boolean>((state, use_fargo_hot_handicap) => ({
         ...state,
         game: {
             ...(state.game as IGame),
-            useFargoHotHandicap,
+            use_fargo_hot_handicap,
         },
     }));
 
