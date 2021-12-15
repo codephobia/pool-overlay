@@ -10,7 +10,7 @@ export class SocketService {
 
     public connect(): void {
         try {
-            this._conn = new WebSocket('ws://localhost:1268/latest/overlay');
+            this._conn = new WebSocket('ws://192.168.0.26:1268/latest/overlay');
             this._conn.onopen = this._onOpen.bind(this);
             this._conn.onmessage = this._onMessage.bind(this);
             this._conn.onclose = this._onClose.bind(this);
