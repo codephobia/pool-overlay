@@ -10,6 +10,7 @@ $versus-text-color: #ffffff;
 $fargo-background-color: #313236;
 $fargo-text-color: #ffffff;
 $handicap-background-color: #99002c;
+$handicap-level-background-color: #1b3887;
 $handicap-text-color: #ffffff;
 
 :host {
@@ -55,7 +56,7 @@ $handicap-text-color: #ffffff;
 
                     &.top {
                         margin: 0 22px;
-                        width: calc(100% - 44px);
+                        width: calc(100% - 34px);
                     }
                 }
 
@@ -75,14 +76,14 @@ $handicap-text-color: #ffffff;
                             display: flex;
                             flex-direction: row;
                             flex: 1 0 auto;
-                            height: 60px;
+                            height: 30px;
 
                             .divider {
                                 position: relative;
                                 flex: none;
                                 z-index: 2;
                                 width: 3px;
-                                height: 60px;
+                                height: 30px;
                                 background-image: linear-gradient(
                                     180deg,
                                     $gradient-dark,
@@ -96,13 +97,13 @@ $handicap-text-color: #ffffff;
                                 flex-direction: column;
                                 flex: 1 0 auto;
                                 background-color: $handicap-background-color;
-                                width: 64px;
+                                width: 32px;
                                 margin: 0 8px;
                                 position: relative;
                                 z-index: 1;
                                 justify-content: center;
                                 align-items: center;
-                                font-size: 28px;
+                                font-size: 18px;
                                 color: $handicap-text-color;
 
                                 &:before {
@@ -170,44 +171,41 @@ $handicap-text-color: #ffffff;
                         position: relative;
                         z-index: 2;
                         overflow: hidden;
-                        margin: 0 -11px;
+                        margin: 0 -5px;
                         width: 54px;
-                        height: 60px;
-                        background-color: $handicap-background-color;
+                        height: 30px;
+                        background-color: $fargo-background-color;
                         clip-path: polygon(
-                            22px 0,
-                            calc(100% - 22px) 0,
+                            11px 0,
+                            calc(100% - 11px) 0,
                             100% 100%,
                             0 100%
                         );
                         align-items: center;
                         justify-content: center;
 
+                        &:before {
+                            position: absolute;
+                            font-size: 10px;
+                            color: $handicap-text-color;
+                            letter-spacing: 1px;
+                            // writing-mode: vertical-rl;
+                            text-orientation: upright;
+                        }
+
                         &.hot {
                             &:before {
-                                position: absolute;
-                                font-size: 10px;
-                                content: '🌶️🌶️🌶️';
-                                writing-mode: vertical-rl;
-                                text-orientation: upright;
+                                content: 'HOT';
                             }
                         }
                         &.medium {
                             &:before {
-                                position: absolute;
-                                font-size: 10px;
-                                content: '🌶️🌶️';
-                                writing-mode: vertical-rl;
-                                text-orientation: upright;
+                                content: 'MED';
                             }
                         }
                         &.mild {
                             &:before {
-                                position: absolute;
-                                font-size: 10px;
-                                content: '🌶️';
-                                writing-mode: vertical-rl;
-                                text-orientation: upright;
+                                content: 'MILD';
                             }
                         }
                     }
