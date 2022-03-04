@@ -38,7 +38,7 @@ export class GameService {
 
     public updateRaceTo(direction: Direction) {
         const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/race-to`;
-        return this.http.patch<{ raceTo: number }>(url, { direction });
+        return this.http.patch<{ raceTo: number, useFargoHotHandicap: boolean }>(url, { direction });
     }
 
     public resetScore() {

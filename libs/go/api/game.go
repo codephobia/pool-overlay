@@ -45,7 +45,8 @@ type GameRaceToPatchBody struct {
 
 // GameRaceToResp is a reponse containing the game race to.
 type GameRaceToResp struct {
-	RaceTo int `json:"raceTo"`
+	RaceTo              int  `json:"raceTo"`
+	UseFargoHotHandicap bool `json:"useFargoHotHandicap"`
 }
 
 // GameScorePatchBody is the incoming body on a patch request for updating the
@@ -324,7 +325,8 @@ func (server *Server) handleGameRaceToPatch(w http.ResponseWriter, r *http.Reque
 
 	// send response
 	server.handleSuccess(w, r, GameRaceToResp{
-		RaceTo: server.state.Game.RaceTo,
+		RaceTo:              server.state.Game.RaceTo,
+		UseFargoHotHandicap: server.state.Game.UseFargoHotHandicap,
 	})
 }
 
@@ -733,6 +735,7 @@ func (server *Server) handleGameFargoHotHandicapPatch(w http.ResponseWriter, r *
 
 	// Update the game fargo hot handicap option.
 	if err := server.state.Game.SetUseFargoHotHandicap(body.UseFargoHotHandicap); err != nil {
+		// TODO: Currently all errors return as 500 here, but might not always make sense. Could use errors.Is for this.
 		server.handleError(w, r, http.StatusInternalServerError, err)
 		return
 	}

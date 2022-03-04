@@ -17,6 +17,12 @@ var (
 	ErrInvalidPlayerID = errors.New("invalid player id")
 	// ErrInvalidTeamNumber - Invalid team number.
 	ErrInvalidTeamNumber = errors.New("invalid team number")
+	// ErrInvalidRaceTo - Invalid race to number.
+	ErrInvalidRaceTo = errors.New("invalid race to number")
+	// The minimum number of games required to use handicapping.
+	minHandicapRaceTo = 2
+	// The maximum number of games allowed to use handicapping.
+	maxHandicapRaceTo = 7
 )
 
 // Game is the current state of the game being played.
@@ -112,7 +118,7 @@ func (g *Game) LoadLatest() *Game {
 				})
 		}).
 		Preload("FargoHotHandicap", func(db *gorm.DB) *gorm.DB {
-			return db.Select("race_to", "difference_start", "difference_end", "wins_higher", "wins_lower")
+			return db.Select("id", "race_to", "difference_start", "difference_end", "wins_higher", "wins_lower")
 		}).
 		Find(&latest)
 
@@ -173,6 +179,19 @@ func (g *Game) IncrementRaceTo() error {
 
 	g.RaceTo++
 
+	// TODO: Reach out to Fargo and see if we can account for all races.
+	// Make sure we aren't using handicapping if outside of the race threshold.
+	if g.RaceTo > maxHandicapRaceTo {
+		g.SetUseFargoHotHandicap(false)
+	}
+
+	// Update fargo hot handicap if we are using it.
+	if g.UseFargoHotHandicap {
+		if err := g.updateFargoHotHandicap(); err != nil {
+			return err
+		}
+	}
+
 	return g.Save(false)
 }
 
@@ -186,6 +205,18 @@ func (g *Game) DecrementRaceTo() error {
 
 	if newRaceTo > 0 {
 		g.RaceTo = newRaceTo
+	}
+
+	// Make sure we aren't using handicapping if outside of the race threshold.
+	if g.RaceTo < minHandicapRaceTo {
+		g.SetUseFargoHotHandicap(false)
+	}
+
+	// Update fargo hot handicap if we are using it.
+	if g.UseFargoHotHandicap {
+		if err := g.updateFargoHotHandicap(); err != nil {
+			return err
+		}
 	}
 
 	return g.Save(false)
@@ -390,9 +421,15 @@ func (g *Game) SetTeam(teamNum int, team *Team) error {
 // SetUseFargoHotHandicap updates if we are using fargo hot handicap for the
 // current game.
 func (g *Game) SetUseFargoHotHandicap(use bool) error {
+	// Make sure race to is within allowed threshold.
+	if use && (g.RaceTo < minHandicapRaceTo || g.RaceTo > maxHandicapRaceTo) {
+		return ErrInvalidRaceTo
+	}
+
 	g.UseFargoHotHandicap = use
 
 	if use {
+		// Update handicap if both players are set.
 		if g.PlayerOne != nil && g.PlayerTwo != nil {
 			if err := g.updateFargoHotHandicap(); err != nil {
 				return err

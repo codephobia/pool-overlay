@@ -30,11 +30,12 @@ export class ControllerStore extends ComponentStore<ControllerState> {
         game,
     }));
 
-    public readonly setRaceTo = this.updater<number>((state, race_to) => ({
+    public readonly setRaceTo = this.updater<{ race_to: number, use_fargo_hot_handicap: boolean }>((state, { race_to, use_fargo_hot_handicap }) => ({
         ...state,
         game: {
             ...(state.game as IGame),
             race_to,
+            use_fargo_hot_handicap,
         },
     }));
 
@@ -119,7 +120,12 @@ export class ControllerStore extends ComponentStore<ControllerState> {
         tap(() => { this.setPending(true); }),
         switchMap(direction => this.gameService.updateRaceTo(direction).pipe(
             tapResponse(
-                ({ raceTo }) => { this.setRaceTo(raceTo); },
+                ({ raceTo, useFargoHotHandicap }) => {
+                    this.setRaceTo({
+                        race_to: raceTo,
+                        use_fargo_hot_handicap: useFargoHotHandicap
+                    });
+                },
                 error => console.error(error),
                 () => { this.setPending(false); },
             )
