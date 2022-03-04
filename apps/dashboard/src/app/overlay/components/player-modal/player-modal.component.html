@@ -5,10 +5,10 @@
     </div>
     <div class="flex flex-row flex-grow">
         <ng-container *ngIf="vm$ | async as vm">
-            <div class="flex flex-col flex-grow">
+            <div class="flex flex-col flex-grow overflow-y-scroll max-h-96">
                 <ng-container *ngIf="vm.loaded; else loading">
                     <div
-                        class="flex flex-row h-20 px-5 gap-5 cursor-pointer"
+                        class="flex flex-row flex-shrink-0 h-20 px-5 gap-5 cursor-pointer"
                         *ngFor="let player of vm.players; even as isEven"
                         [ngClass]="bgColor(player.id, isEven)"
                         (click)="selectPlayer(player.id)"
