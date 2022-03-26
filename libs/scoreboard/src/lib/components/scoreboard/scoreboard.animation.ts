@@ -23,6 +23,10 @@ const scoreboardAnimation = animation([
                 style({ transform: 'translateY(-100%)' }),
                 animate('0.5s ease-in-out', style({ transform: 'translateY(0)' })),
             ], { optional: true }),
+            query(':enter .handicap-wrapper', [
+                style({ height: '0px' }),
+                animate('0.5s ease-in-out', style({ height: '*' })),
+            ], { optional: true }),
         ]),
         group([
             query(':enter .player-wrapper.one', [
@@ -51,6 +55,11 @@ const scoreboardAnimation = animation([
                 style({ transform: 'translateY(0)' }),
                 animate('0.5s ease-in-out', style({ transform: 'translateY(-100%)' })),
             ], { optional: true }),
+            query(':leave .handicap-wrapper', [
+                style({ height: '*' }),
+                animate('0.5s ease-in-out', style({ height: '0px' })),
+            ], { optional: true }),
+
         ]),
     ]),
 ]);

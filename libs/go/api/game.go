@@ -45,7 +45,8 @@ type GameRaceToPatchBody struct {
 
 // GameRaceToResp is a reponse containing the game race to.
 type GameRaceToResp struct {
-	RaceTo int `json:"raceTo"`
+	RaceTo              int  `json:"raceTo"`
+	UseFargoHotHandicap bool `json:"useFargoHotHandicap"`
 }
 
 // GameScorePatchBody is the incoming body on a patch request for updating the
@@ -88,9 +89,23 @@ type GamePlayersNamePatchBody struct {
 	Name      string `json:"name"`
 }
 
+// GameTeamsPatchBody is the incoming body on a patch request for updating the
+// team for the specified team number.
 type GameTeamsPatchBody struct {
 	TeamNum int `json:"teamNum"`
 	TeamID  int `json:"teamID"`
+}
+
+// GameFargoHotHandicapPatchBody is the incoming body on a patch request for
+// updating the fargo hot handicap.
+type GameFargoHotHandicapPatchBody struct {
+	UseFargoHotHandicap bool `json:"useFargoHotHandicap"`
+}
+
+// GameFargoHotHandicapPatchResp is the response containing the new fargo hot
+// handicap setting.
+type GameFargoHotHandicapPatchResp struct {
+	UseFargoHotHandicap bool `json:"useFargoHotHandicap"`
 }
 
 // Handler for /game.
@@ -310,7 +325,8 @@ func (server *Server) handleGameRaceToPatch(w http.ResponseWriter, r *http.Reque
 
 	// send response
 	server.handleSuccess(w, r, GameRaceToResp{
-		RaceTo: server.state.Game.RaceTo,
+		RaceTo:              server.state.Game.RaceTo,
+		UseFargoHotHandicap: server.state.Game.UseFargoHotHandicap,
 	})
 }
 
@@ -691,4 +707,54 @@ func (server *Server) handleGameTeamsPatch(w http.ResponseWriter, r *http.Reques
 
 	// send response
 	server.handleSuccess(w, r, server.state.Game)
+}
+
+// Handler for /game/fargo-hot-handicap.
+func (server *Server) handleGameFargoHotHandicap() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "OPTIONS":
+			server.HandleOptions(w, r)
+		case "PATCH":
+			server.handleGameFargoHotHandicapPatch(w, r)
+		default:
+			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
+		}
+	})
+}
+
+// Game fargo-hot-handicap handler for PATCH method.
+func (server *Server) handleGameFargoHotHandicapPatch(w http.ResponseWriter, r *http.Request) {
+	// decode the body
+	var body GameFargoHotHandicapPatchBody
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&body); err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidGameType)
+		return
+	}
+
+	// Update the game fargo hot handicap option.
+	if err := server.state.Game.SetUseFargoHotHandicap(body.UseFargoHotHandicap); err != nil {
+		// TODO: Currently all errors return as 500 here, but might not always make sense. Could use errors.Is for this.
+		server.handleError(w, r, http.StatusInternalServerError, err)
+		return
+	}
+
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.GameEventType,
+		events.NewGameEventPayload(server.state.Game),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
+
+	// send response
+	server.handleSuccess(w, r, GameFargoHotHandicapPatchResp{
+		UseFargoHotHandicap: server.state.Game.UseFargoHotHandicap,
+	})
 }

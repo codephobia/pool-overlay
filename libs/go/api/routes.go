@@ -73,4 +73,7 @@ func (server *Server) InitRoutes() {
 
 	// game/teams
 	server.AddRouteToAllVersions("/game/teams", server.handleGameTeams())
+
+	// game/fargo-hot-handicap
+	server.AddRouteToAllVersions("/game/fargo-hot-handicap", server.handleGameFargoHotHandicap())
 }

@@ -1,5 +1,35 @@
 <div class="scoreboard-wrapper" [@scoreboardTransition]="!vm.hidden" *ngIf="vm$ | async as vm">
     <div class="scoreboard" *ngIf="!vm.hidden">
+        <div class="handicap-wrapper">
+            <div
+                class="handicap"
+                @handicapTransition
+                *ngIf="vm.game?.use_fargo_hot_handicap && vm.game?.player_one && vm.game?.player_two && vm.game?.fargo_hot_handicap?.wins_higher != vm.game?.fargo_hot_handicap?.wins_lower"
+            >
+                <div class="bar top"></div>
+                <div class="player-info">
+                    <div class="player-wrapper">
+                        <div class="player one">
+                            <div class="divider"></div>
+                            <div class="race-to">
+                                <app-character-rotater [characters]="playerOneRaceTo(vm.game)"></app-character-rotater>
+                            </div>
+                            <div class="divider"></div>
+                        </div>
+                    </div>
+                    <div class="level hot"></div>
+                    <div class="player-wrapper">
+                        <div class="player two">
+                            <div class="divider"></div>
+                            <div class="race-to">
+                                <app-character-rotater [characters]="playerTwoRaceTo(vm.game)"></app-character-rotater>
+                            </div>
+                            <div class="divider"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="players">
             <div class="bar top"></div>
             <div class="player-info">

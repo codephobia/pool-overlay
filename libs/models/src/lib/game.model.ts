@@ -1,6 +1,7 @@
 import { IPlayer } from './player.model';
 import { GameType } from './game-type.enum';
 import { VsMode } from './vs-mode.enum';
+import { FargoHotHandicap } from './fargo-hot-handicap';
 
 export interface IGame {
     type: GameType;
@@ -10,4 +11,6 @@ export interface IGame {
     score_two: number;
     player_one?: IPlayer;
     player_two?: IPlayer;
+    use_fargo_hot_handicap: boolean;
+    fargo_hot_handicap?: FargoHotHandicap;
 }

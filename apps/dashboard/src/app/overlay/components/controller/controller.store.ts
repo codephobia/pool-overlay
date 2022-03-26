@@ -30,11 +30,12 @@ export class ControllerStore extends ComponentStore<ControllerState> {
         game,
     }));
 
-    public readonly setRaceTo = this.updater<number>((state, race_to) => ({
+    public readonly setRaceTo = this.updater<{ race_to: number, use_fargo_hot_handicap: boolean }>((state, { race_to, use_fargo_hot_handicap }) => ({
         ...state,
         game: {
             ...(state.game as IGame),
             race_to,
+            use_fargo_hot_handicap,
         },
     }));
 
@@ -52,6 +53,14 @@ export class ControllerStore extends ComponentStore<ControllerState> {
         game: {
             ...(state.game as IGame),
             type,
+        },
+    }));
+
+    public readonly setFargoHotHandicap = this.updater<boolean>((state, use_fargo_hot_handicap) => ({
+        ...state,
+        game: {
+            ...(state.game as IGame),
+            use_fargo_hot_handicap,
         },
     }));
 
@@ -111,7 +120,12 @@ export class ControllerStore extends ComponentStore<ControllerState> {
         tap(() => { this.setPending(true); }),
         switchMap(direction => this.gameService.updateRaceTo(direction).pipe(
             tapResponse(
-                ({ raceTo }) => { this.setRaceTo(raceTo); },
+                ({ raceTo, useFargoHotHandicap }) => {
+                    this.setRaceTo({
+                        race_to: raceTo,
+                        use_fargo_hot_handicap: useFargoHotHandicap
+                    });
+                },
                 error => console.error(error),
                 () => { this.setPending(false); },
             )
@@ -169,6 +183,19 @@ export class ControllerStore extends ComponentStore<ControllerState> {
             tapResponse(
                 ({ hidden }) => {
                     this.setHidden(hidden);
+                },
+                error => console.error(error),
+                () => { this.setPending(false); },
+            )
+        ))
+    ));
+
+    public readonly toggleFargoHotHandicap = this.effect<boolean>(useFargoHotHandicap$ => useFargoHotHandicap$.pipe(
+        tap(() => { this.setPending(true); }),
+        switchMap(useFargoHotHandicap => this.gameService.setFargoHotHandicap(useFargoHotHandicap).pipe(
+            tapResponse(
+                ({ useFargoHotHandicap }) => {
+                    this.setFargoHotHandicap(useFargoHotHandicap);
                 },
                 error => console.error(error),
                 () => { this.setPending(false); },
