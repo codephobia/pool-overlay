@@ -26,7 +26,7 @@ type FargoHotHandicap struct {
 
 // LoadByRaceTo loads handicaps for the supplied race to.
 func (f *FargoHotHandicaps) LoadByRaceTo(database *gorm.DB, raceTo int) error {
-	if raceTo < 2 || raceTo > 7 {
+	if raceTo < minHandicapRaceTo || raceTo > maxHandicapRaceTo {
 		return ErrRaceToInvalid
 	}
 
