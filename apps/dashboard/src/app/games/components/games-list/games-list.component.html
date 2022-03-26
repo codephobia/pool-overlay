@@ -1,0 +1,47 @@
+<div class="flex flex-col flex-grow">
+    <div class="flex flex-row h-20 px-5 gap-5 bg-blue-900">
+        <div class="w-52 flex flex-col justify-center">
+            <p class="text-white">Player One</p>
+        </div>
+        <div class="w-52 flex flex-col justify-center">
+            <p class="text-white">Player Two</p>
+        </div>
+        <div class="w-24 flex flex-col justify-center">
+            <p class="text-white whitespace-nowrap">Game Type</p>
+        </div>
+        <div class="w-24 flex flex-col justify-center">
+            <p class="text-white whitespace-nowrap">Race To</p>
+        </div>
+        <div class="flex flex-col flex-grow justify-center">
+            <p class="text-white whitespace-nowrap">Date</p>
+        </div>
+    </div>
+    <ng-container *ngIf="loaded; else loading">
+        <div class="flex flex-row h-20 px-5 gap-5" *ngFor="let game of games; even as isEven; odd as isOdd" [ngClass]="{ 'bg-gray-600': isEven, 'bg-gray-700': isOdd }">
+            <div class="w-52 flex flex-col justify-center">
+                <p class="text-white whitespace-nowrap">
+                    {{ game?.player_one?.name }} <span>({{ game?.score_one }})</span>
+                </p>
+            </div>
+            <div class="w-52 flex flex-col justify-center">
+                <p class="text-white whitespace-nowrap">
+                    {{ game?.player_two?.name }} <span>({{ game?.score_two }})</span>
+                </p>
+            </div>
+            <div class="w-24 flex flex-col justify-center">
+                <p class="text-white whitespace-nowrap">{{ game?.type }}</p>
+            </div>
+            <div class="w-24 flex flex-col justify-center">
+                <p class="text-white whitespace-nowrap">{{ game?.race_to }}</p>
+            </div>
+            <div class="flex flex-col flex-grow justify-center">
+                <p class="text-white whitespace-nowrap">{{ game?.updated_at | date: 'medium' }}</p>
+            </div>
+        </div>
+    </ng-container>
+    <ng-template #loading>
+        <div class="relative flex flex-row h-20 px-5 gap-5" *ngFor="let g of [1, 2, 3, 4, 5]; even as isEven; odd as isOdd" [ngClass]="{ 'bg-gray-600': isEven, 'bg-gray-700': isOdd }">
+            <div class="shimmer-overlay"></div>
+        </div>
+    </ng-template>
+</div>

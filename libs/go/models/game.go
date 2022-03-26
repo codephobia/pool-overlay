@@ -49,7 +49,7 @@ type Game struct {
 
 	UseFargoHotHandicap bool              `json:"use_fargo_hot_handicap"`
 	FargoHotHandicapID  *uint             `json:"fargo_hot_handicap_id,omitempty"`
-	FargoHotHandicap    *FargoHotHandicap `json:"fargo_hot_handicap" gorm:"foreignKey:fargo_hot_handicap_id"`
+	FargoHotHandicap    *FargoHotHandicap `json:"fargo_hot_handicap,omitempty" gorm:"foreignKey:fargo_hot_handicap_id"`
 
 	CreatedAt *time.Time      `json:"created_at,omitempty"`
 	UpdatedAt *time.Time      `json:"updated_at,omitempty"`

@@ -19,8 +19,8 @@ type Player struct {
 	Name        string `json:"name,omitempty" gorm:"size:100"`
 	FlagID      uint   `json:"flag_id,omitempty"`
 	Flag        *Flag  `json:"flag,omitempty" gorm:"foreignKey:flag_id"`
-	FargoID     uint   `json:"fargo_id"`
-	FargoRating uint   `json:"fargo_rating"`
+	FargoID     uint   `json:"fargo_id,omitempty"`
+	FargoRating uint   `json:"fargo_rating,omitempty"`
 
 	CreatedAt *time.Time      `json:"created_at,omitempty"`
 	UpdatedAt *time.Time      `json:"updated_at,omitempty"`

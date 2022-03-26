@@ -13,7 +13,7 @@ export class SideNavComponent {
         link: 'players',
     }, {
         title: 'Games',
-        link: '#',
+        link: 'games',
     }, {
         title: 'Drawing',
         link: 'drawing',

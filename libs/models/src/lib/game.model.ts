@@ -13,4 +13,8 @@ export interface IGame {
     player_two?: IPlayer;
     use_fargo_hot_handicap: boolean;
     fargo_hot_handicap?: FargoHotHandicap;
+
+    created_at?: string;
+    updated_at?: string;
+    deleted_at?: string;
 }

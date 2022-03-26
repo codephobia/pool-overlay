@@ -41,6 +41,12 @@ func (server *Server) InitRoutes() {
 	// players/count
 	server.AddRouteToAllVersions("/players/count", server.handlePlayersCount())
 
+	// games
+	server.AddRouteToAllVersions("/games", server.handleGames())
+
+	// games/count
+	server.AddRouteToAllVersions("/games/count", server.handleGamesCount())
+
 	// players/{playerID}
 	server.AddRouteToAllVersions("/players/{playerID}", server.handlePlayerByID())
 
