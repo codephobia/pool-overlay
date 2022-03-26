@@ -182,7 +182,9 @@ func (g *Game) IncrementRaceTo() error {
 	// TODO: Reach out to Fargo and see if we can account for all races.
 	// Make sure we aren't using handicapping if outside of the race threshold.
 	if g.RaceTo > maxHandicapRaceTo {
-		g.SetUseFargoHotHandicap(false)
+		if err := g.SetUseFargoHotHandicap(false); err != nil {
+			return err
+		}
 	}
 
 	// Update fargo hot handicap if we are using it.
@@ -209,7 +211,9 @@ func (g *Game) DecrementRaceTo() error {
 
 	// Make sure we aren't using handicapping if outside of the race threshold.
 	if g.RaceTo < minHandicapRaceTo {
-		g.SetUseFargoHotHandicap(false)
+		if err := g.SetUseFargoHotHandicap(false); err != nil {
+			return err
+		}
 	}
 
 	// Update fargo hot handicap if we are using it.
