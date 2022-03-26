@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { GameType, gameTypeToString, IGame } from '@pool-overlay/models';
 import { SocketService } from '../../services/socket.service';
+import { handicapTransition } from './handicap.animation';
 import { scoreboardTransition } from './scoreboard.animation';
 import { ScoreboardStore } from './scoreboard.store';
 
@@ -10,7 +11,7 @@ import { ScoreboardStore } from './scoreboard.store';
     templateUrl: './scoreboard.component.html',
     styleUrls: ['./scoreboard.component.scss'],
     providers: [ScoreboardStore, SocketService],
-    animations: [scoreboardTransition],
+    animations: [scoreboardTransition, handicapTransition],
 })
 export class ScoreboardComponent implements OnInit {
     public readonly vm$ = this._scoreboardStore.vm$;
