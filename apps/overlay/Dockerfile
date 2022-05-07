@@ -1,9 +1,9 @@
-FROM node:14.15.0-alpine3.12
+FROM node:16.15.0-alpine3.14
 
 WORKDIR /workspace
 
-COPY jest.config.js \
-    jest.preset.js \
+COPY jest.config.ts \
+    jest.preset.ts \
     nx.json \
     package-lock.json \
     package.json \
