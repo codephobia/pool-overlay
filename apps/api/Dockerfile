@@ -4,8 +4,11 @@ FROM nxgo/cli as builder
 # Create app directory
 WORKDIR /workspace
 
+# Build argument for fontawesome npm token
+ARG FONTAWESOME_NPM_AUTH_TOKEN
+
 # Copy package.json and the lock file
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json .npmrc ./
 
 # Install app dependencies
 RUN npm ci

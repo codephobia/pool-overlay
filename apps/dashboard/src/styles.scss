@@ -2,6 +2,15 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+@layer base {
+    :root {
+        --color-nav-icon: #ffffff;
+        --color-nav-background: #304292;
+        --color-nav-background-active: #0082ff;
+        --color-nav-border: #19191e;
+    }
+}
+
 @font-face {
     font-family: 'Cascadia Mono';
     src: url(./assets/fonts/CascadiaMono.ttf);
