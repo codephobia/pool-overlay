@@ -6,19 +6,19 @@ module.exports = {
     theme: {
         extend: {
             textColor: {
-                nav: {
-                    icon: 'var(--color-nav-icon)',
+                sad: {
+                    icon: 'var(--color-sad-text)',
                 },
             },
             backgroundColor: {
-                nav: {
-                    background: 'var(--color-nav-background)',
-                    'background-active': 'var(--color-nav-background-active)',
+                sad: {
+                    background: 'var(--color-sad-background)',
+                    'background-active': 'var(--color-sad-background-active)',
                 },
             },
             borderColor: {
-                nav: {
-                    dark: 'var(--color-nav-border)',
+                sad: {
+                    dark: 'var(--color-sad-border)',
                 },
             },
         },
