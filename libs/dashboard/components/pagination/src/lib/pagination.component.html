@@ -1,0 +1,20 @@
+<div class="flex flex-row" *ngIf="vm$ | async as vm">
+    <button
+        type="button"
+        class="flex flex-col w-42px h-42px rounded-l border-t border-l border-b justify-center items-center"
+        [ngClass]="{ 'bg-sad-background-active border-sad-active': vm.hasPrevPage, 'bg-sad-input-background border-sad-input cursor-default': !vm.hasPrevPage }"
+        [disabled]="!vm.hasPrevPage"
+        (click)="goToPage(vm.prevPage)"
+    >
+        <fa-icon class="text-white text-lg" [icon]="faChevronLeft"></fa-icon>
+    </button>
+    <button
+        type="button"
+        class="flex flex-col w-42px h-42px rounded-r border-sad-active border-t border-r border-b bg-sad-background-active justify-center items-center"
+        [ngClass]="{ 'bg-sad-background-active border-sad-active': vm.hasNextPage, 'bg-sad-input-background border-sad-input cursor-default': !vm.hasNextPage }"
+        [disabled]="!vm.hasNextPage"
+        (click)="goToPage(vm.nextPage)"
+    >
+        <fa-icon class="text-white text-lg" [icon]="faChevronRight"></fa-icon>
+    </button>
+</div>

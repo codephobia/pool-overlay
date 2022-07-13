@@ -1,5 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { PageEvent } from '@dashboard/components/pagination';
+import { faXmark } from '@fortawesome/pro-regular-svg-icons';
 
 import { PlayerModalStore } from './player-modal.store';
 
@@ -14,6 +16,8 @@ export interface PlayerModalData {
     providers: [PlayerModalStore],
 })
 export class PlayerModalComponent implements OnInit {
+    public faXmark = faXmark;
+    public readonly perPage = 10;
     public playerNum: number;
     public currentPlayerId: number | undefined;
     public vm$ = this.store.vm$;
@@ -33,11 +37,15 @@ export class PlayerModalComponent implements OnInit {
 
     public bgColor(playerId: number, isEven: boolean): string {
         if (playerId === this.currentPlayerId) {
-            return 'bg-blue-700 hover:bg-blue-600';
+            return 'bg-sad-background-active';
         } else if (isEven) {
-            return 'bg-gray-500 hover:bg-gray-400';
+            return 'bg-sad-table-even hover:bg-sad-background-active';
         }
-        return 'bg-gray-700 hover:bg-gray-600';
+        return 'bg-sad-table-odd hover:bg-sad-background-active';
+    }
+
+    public onPageChange({ page }: PageEvent): void {
+        this.store.getPlayers(page);
     }
 
     public selectPlayer(playerId: number): void {

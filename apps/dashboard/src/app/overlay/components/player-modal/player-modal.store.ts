@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
+import { forkJoin } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import { IPlayer } from '@pool-overlay/models';
@@ -8,6 +9,7 @@ import { PlayersService } from '../../../shared/services/players.service';
 export interface PlayerModalState {
     loaded: boolean;
     page: number;
+    count: number;
     players: IPlayer[];
 }
 
@@ -19,6 +21,7 @@ export class PlayerModalStore extends ComponentStore<PlayerModalState> {
         super({
             loaded: false,
             page: 1,
+            count: 0,
             players: []
         });
     }
@@ -33,6 +36,11 @@ export class PlayerModalStore extends ComponentStore<PlayerModalState> {
         page,
     }));
 
+    public readonly setCount = this.updater<number>((state, count) => ({
+        ...state,
+        count,
+    }));
+
     public readonly setPlayers = this.updater<IPlayer[]>((state, players) => ({
         ...state,
         loaded: true,
@@ -41,23 +49,31 @@ export class PlayerModalStore extends ComponentStore<PlayerModalState> {
 
     public readonly loaded$ = this.select(state => state.loaded);
     public readonly page$ = this.select(state => state.page);
+    public readonly count$ = this.select(state => state.count);
     public readonly players$ = this.select(state => state.players);
     public readonly vm$ = this.select(
         this.loaded$,
         this.page$,
+        this.count$,
         this.players$,
-        (loaded, page, players) => ({
+        (loaded, page, count, players) => ({
             loaded,
             page,
+            count,
             players,
         })
     );
 
     public readonly getPlayers = this.effect<number>(page$ => page$.pipe(
-        switchMap(page => this.playersService.find(page).pipe(
+        switchMap(page => forkJoin([
+            this.playersService.find(page),
+            this.playersService.count(),
+        ]).pipe(
             tapResponse(
-                players => {
-                    this.setPlayers(players)
+                ([players, { count }]) => {
+                    this.setPlayers(players);
+                    this.setPage(page);
+                    this.setCount(count);
                 },
                 error => console.error(error)
             ),

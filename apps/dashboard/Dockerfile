@@ -18,4 +18,4 @@ COPY jest.config.ts \
     .npmrc \
     /workspace/
 
-RUN npm install
+RUN npm ci

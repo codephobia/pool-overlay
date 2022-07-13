@@ -25,7 +25,8 @@ export class ControllerComponent implements OnInit {
 
     public updatePlayer(playerNum: number, playerId: number | undefined): void {
         const dialog = this.dialog.open(PlayerModalComponent, {
-            width: '500px',
+            width: '700px',
+            height: '726px',
             panelClass: 'no-padding',
             data: {
                 playerNum,

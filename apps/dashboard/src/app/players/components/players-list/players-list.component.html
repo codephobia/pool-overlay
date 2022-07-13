@@ -1,45 +1,43 @@
 <div class="flex flex-col flex-grow">
-    <div class="flex flex-row h-20 px-5 gap-5 bg-blue-900">
-        <div class="w-14 flex flex-col justify-center">
-            <p class="text-white">Flag</p>
+    <div class="flex flex-row h-66px bg-sad-input-background border-sad-active border-b">
+        <div class="w-1/12 flex flex-col justify-center items-start px-10">
+            <p class="text-white uppercase text-xs">Flag</p>
         </div>
-        <div class="w-52 flex flex-col justify-center">
-            <p class="text-white">Name</p>
+        <div class="w-5/12 flex flex-col justify-center items-start px-10">
+            <p class="text-white uppercase text-xs">Name</p>
         </div>
-        <div class="w-24 flex flex-col justify-center">
-            <p class="text-white whitespace-nowrap">Fargo ID</p>
+        <div class="w-2/12 flex flex-col justify-center items-start px-10">
+            <p class="text-white uppercase text-xs whitespace-nowrap">Fargo ID</p>
         </div>
-        <div class="flex flex-col flex-grow justify-center">
-            <p class="text-white whitespace-nowrap">Fargo Rating</p>
+        <div class="w-2/12 flex flex-col justify-center items-start px-10">
+            <p class="text-white uppercase text-xs whitespace-nowrap">Fargo Rating</p>
         </div>
-        <div class="w-44 flex flex-col justify-center">
-            <p class="text-white">Actions</p>
-        </div>
+        <div class="w-2/12 flex flex-col px-10"></div>
     </div>
     <ng-container *ngIf="loaded; else loading">
-        <div class="flex flex-row h-20 px-5 gap-5" *ngFor="let player of players; even as isEven; odd as isOdd" [ngClass]="{ 'bg-gray-600': isEven, 'bg-gray-700': isOdd }">
-            <div class="w-14 flex flex-col justify-center items-center">
-                <img *ngIf="player?.flag" class="w-14 h-auto" src="./assets/flags/{{ player?.flag?.image_path }}" [alt]="player?.flag?.country" />
+        <div class="flex flex-row h-66px" *ngFor="let player of players; even as isEven; odd as isOdd" [ngClass]="{ 'bg-sad-table-even': isEven, 'bg-sad-table-odd': isOdd }">
+            <div class="w-1/12 flex flex-col justify-center items-start px-10">
+                <img *ngIf="player?.flag" class="w-5 h-auto" src="./assets/flags/{{ player?.flag?.image_path }}" [alt]="player?.flag?.country" />
             </div>
-            <div class="w-52 flex flex-col justify-center">
-                <p class="text-white whitespace-nowrap">{{ player?.name }}</p>
+            <div class="w-5/12 flex flex-col justify-center px-10">
+                <p class="text-white uppercase text-xs whitespace-nowrap">{{ player?.name }}</p>
             </div>
-            <div class="w-24 flex flex-col justify-center">
-                <p class="text-white whitespace-nowrap">{{ player?.fargo_id }}</p>
+            <div class="w-2/12 flex flex-col justify-center px-10">
+                <p class="text-white uppercase text-xs">{{ player?.fargo_id }}</p>
             </div>
-            <div class="flex flex-col flex-grow justify-center">
-                <p class="text-white whitespace-nowrap">{{ player?.fargo_rating }}</p>
+            <div class="w-2/12 flex flex-col justify-center px-10">
+                <p class="text-white uppercase text-xs">{{ player?.fargo_rating }}</p>
             </div>
-            <div class="w-44 flex flex-col justify-center">
-                <div class="flex flex-row gap-2.5 whitespace-nowrap">
-                    <a class="text-gray-50 bg-blue-700 rounded py-2.5 px-5" routerLink="./edit/{{ player?.id }}">Edit</a>
-                    <button type="button" class="text-white bg-red-700 rounded py-2.5 px-5" (click)="deletePlayerById(player)">Delete</button>
+            <div class="w-2/12 flex flex-col justify-center items-end px-10">
+                <div class="flex flex-row gap-5 whitespace-nowrap">
+                    <a class="text-white bg-sad-success rounded py-2.5 px-5 uppercase text-xs" routerLink="./edit/{{ player?.id }}">Edit</a>
+                    <button type="button" class="text-white bg-sad-error rounded py-2.5 px-5 uppercase text-xs" (click)="deletePlayerById(player)">Delete</button>
                 </div>
             </div>
         </div>
     </ng-container>
     <ng-template #loading>
-        <div class="relative flex flex-row h-20 px-5 gap-5" *ngFor="let player of [1, 2, 3, 4, 5]; even as isEven; odd as isOdd" [ngClass]="{ 'bg-gray-600': isEven, 'bg-gray-700': isOdd }">
+        <div class="relative flex flex-row h-66px" *ngFor="let player of [1, 2, 3, 4, 5]; even as isEven; odd as isOdd" [ngClass]="{ 'bg-sad-table-even': isEven, 'bg-sad-table-odd': isOdd }">
             <div class="shimmer-overlay"></div>
         </div>
     </ng-template>

@@ -1,11 +1,18 @@
-<div class="py-2.5 px-5 flex flex-col">
-    <div class="pb-5 flex flex-row justify-between">
-        <h1 class="text-gray-50 uppercase text-4xl">Players</h1>
-        <a class="text-gray-50 bg-blue-700 rounded py-2.5 px-5" routerLink="./create">Create Player</a>
+<div class="p-50px flex flex-col bg-gradient-to-br from-grad-start to-grad-stop min-h-screen" *ngIf="vm$ | async as vm">
+    <div class="flex flex-row justify-between items-center h-66px bg-sad-section-title rounded-t">
+        <h1 class="text-white uppercase text-4xl px-10">Players</h1>
+        <a class="text-black bg-white bg-opacity-30 hover:bg-opacity-90 uppercase rounded py-2.5 px-5 text-xs whitespace-nowrap" routerLink="./create">Create Player</a>
+        <div class="flex flex-col w-full items-end px-10">
+            <div class="flex flex-row flex-grow w-full justify-end gap-10">
+                <dashboard-search class="flex flex-col flex-grow w-full max-w-sm"></dashboard-search>
+                <dashboard-pagination class="flex flex-col" [page]="vm.page" [count]="vm.count" [perPage]="perPage" (pageChange)="onPageChange($event)"></dashboard-pagination>
+            </div>
+        </div>
     </div>
-    <div *ngIf="vm$ | async as vm">
-        <!-- pagination -->
+    <div>
         <pool-overlay-players-list [loaded]="vm.loaded" [players]="vm.players" (deletePlayer)="deletePlayerById($event)"></pool-overlay-players-list>
-        <!-- pagination -->
+    </div>
+    <div class="flex flex-row h-66px bg-sad-section-title border-sad-active border-t border-b justify-end items-center px-10">
+        <dashboard-pagination class="flex flex-col" [page]="vm.page" [count]="vm.count" [perPage]="perPage" (pageChange)="onPageChange($event)"></dashboard-pagination>
     </div>
 </div>

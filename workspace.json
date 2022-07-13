@@ -130,6 +130,51 @@
             },
             "tags": []
         },
+        "dashboard-components": {
+            "projectType": "library",
+            "root": "libs/dashboard/components",
+            "sourceRoot": "libs/dashboard/components/src",
+            "architect": {
+                "build": {
+                    "builder": "@nrwl/angular:ng-packagr-lite",
+                    "outputs": ["dist/libs/dashboard/components"],
+                    "options": {
+                        "project": "libs/dashboard/components/ng-package.json"
+                    },
+                    "configurations": {
+                        "production": {
+                            "tsConfig": "libs/dashboard/components/tsconfig.lib.prod.json"
+                        },
+                        "development": {
+                            "tsConfig": "libs/dashboard/components/tsconfig.lib.json"
+                        }
+                    },
+                    "defaultConfiguration": "production"
+                },
+                "test": {
+                    "builder": "@nrwl/jest:jest",
+                    "outputs": ["coverage/libs/dashboard/components"],
+                    "options": {
+                        "jestConfig": "libs/dashboard/components/jest.config.ts",
+                        "passWithNoTests": true
+                    }
+                },
+                "lint": {
+                    "builder": "@nrwl/linter:eslint",
+                    "options": {
+                        "lintFilePatterns": [
+                            "libs/dashboard/components/**/*.ts",
+                            "libs/dashboard/components/**/*.html",
+                            "libs/dashboard/components/search/**/*.ts",
+                            "libs/dashboard/components/search/**/*.html",
+                            "libs/dashboard/components/pagination/**/*.ts",
+                            "libs/dashboard/components/pagination/**/*.html"
+                        ]
+                    }
+                }
+            },
+            "tags": []
+        },
         "go": {
             "projectType": "library",
             "root": "libs/go",

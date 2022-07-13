@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	playersPerPage = 100
+	playersPerPage = 10
 )
 
 // PlayersPostBody is an incoming body on a POST request for creating a player.

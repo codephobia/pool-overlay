@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
-import { concatMap, switchMap } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
+import { concatMap, map, switchMap, takeUntil } from 'rxjs/operators';
 
 import { IPlayer } from '@pool-overlay/models';
 import { PlayersService } from '../../../shared/services/players.service';
@@ -8,18 +10,31 @@ import { PlayersService } from '../../../shared/services/players.service';
 export interface PlayersListState {
     loaded: boolean;
     page: number;
+    count: number;
     players: IPlayer[];
 }
 
 @Injectable()
 export class PlayersListStore extends ComponentStore<PlayersListState> {
     constructor(
+        route: ActivatedRoute,
         private playersService: PlayersService,
     ) {
         super({
             loaded: false,
             page: 1,
+            count: 0,
             players: []
+        });
+
+        route.queryParamMap.pipe(
+            map(params => Number(params.get('page'))),
+            takeUntil(this.destroy$),
+        ).subscribe(page => {
+            const newPage = page ? page : 1;
+            console.log(newPage);
+            this.setPage(newPage);
+            this.getPlayers(newPage);
         });
     }
 
@@ -31,6 +46,11 @@ export class PlayersListStore extends ComponentStore<PlayersListState> {
     public readonly setPage = this.updater<number>((state, page) => ({
         ...state,
         page,
+    }));
+
+    public readonly setCount = this.updater<number>((state, count) => ({
+        ...state,
+        count,
     }));
 
     public readonly setPlayers = this.updater<IPlayer[]>((state, players) => ({
@@ -52,25 +72,30 @@ export class PlayersListStore extends ComponentStore<PlayersListState> {
 
     public readonly loaded$ = this.select(state => state.loaded);
     public readonly page$ = this.select(state => state.page);
+    public readonly count$ = this.select(state => state.count);
     public readonly players$ = this.select(state => state.players);
     public readonly vm$ = this.select(
         this.loaded$,
         this.page$,
+        this.count$,
         this.players$,
-        (loaded, page, players) => ({
+        (loaded, page, count, players) => ({
             loaded,
             page,
+            count,
             players,
         })
     );
 
-    // TODO: ADD PLAYER COUNT TO STATE AND GETPLAYERS CALL
-
     public readonly getPlayers = this.effect<number>(page$ => page$.pipe(
-        switchMap(page => this.playersService.find(page).pipe(
+        switchMap(page => forkJoin([
+            this.playersService.find(page),
+            this.playersService.count(),
+        ]).pipe(
             tapResponse(
-                players => {
-                    this.setPlayers(players)
+                ([players, { count }]) => {
+                    this.setPlayers(players);
+                    this.setCount(count);
                 },
                 error => console.error(error)
             ),
