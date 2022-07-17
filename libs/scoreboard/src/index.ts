@@ -1,1 +1,1 @@
-export * from './lib/scoreboard.module';
+export * from './lib/public-api';

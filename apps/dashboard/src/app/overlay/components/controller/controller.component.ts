@@ -5,19 +5,28 @@ import { GameType } from '@pool-overlay/models';
 import { ControllerStore } from './controller.store';
 import { Direction } from '../../models/direction.model';
 import { PlayerModalComponent, PlayerModalData } from '../player-modal/player-modal.component';
+import { SocketService } from '@pool-overlay/scoreboard';
 
 @Component({
     selector: 'pool-overlay-controller',
     templateUrl: './controller.component.html',
-    providers: [ControllerStore],
+    providers: [ControllerStore, SocketService],
 })
 export class ControllerComponent implements OnInit {
     public readonly vm$ = this.store.vm$;
 
     constructor(
         private dialog: MatDialog,
+        private readonly socketService: SocketService,
         private readonly store: ControllerStore,
-    ) { }
+    ) {
+        this.socketService.bind('GAME_EVENT', res => this.store.setGame(res.game));
+        this.socketService.bind('OVERLAY_TOGGLE', res => this.store.setHidden(res.hidden));
+        this.socketService.bind('OVERLAY_TOGGLE_FLAGS', res => this.store.setShowFlags(res.showFlags));
+        this.socketService.bind('OVERLAY_TOGGLE_FARGO', res => this.store.setShowFargo(res.showFargo));
+        this.socketService.bind('OVERLAY_TOGGLE_SCORE', res => this.store.setShowScore(res.showScore));
+        this.socketService.connect();
+    }
 
     public ngOnInit(): void {
         this.store.getGame();
