@@ -61,11 +61,6 @@ export class GameService {
         return this.http.patch<{ useFargoHotHandicap: boolean }>(url, { useFargoHotHandicap });
     }
 
-    public toggleOverlay() {
-        const url = `${this.apiURL}/${this.apiVersion}/overlay/toggle`;
-        return this.http.get<{ hidden: boolean }>(url);
-    }
-
     public save() {
         const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}`;
         return this.http.post<void>(url, {});

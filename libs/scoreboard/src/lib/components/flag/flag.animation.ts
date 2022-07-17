@@ -23,6 +23,7 @@ const flagAnimation = animation([
 
 export const flagTrigger = trigger('flagTrigger', [
     transition('void => *', []),
+    transition('* => void', []),
     transition('* => *', [
         useAnimation(flagAnimation)
     ]),

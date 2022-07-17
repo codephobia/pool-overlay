@@ -13,6 +13,21 @@ type OverlayToggleResp struct {
 	Hidden bool `json:"hidden"`
 }
 
+// OverlayToggleFlagsResp is the response from toggling flags on the overlay.
+type OverlayToggleFlagsResp struct {
+	ShowFlags bool `json:"showFlags"`
+}
+
+// OverlayToggleFargoResp is the response from toggling fargo ratings on the overlay.
+type OverlayToggleFargoResp struct {
+	ShowFargo bool `json:"showFargo"`
+}
+
+// OverlayToggleScoreResp is the response from toggling the player scores on the overlay.
+type OverlayToggleScoreResp struct {
+	ShowScore bool `json:"showScore"`
+}
+
 // Handler for overlay.
 func (server *Server) handleOverlay() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -80,5 +95,107 @@ func (server *Server) handleOverlayToggleGet(w http.ResponseWriter, r *http.Requ
 
 	server.handleSuccess(w, r, &OverlayToggleResp{
 		Hidden: hidden,
+	})
+}
+
+// Handler for overlay toggle flags.
+func (server *Server) handleOverlayToggleFlags() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "GET":
+			server.handleOverlayToggleFlagsGet(w, r)
+		default:
+			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
+		}
+	})
+}
+
+// Overlay toggle flags handler for GET method.
+func (server *Server) handleOverlayToggleFlagsGet(w http.ResponseWriter, r *http.Request) {
+	showFlags := server.state.ToggleFlags()
+
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.OverlayToggleFlagsEventType,
+		events.NewOverlayToggleFlagsEventPayload(showFlags),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
+
+	server.handleSuccess(w, r, &OverlayToggleFlagsResp{
+		ShowFlags: showFlags,
+	})
+}
+
+// Handler for overlay toggle fargo.
+func (server *Server) handleOverlayToggleFargo() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "GET":
+			server.handleOverlayToggleFargoGet(w, r)
+		default:
+			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
+		}
+	})
+}
+
+// Overlay toggle fargo handler for GET method.
+func (server *Server) handleOverlayToggleFargoGet(w http.ResponseWriter, r *http.Request) {
+	showFargo := server.state.ToggleFargo()
+
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.OverlayToggleFargoEventType,
+		events.NewOverlayToggleFargoEventPayload(showFargo),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
+
+	server.handleSuccess(w, r, &OverlayToggleFargoResp{
+		ShowFargo: showFargo,
+	})
+}
+
+// Handler for overlay toggle score.
+func (server *Server) handleOverlayToggleScore() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "GET":
+			server.handleOverlayToggleScoreGet(w, r)
+		default:
+			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
+		}
+	})
+}
+
+// Overlay toggle score handler for GET method.
+func (server *Server) handleOverlayToggleScoreGet(w http.ResponseWriter, r *http.Request) {
+	showScore := server.state.ToggleScore()
+
+	// Generate message to broadcast to overlay.
+	message, err := overlay.NewEvent(
+		events.OverlayToggleScoreEventType,
+		events.NewOverlayToggleScoreEventPayload(showScore),
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Broadcast update to overlay.
+	server.overlay.Broadcast <- message
+
+	server.handleSuccess(w, r, &OverlayToggleScoreResp{
+		ShowScore: showScore,
 	})
 }

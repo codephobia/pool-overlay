@@ -31,6 +31,7 @@ const characterRotaterAnimation = animation([
 
 export const characterRotater = trigger('characterRotater', [
     transition('void => *', []),
+    transition('* => void', []),
     transition('* => *', [
         useAnimation(characterRotaterAnimation)
     ]),

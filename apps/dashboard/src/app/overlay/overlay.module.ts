@@ -10,6 +10,7 @@ import { SharedModule } from '../shared/shared.module';
 import { ScoreboardModule } from '@pool-overlay/scoreboard';
 import { OverlayRoutingModule } from './overlay-routing.module';
 import { GameService } from './services/game.service';
+import { OverlayStateService } from './services/overlay-state.service';
 import { HomePageComponent } from './containers/home/home-page.component';
 import { ControllerComponent } from './components/controller/controller.component';
 import { PlayerModalComponent } from './components/player-modal/player-modal.component';
@@ -23,6 +24,7 @@ const COMPONENTS = [
 
 const SERVICES = [
     GameService,
+    OverlayStateService,
 ];
 
 @NgModule({

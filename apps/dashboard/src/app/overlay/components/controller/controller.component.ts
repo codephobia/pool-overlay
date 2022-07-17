@@ -67,6 +67,18 @@ export class ControllerComponent implements OnInit {
         this.store.toggleOverlay();
     }
 
+    public toggleFlags(): void {
+        this.store.toggleFlags();
+    }
+
+    public toggleFargo(): void {
+        this.store.toggleFargo();
+    }
+
+    public toggleScore(): void {
+        this.store.toggleScore();
+    }
+
     public updateScore(playerNum: number, direction: Direction): void {
         this.store.updateScore({ playerNum, direction });
     }

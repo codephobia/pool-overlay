@@ -32,6 +32,15 @@ func (server *Server) InitRoutes() {
 	// overlay/toggle
 	server.AddRouteToAllVersions("/overlay/toggle", server.handleOverlayToggle())
 
+	// overlay/toggle/flags
+	server.AddRouteToAllVersions("/overlay/toggle/flags", server.handleOverlayToggleFlags())
+
+	// overlay/toggle/fargo
+	server.AddRouteToAllVersions("/overlay/toggle/fargo", server.handleOverlayToggleFargo())
+
+	// overlay/toggle/score
+	server.AddRouteToAllVersions("/overlay/toggle/score", server.handleOverlayToggleScore())
+
 	// web socket connection to telestrator
 	server.AddRouteToAllVersions("/telestrator", server.handleTelestrator())
 

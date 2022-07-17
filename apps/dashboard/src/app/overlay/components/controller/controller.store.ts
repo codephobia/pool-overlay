@@ -3,6 +3,7 @@ import { ComponentStore, tapResponse } from '@ngrx/component-store';
 import { concatMap, switchMap, tap } from 'rxjs/operators';
 
 import { GameService } from '../../services/game.service';
+import { OverlayStateService } from '../../services/overlay-state.service';
 import { GameType, IGame } from '@pool-overlay/models';
 import { Direction } from '../../models/direction.model';
 
@@ -10,14 +11,25 @@ export interface ControllerState {
     pending: boolean;
     game: IGame | null;
     hidden: boolean;
+    showFlags: boolean;
+    showFargo: boolean;
+    showScore: boolean;
 }
 
 @Injectable()
 export class ControllerStore extends ComponentStore<ControllerState> {
     constructor(
         private gameService: GameService,
+        private overlayStateService: OverlayStateService,
     ) {
-        super({ pending: false, game: null, hidden: false });
+        super({
+            pending: false,
+            game: null,
+            hidden: false,
+            showFlags: true,
+            showFargo: true,
+            showScore: true,
+        });
     }
 
     public readonly setPending = this.updater<boolean>((state, pending) => ({
@@ -69,17 +81,41 @@ export class ControllerStore extends ComponentStore<ControllerState> {
         hidden,
     }));
 
+    public readonly setShowFlags = this.updater<boolean>((state, showFlags) => ({
+        ...state,
+        showFlags,
+    }));
+
+    public readonly setShowFargo = this.updater<boolean>((state, showFargo) => ({
+        ...state,
+        showFargo,
+    }));
+
+    public readonly setShowScore = this.updater<boolean>((state, showScore) => ({
+        ...state,
+        showScore,
+    }));
+
     public readonly pending$ = this.select(state => state.pending);
     public readonly game$ = this.select(state => state.game);
     public readonly hidden$ = this.select(state => state.hidden);
+    public readonly showFlags$ = this.select(state => state.showFlags);
+    public readonly showFargo$ = this.select(state => state.showFargo);
+    public readonly showScore$ = this.select(state => state.showScore);
     public readonly vm$ = this.select(
         this.pending$,
         this.game$,
         this.hidden$,
-        (pending, game, hidden) => ({
+        this.showFlags$,
+        this.showFargo$,
+        this.showScore$,
+        (pending, game, hidden, showFlags, showFargo, showScore) => ({
             pending,
             game,
             hidden,
+            showFlags,
+            showFargo,
+            showScore,
         }),
     );
 
@@ -179,10 +215,49 @@ export class ControllerStore extends ComponentStore<ControllerState> {
 
     public readonly toggleOverlay = this.effect(trigger$ => trigger$.pipe(
         tap(() => { this.setPending(true); }),
-        switchMap(() => this.gameService.toggleOverlay().pipe(
+        switchMap(() => this.overlayStateService.toggle().pipe(
             tapResponse(
                 ({ hidden }) => {
                     this.setHidden(hidden);
+                },
+                error => console.error(error),
+                () => { this.setPending(false); },
+            )
+        ))
+    ));
+
+    public readonly toggleFlags = this.effect(trigger$ => trigger$.pipe(
+        tap(() => { this.setPending(true); }),
+        switchMap(() => this.overlayStateService.toggleFlags().pipe(
+            tapResponse(
+                ({ showFlags }) => {
+                    this.setShowFlags(showFlags);
+                },
+                error => console.error(error),
+                () => { this.setPending(false); },
+            )
+        ))
+    ));
+
+    public readonly toggleFargo = this.effect(trigger$ => trigger$.pipe(
+        tap(() => { this.setPending(true); }),
+        switchMap(() => this.overlayStateService.toggleFargo().pipe(
+            tapResponse(
+                ({ showFargo }) => {
+                    this.setShowFargo(showFargo);
+                },
+                error => console.error(error),
+                () => { this.setPending(false); },
+            )
+        ))
+    ));
+
+    public readonly toggleScore = this.effect(trigger$ => trigger$.pipe(
+        tap(() => { this.setPending(true); }),
+        switchMap(() => this.overlayStateService.toggleScore().pipe(
+            tapResponse(
+                ({ showScore }) => {
+                    this.setShowScore(showScore);
                 },
                 error => console.error(error),
                 () => { this.setPending(false); },
