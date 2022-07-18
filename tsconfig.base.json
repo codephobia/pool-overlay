@@ -16,11 +16,8 @@
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
-            "@dashboard/components/search": [
-                "libs/dashboard/components/search/src/index.ts"
-            ],
-            "@dashboard/components/pagination": [
-                "libs/dashboard/components/pagination/src/index.ts"
+            "@dashboard/components/*": [
+                "libs/dashboard/components/*/src/index.ts"
             ],
             "@pool-overlay/models": ["libs/models/src/index.ts"],
             "@pool-overlay/scoreboard": ["libs/scoreboard/src/index.ts"]

@@ -80,7 +80,6 @@ export class ScoreboardStore extends ComponentStore<ScoreboardState> {
                     tapResponse(
                         (game) => {
                             this.setGame({ game });
-                            console.log(game);
                         },
                         (error) => console.error(error)
                     ),

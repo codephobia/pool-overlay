@@ -15,6 +15,7 @@ import { HomePageComponent } from './containers/home/home-page.component';
 import { ControllerComponent } from './components/controller/controller.component';
 import { PlayerModalComponent } from './components/player-modal/player-modal.component';
 import { PaginationModule } from '@dashboard/components/pagination';
+import { ToggleModule } from '@dashboard/components/toggle';
 
 const COMPONENTS = [
     HomePageComponent,
@@ -40,6 +41,7 @@ const SERVICES = [
             environment,
         }),
         PaginationModule,
+        ToggleModule,
     ],
     exports: [],
     declarations: [

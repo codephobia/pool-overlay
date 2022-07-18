@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { take, filter } from 'rxjs/operators';
 
 import { GameType } from '@pool-overlay/models';
 import { ControllerStore } from './controller.store';
@@ -73,6 +74,14 @@ export class ControllerComponent implements OnInit {
     }
 
     public toggleOverlay(): void {
+        // this.store.hidden$.pipe(
+        //     take(1),
+        // ).subscribe((hidden) => {
+        //     if (hidden === checked) {
+        //         this.store.toggleOverlay();
+        //     }
+        // });
+
         this.store.toggleOverlay();
     }
 

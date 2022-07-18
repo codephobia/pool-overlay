@@ -73,30 +73,10 @@
             </div>
         </div>
         <div class="flex flex-col gap-2.5">
-            <div>
-                <h2 class="mb-2.5 text-white">Overlay</h2>
-                <div>
-                    <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="toggleOverlay()">{{ vm.hidden ? 'Show' : 'Hide' }}</button>
-                </div>
-            </div>
-            <div>
-                <h2 class="mb-2.5 text-white">Flags</h2>
-                <div>
-                    <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="toggleFlags()">{{ !vm.showFlags ? 'Show' : 'Hide' }}</button>
-                </div>
-            </div>
-            <div>
-                <h2 class="mb-2.5 text-white">Fargo</h2>
-                <div>
-                    <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="toggleFargo()">{{ !vm.showFargo ? 'Show' : 'Hide' }}</button>
-                </div>
-            </div>
-            <div>
-                <h2 class="mb-2.5 text-white">Score</h2>
-                <div>
-                    <button type="button" class="px-5 py-2.5 rounded bg-gray-700 text-white" (click)="toggleScore()">{{ !vm.showScore ? 'Show' : 'Hide' }}</button>
-                </div>
-            </div>
+            <dashboard-toggle label="Overlay" [checked]="!vm.hidden" (toggled)="toggleOverlay()"></dashboard-toggle>
+            <dashboard-toggle label="Flags" [checked]="vm.showFlags" (toggled)="toggleFlags()"></dashboard-toggle>
+            <dashboard-toggle label="Fargo" [checked]="vm.showFargo" (toggled)="toggleFargo()"></dashboard-toggle>
+            <dashboard-toggle label="Score" [checked]="vm.showScore" (toggled)="toggleScore()"></dashboard-toggle>
         </div>
         <div>
             <h2 class="mb-2.5 text-white">Game</h2>

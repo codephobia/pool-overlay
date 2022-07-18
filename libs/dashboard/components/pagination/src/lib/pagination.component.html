@@ -2,7 +2,7 @@
     <button
         type="button"
         class="flex flex-col w-42px h-42px rounded-l border-t border-l border-b justify-center items-center"
-        [ngClass]="{ 'bg-sad-background-active border-sad-active': vm.hasPrevPage, 'bg-sad-input-background border-sad-input cursor-default': !vm.hasPrevPage }"
+        [ngClass]="{ 'bg-sad-active border-sad-active': vm.hasPrevPage, 'bg-sad-input border-sad-input cursor-default': !vm.hasPrevPage }"
         [disabled]="!vm.hasPrevPage"
         (click)="goToPage(vm.prevPage)"
     >
@@ -10,8 +10,8 @@
     </button>
     <button
         type="button"
-        class="flex flex-col w-42px h-42px rounded-r border-sad-active border-t border-r border-b bg-sad-background-active justify-center items-center"
-        [ngClass]="{ 'bg-sad-background-active border-sad-active': vm.hasNextPage, 'bg-sad-input-background border-sad-input cursor-default': !vm.hasNextPage }"
+        class="flex flex-col w-42px h-42px rounded-r border-sad-active border-t border-r border-b bg-sad-active justify-center items-center"
+        [ngClass]="{ 'bg-sad-active border-sad-active': vm.hasNextPage, 'bg-sad-input border-sad-input cursor-default': !vm.hasNextPage }"
         [disabled]="!vm.hasNextPage"
         (click)="goToPage(vm.nextPage)"
     >

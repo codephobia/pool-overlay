@@ -17,8 +17,8 @@ module.exports = {
             backgroundColor: {
                 sad: {
                     background: 'var(--color-sad-background)',
-                    'background-active': 'var(--color-sad-background-active)',
-                    'input-background': 'var(--color-sad-input-background)',
+                    active: 'var(--color-sad-background-active)',
+                    input: 'var(--color-sad-input-background)',
                     'section-title':
                         'var(--color-sad-section-title-background)',
                     'table-odd': 'var(--color-sad-bg-table-odd)',

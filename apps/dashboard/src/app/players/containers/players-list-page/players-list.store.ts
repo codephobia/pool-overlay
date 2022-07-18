@@ -32,7 +32,6 @@ export class PlayersListStore extends ComponentStore<PlayersListState> {
             takeUntil(this.destroy$),
         ).subscribe(page => {
             const newPage = page ? page : 1;
-            console.log(newPage);
             this.setPage(newPage);
             this.getPlayers(newPage);
         });

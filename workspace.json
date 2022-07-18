@@ -175,6 +175,48 @@
             },
             "tags": []
         },
+        "dashboard-components-toggle": {
+            "projectType": "library",
+            "root": "libs/dashboard/components/toggle",
+            "sourceRoot": "libs/dashboard/components/toggle/src",
+            "prefix": "pool-overlay",
+            "architect": {
+                "build": {
+                    "builder": "@nrwl/angular:ng-packagr-lite",
+                    "outputs": ["dist/libs/dashboard/components/toggle"],
+                    "options": {
+                        "project": "libs/dashboard/components/toggle/ng-package.json"
+                    },
+                    "configurations": {
+                        "production": {
+                            "tsConfig": "libs/dashboard/components/toggle/tsconfig.lib.prod.json"
+                        },
+                        "development": {
+                            "tsConfig": "libs/dashboard/components/toggle/tsconfig.lib.json"
+                        }
+                    },
+                    "defaultConfiguration": "production"
+                },
+                "test": {
+                    "builder": "@nrwl/jest:jest",
+                    "outputs": ["coverage/libs/dashboard/components/toggle"],
+                    "options": {
+                        "jestConfig": "libs/dashboard/components/toggle/jest.config.ts",
+                        "passWithNoTests": true
+                    }
+                },
+                "lint": {
+                    "builder": "@nrwl/linter:eslint",
+                    "options": {
+                        "lintFilePatterns": [
+                            "libs/dashboard/components/toggle/**/*.ts",
+                            "libs/dashboard/components/toggle/**/*.html"
+                        ]
+                    }
+                }
+            },
+            "tags": []
+        },
         "go": {
             "projectType": "library",
             "root": "libs/go",
