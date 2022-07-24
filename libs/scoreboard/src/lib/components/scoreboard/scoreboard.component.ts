@@ -21,10 +21,7 @@ export class ScoreboardComponent implements OnInit {
         private _socketService: SocketService,
     ) {
         this._socketService.bind('GAME_EVENT', this._scoreboardStore.setGame);
-        this._socketService.bind('OVERLAY_TOGGLE', this._scoreboardStore.setHidden);
-        this._socketService.bind('OVERLAY_TOGGLE_FLAGS', this._scoreboardStore.setShowFlags);
-        this._socketService.bind('OVERLAY_TOGGLE_FARGO', this._scoreboardStore.setShowFargo);
-        this._socketService.bind('OVERLAY_TOGGLE_SCORE', this._scoreboardStore.setShowScore);
+        this._socketService.bind('OVERLAY_STATE_EVENT', this._scoreboardStore.setOverlay);
         this._socketService.connect();
     }
 

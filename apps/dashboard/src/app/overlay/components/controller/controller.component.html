@@ -73,10 +73,10 @@
             </div>
         </div>
         <div class="flex flex-col gap-2.5">
-            <dashboard-toggle label="Overlay" [checked]="!vm.hidden" (toggled)="toggleOverlay()"></dashboard-toggle>
-            <dashboard-toggle label="Flags" [checked]="vm.showFlags" (toggled)="toggleFlags()"></dashboard-toggle>
-            <dashboard-toggle label="Fargo" [checked]="vm.showFargo" (toggled)="toggleFargo()"></dashboard-toggle>
-            <dashboard-toggle label="Score" [checked]="vm.showScore" (toggled)="toggleScore()"></dashboard-toggle>
+            <dashboard-toggle label="Overlay" [checked]="!vm.overlay.hidden" (toggled)="toggleOverlay()"></dashboard-toggle>
+            <dashboard-toggle label="Flags" [checked]="vm.overlay.showFlags" (toggled)="toggleFlags()"></dashboard-toggle>
+            <dashboard-toggle label="Fargo" [checked]="vm.overlay.showFargo" (toggled)="toggleFargo()"></dashboard-toggle>
+            <dashboard-toggle label="Score" [checked]="vm.overlay.showScore" (toggled)="toggleScore()"></dashboard-toggle>
         </div>
         <div>
             <h2 class="mb-2.5 text-white">Game</h2>

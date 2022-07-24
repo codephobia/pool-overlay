@@ -1,5 +1,5 @@
-<div class="scoreboard-wrapper" [@scoreboardTransition]="!vm.hidden" *ngIf="vm$ | async as vm">
-    <div class="scoreboard" *ngIf="!vm.hidden">
+<div class="scoreboard-wrapper" [@scoreboardTransition]="!vm.overlay.hidden" *ngIf="vm$ | async as vm">
+    <div class="scoreboard" *ngIf="!vm.overlay.hidden">
         <div class="handicap-wrapper">
             <div
                 class="handicap"
@@ -33,9 +33,9 @@
         <div class="players">
             <div class="bar top"></div>
             <div class="player-info">
-                <div class="player-wrapper one" [ngClass]="{ 'with-flag': vm.showFlags, 'with-fargo': vm.showFargo }">
+                <div class="player-wrapper one" [ngClass]="{ 'with-flag': vm.overlay.showFlags, 'with-fargo': vm.overlay.showFargo }">
                     <div class="player one">
-                        <ng-container *ngIf="vm.showFlags">
+                        <ng-container *ngIf="vm.overlay.showFlags">
                             <div class="divider"></div>
                             <div class="flag">
                                 <app-flag class="player-one" [imagePath]="vm.game?.player_one?.flag?.image_path"></app-flag>
@@ -45,7 +45,7 @@
                         <div class="player-name">
                             <app-character-rotater *ngIf="vm.game?.player_one?.name" [characters]="vm.game?.player_one?.name"></app-character-rotater>
                         </div>
-                        <ng-container *ngIf="vm.showFargo">
+                        <ng-container *ngIf="vm.overlay.showFargo">
                             <div class="divider"></div>
                             <div class="fargo-rating">
                                 <div class="title">Fargo</div>
@@ -54,9 +54,9 @@
                         </ng-container>
                     </div>
                 </div>
-                <div class="scores-wrapper" [ngClass]="{ 'with-score': vm.showScore }">
+                <div class="scores-wrapper" [ngClass]="{ 'with-score': vm.overlay.showScore }">
                     <div class="scores">
-                        <ng-container *ngIf="vm.showScore">
+                        <ng-container *ngIf="vm.overlay.showScore">
                             <div class="divider left"></div>
                             <div class="score left">
                                 <app-character-rotater *ngIf="vm.game?.score_one !== null" [characters]="vm.game?.score_one"></app-character-rotater>
@@ -65,7 +65,7 @@
                         <div class="divider left"></div>
                         <div class="versus">vs</div>
                         <div class="divider right"></div>
-                        <ng-container *ngIf="vm.showScore">
+                        <ng-container *ngIf="vm.overlay.showScore">
                             <div class="score right">
                                 <app-character-rotater *ngIf="vm.game?.score_two !== null" [characters]="vm.game?.score_two"></app-character-rotater>
                             </div>
@@ -73,9 +73,9 @@
                         </ng-container>
                     </div>
                 </div>
-                <div class="player-wrapper two" [ngClass]="{ 'with-flag': vm.showFlags, 'with-fargo': vm.showFargo }">
+                <div class="player-wrapper two" [ngClass]="{ 'with-flag': vm.overlay.showFlags, 'with-fargo': vm.overlay.showFargo }">
                     <div class="player two">
-                        <ng-container *ngIf="vm.showFargo">
+                        <ng-container *ngIf="vm.overlay.showFargo">
                             <div class="fargo-rating">
                                 <div class="title">Fargo</div>
                                 <app-character-rotater *ngIf="vm.game?.player_two?.fargo_rating" [characters]="vm.game?.player_two?.fargo_rating"></app-character-rotater>
@@ -86,7 +86,7 @@
                             <app-character-rotater *ngIf="vm.game?.player_two?.name" [characters]="vm.game?.player_two?.name"></app-character-rotater>
                         </div>
                         <div class="divider"></div>
-                        <ng-container *ngIf="vm.showFlags">
+                        <ng-container *ngIf="vm.overlay.showFlags">
                             <div class="flag">
                                 <app-flag class="player-two" [imagePath]="vm.game?.player_two?.flag?.image_path"></app-flag>
                             </div>

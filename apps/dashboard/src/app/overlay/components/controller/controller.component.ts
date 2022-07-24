@@ -22,10 +22,7 @@ export class ControllerComponent implements OnInit {
         private readonly store: ControllerStore,
     ) {
         this.socketService.bind('GAME_EVENT', res => this.store.setGame(res.game));
-        this.socketService.bind('OVERLAY_TOGGLE', res => this.store.setHidden(res.hidden));
-        this.socketService.bind('OVERLAY_TOGGLE_FLAGS', res => this.store.setShowFlags(res.showFlags));
-        this.socketService.bind('OVERLAY_TOGGLE_FARGO', res => this.store.setShowFargo(res.showFargo));
-        this.socketService.bind('OVERLAY_TOGGLE_SCORE', res => this.store.setShowScore(res.showScore));
+        this.socketService.bind('OVERLAY_STATE_EVENT', this.store.setOverlay);
         this.socketService.connect();
     }
 

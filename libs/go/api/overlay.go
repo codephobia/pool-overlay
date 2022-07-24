@@ -62,6 +62,19 @@ func (server *Server) handleOverlayGet(w http.ResponseWriter, r *http.Request) {
 	// init read / write for socket connection
 	go oc.WritePump()
 	go oc.ReadPump()
+
+	// Generate current overlay state message.
+	message, err := overlay.NewEvent(
+		events.OverlayStateEventType,
+		server.state.Overlay,
+	).ToBytes()
+	if err != nil {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+		return
+	}
+
+	// Send current state to new connection.
+	oc.Send <- message
 }
 
 // Handler for overlay toggle.
@@ -78,12 +91,12 @@ func (server *Server) handleOverlayToggle() http.Handler {
 
 // Overlay toggle handler for GET method.
 func (server *Server) handleOverlayToggleGet(w http.ResponseWriter, r *http.Request) {
-	hidden := server.state.ToggleHidden()
+	hidden := server.state.Overlay.ToggleHidden()
 
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
-		events.OverlayToggleEventType,
-		events.NewOverlayToggleEventPayload(hidden),
+		events.OverlayStateEventType,
+		server.state.Overlay,
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
@@ -112,12 +125,12 @@ func (server *Server) handleOverlayToggleFlags() http.Handler {
 
 // Overlay toggle flags handler for GET method.
 func (server *Server) handleOverlayToggleFlagsGet(w http.ResponseWriter, r *http.Request) {
-	showFlags := server.state.ToggleFlags()
+	showFlags := server.state.Overlay.ToggleFlags()
 
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
-		events.OverlayToggleFlagsEventType,
-		events.NewOverlayToggleFlagsEventPayload(showFlags),
+		events.OverlayStateEventType,
+		server.state.Overlay,
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
@@ -146,12 +159,12 @@ func (server *Server) handleOverlayToggleFargo() http.Handler {
 
 // Overlay toggle fargo handler for GET method.
 func (server *Server) handleOverlayToggleFargoGet(w http.ResponseWriter, r *http.Request) {
-	showFargo := server.state.ToggleFargo()
+	showFargo := server.state.Overlay.ToggleFargo()
 
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
-		events.OverlayToggleFargoEventType,
-		events.NewOverlayToggleFargoEventPayload(showFargo),
+		events.OverlayStateEventType,
+		server.state.Overlay,
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
@@ -180,12 +193,12 @@ func (server *Server) handleOverlayToggleScore() http.Handler {
 
 // Overlay toggle score handler for GET method.
 func (server *Server) handleOverlayToggleScoreGet(w http.ResponseWriter, r *http.Request) {
-	showScore := server.state.ToggleScore()
+	showScore := server.state.Overlay.ToggleScore()
 
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
-		events.OverlayToggleScoreEventType,
-		events.NewOverlayToggleScoreEventPayload(showScore),
+		events.OverlayStateEventType,
+		server.state.Overlay,
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)

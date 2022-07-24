@@ -4,16 +4,13 @@ import { concatMap, switchMap, tap } from 'rxjs/operators';
 
 import { GameService } from '../../services/game.service';
 import { OverlayStateService } from '../../services/overlay-state.service';
-import { GameType, IGame } from '@pool-overlay/models';
+import { GameType, IGame, OverlayState } from '@pool-overlay/models';
 import { Direction } from '../../models/direction.model';
 
 export interface ControllerState {
     pending: boolean;
     game: IGame | null;
-    hidden: boolean;
-    showFlags: boolean;
-    showFargo: boolean;
-    showScore: boolean;
+    overlay: OverlayState;
 }
 
 @Injectable()
@@ -25,10 +22,12 @@ export class ControllerStore extends ComponentStore<ControllerState> {
         super({
             pending: false,
             game: null,
-            hidden: false,
-            showFlags: true,
-            showFargo: true,
-            showScore: true,
+            overlay: {
+                hidden: false,
+                showFlags: true,
+                showFargo: true,
+                showScore: true,
+            },
         });
     }
 
@@ -76,46 +75,54 @@ export class ControllerStore extends ComponentStore<ControllerState> {
         },
     }));
 
+    public readonly setOverlay = this.updater<OverlayState>((state, overlay) => ({
+        ...state,
+        overlay,
+    }));
+
     public readonly setHidden = this.updater<boolean>((state, hidden) => ({
         ...state,
-        hidden,
+        overlay: {
+            ...(state.overlay as OverlayState),
+            hidden,
+        },
     }));
 
     public readonly setShowFlags = this.updater<boolean>((state, showFlags) => ({
         ...state,
-        showFlags,
+        overlay: {
+            ...(state.overlay as OverlayState),
+            showFlags,
+        },
     }));
 
     public readonly setShowFargo = this.updater<boolean>((state, showFargo) => ({
         ...state,
-        showFargo,
+        overlay: {
+            ...(state.overlay as OverlayState),
+            showFargo,
+        },
     }));
 
     public readonly setShowScore = this.updater<boolean>((state, showScore) => ({
         ...state,
-        showScore,
+        overlay: {
+            ...(state.overlay as OverlayState),
+            showScore,
+        },
     }));
 
     public readonly pending$ = this.select(state => state.pending);
     public readonly game$ = this.select(state => state.game);
-    public readonly hidden$ = this.select(state => state.hidden);
-    public readonly showFlags$ = this.select(state => state.showFlags);
-    public readonly showFargo$ = this.select(state => state.showFargo);
-    public readonly showScore$ = this.select(state => state.showScore);
+    public readonly overlay$ = this.select(state => state.overlay);
     public readonly vm$ = this.select(
         this.pending$,
         this.game$,
-        this.hidden$,
-        this.showFlags$,
-        this.showFargo$,
-        this.showScore$,
-        (pending, game, hidden, showFlags, showFargo, showScore) => ({
+        this.overlay$,
+        (pending, game, overlay) => ({
             pending,
             game,
-            hidden,
-            showFlags,
-            showFargo,
-            showScore,
+            overlay,
         }),
     );
 
