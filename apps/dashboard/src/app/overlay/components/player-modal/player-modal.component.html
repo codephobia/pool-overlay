@@ -1,36 +1,35 @@
-<div class="flex flex-col flex-grow">
-    <div class="flex flex-row flex-none px-5 py-2.5 bg-red-700 text-white justify-between items-center">
-        <h1>Select Player {{ playerNum }}</h1>
-        <button class="button" class="px-5 py-2.5 rounded bg-black items-center" (click)="close()">x</button>
+<div class="flex flex-col flex-grow" *ngIf="vm$ | async as vm">
+    <div class="flex flex-row justify-between items-center h-66px bg-sad-section-title">
+        <h1 class="text-white uppercase text-4xl px-5">Select Player {{ playerNum }}</h1>
+        <div class="flex flex-row gap-5 px-5">
+            <dashboard-pagination class="flex flex-col" [page]="vm.page" [count]="vm.count" [perPage]="perPage" (pageChange)="onPageChange($event)"></dashboard-pagination>
+            <button class="button" class="flex flex-col w-42px h-42px rounded bg-sad-input hover:bg-sad-active justify-center items-center" (click)="close()">
+                <fa-icon class="text-white text-lg" [icon]="faXmark"></fa-icon>
+            </button>
+        </div>
     </div>
     <div class="flex flex-row flex-grow">
-        <ng-container *ngIf="vm$ | async as vm">
-            <div class="flex flex-col flex-grow overflow-y-scroll max-h-96">
-                <ng-container *ngIf="vm.loaded; else loading">
-                    <div
-                        class="flex flex-row flex-shrink-0 h-20 px-5 gap-5 cursor-pointer"
-                        *ngFor="let player of vm.players; even as isEven"
-                        [ngClass]="bgColor(player.id, isEven)"
-                        (click)="selectPlayer(player.id)"
-                    >
-                        <div class="w-14 flex flex-col justify-center items-center">
-                            <img *ngIf="player?.flag" class="w-14 h-auto" src="./assets/flags/{{ player?.flag?.image_path }}" [alt]="player?.flag?.country" />
-                        </div>
-                        <div class="flex flex-col flex-grow justify-center">
-                            <p class="text-white">{{ player?.name }}</p>
-                        </div>
+        <div class="flex flex-col flex-grow bg-gradient-to-br from-grad-start to-grad-stop">
+            <ng-container *ngIf="vm.loaded; else loading">
+                <div
+                    class="flex flex-row flex-shrink-0 h-66px px-5 gap-5 cursor-pointer"
+                    *ngFor="let player of vm.players; even as isEven"
+                    [ngClass]="bgColor(player.id, isEven)"
+                    (click)="selectPlayer(player.id)"
+                >
+                    <div class="w-1/12 flex flex-col justify-center items-center">
+                        <img *ngIf="player?.flag" class="w-5 h-auto" src="./assets/flags/{{ player?.flag?.image_path }}" [alt]="player?.flag?.country" />
                     </div>
-                </ng-container>
-                <ng-template #loading>
-                    <div
-                        class="relative flex flex-row h-20 px-5 gap-5"
-                        *ngFor="let player of [1, 2, 3, 4, 5]; even as isEven; odd as isOdd"
-                        [ngClass]="{ 'bg-gray-600': isEven, 'bg-gray-700': isOdd }"
-                    >
-                        <div class="shimmer-overlay"></div>
+                    <div class="w-11/12 flex flex-col justify-center">
+                        <p class="text-white uppercase text-xs whitespace-nowrap">{{ player?.name }}</p>
                     </div>
-                </ng-template>
-            </div>
-        </ng-container>
+                </div>
+            </ng-container>
+            <ng-template #loading>
+                <div class="relative flex flex-row h-20 px-5 gap-5" *ngFor="let player of [1, 2, 3, 4, 5]; even as isEven; odd as isOdd" [ngClass]="{ 'bg-gray-600': isEven, 'bg-gray-700': isOdd }">
+                    <div class="shimmer-overlay"></div>
+                </div>
+            </ng-template>
+        </div>
     </div>
 </div>

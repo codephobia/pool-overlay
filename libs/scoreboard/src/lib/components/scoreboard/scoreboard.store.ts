@@ -1,49 +1,70 @@
 import { Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, withLatestFrom } from 'rxjs/operators';
 
-import { IGame } from '@pool-overlay/models';
+import { IGame, OverlayState } from '@pool-overlay/models';
 import { APIService } from '../../services/api.service';
 
 export interface ScoreboardState {
     game: IGame | null;
-    hidden: boolean;
+    overlay: OverlayState;
 }
 
 @Injectable()
 export class ScoreboardStore extends ComponentStore<ScoreboardState> {
     constructor(private _apiService: APIService) {
-        super({ game: null, hidden: false });
+        super({
+            game: null,
+            overlay: {
+                table: 1,
+                hidden: false,
+                showFlags: false,
+                showFargo: true,
+                showScore: true,
+            },
+        });
     }
 
     // updaters
-    public readonly setGame = this.updater((state, values: { game: IGame }) => ({
+    public readonly setGame = this.updater<Pick<ScoreboardState, 'game'>>((state, { game }) => ({
         ...state,
-        game: values.game
+        game,
     }));
 
-    public readonly setHidden = this.updater((state, values: { hidden: boolean }) => ({
+    public readonly setOverlay = this.updater<OverlayState>((state, overlay) => ({
         ...state,
-        hidden: values.hidden,
+        overlay,
+    }));
+
+    public readonly setOverlayTable = this.updater<number>((state, table) => ({
+        ...state,
+        overlay: {
+            ...state.overlay,
+            table,
+        },
     }));
 
     // selectors
     public readonly game$ = this.select((state) => state.game);
-    public readonly hidden$ = this.select((state) => state.hidden);
-    public readonly vm$ = this.select(this.game$, this.hidden$, (game, hidden) => ({
-        game,
-        hidden,
-    }));
+    public readonly overlay$ = this.select((state) => state.overlay);
+    public readonly vm$ = this.select(
+        this.game$,
+        this.overlay$,
+        (game, overlay) => ({
+            game,
+            overlay,
+        })
+    );
 
     // effects
     public readonly getGame = this.effect((trigger$) => {
         return trigger$.pipe(
-            switchMap(() =>
-                this._apiService.getGame().pipe(
+            withLatestFrom(this.select(state => state.overlay.table)),
+            switchMap(([_, table]) =>
+                this._apiService.getGame(table).pipe(
                     tapResponse(
                         (game) => {
                             this.setGame({ game });
-                            console.log(game);
                         },
                         (error) => console.error(error)
                     ),

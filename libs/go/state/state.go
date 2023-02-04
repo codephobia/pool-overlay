@@ -1,31 +1,22 @@
 package state
 
 import (
-	"sync"
-
 	"github.com/codephobia/pool-overlay/libs/go/models"
 	"gorm.io/gorm"
 )
 
+// State is the current state of the overlay.
 type State struct {
-	Game   *models.Game `json:"game"`
-	Hidden bool         `json:"hidden"`
-
-	mutex sync.Mutex
+	Table   int           `json:"table"`
+	Game    *models.Game  `json:"game"`
+	Overlay *OverlayState `json:"overlay"`
 }
 
-func NewState(db *gorm.DB) *State {
+// NewState creates a new state.
+func NewState(db *gorm.DB, table int) *State {
 	return &State{
-		Game:   models.NewGame(db).LoadLatest(),
-		Hidden: true,
+		Table:   table,
+		Game:    models.NewGame(db, table).LoadLatest(table),
+		Overlay: NewOverlayState(table),
 	}
-}
-
-func (s *State) ToggleHidden() bool {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-
-	s.Hidden = !s.Hidden
-
-	return s.Hidden
 }

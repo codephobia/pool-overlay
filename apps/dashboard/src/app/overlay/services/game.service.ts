@@ -19,55 +19,50 @@ export class GameService {
         this.apiVersion = config.environment.apiVersion;
     }
 
-    public getGame() {
-        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}`;
+    public getGame(table: number) {
+        const url = `${this.apiURL}/${this.apiVersion}/table/${table}/${this.endpoint}`;
         return this.http.get<IGame>(url);
     }
 
-    public unsetPlayer(playerNum: number) {
-        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/players`;
+    public unsetPlayer(table: number, playerNum: number) {
+        const url = `${this.apiURL}/${this.apiVersion}/table/${table}/${this.endpoint}/players`;
         return this.http.delete<IGame>(url, {
             body: { playerNum },
         });
     }
 
-    public setPlayer(playerNum: number, playerID: number) {
-        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/players`;
+    public setPlayer(table: number, playerNum: number, playerID: number) {
+        const url = `${this.apiURL}/${this.apiVersion}/table/${table}/${this.endpoint}/players`;
         return this.http.patch<IGame>(url, { playerNum, playerID });
     }
 
-    public updateRaceTo(direction: Direction) {
-        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/race-to`;
+    public updateRaceTo(table: number, direction: Direction) {
+        const url = `${this.apiURL}/${this.apiVersion}/table/${table}/${this.endpoint}/race-to`;
         return this.http.patch<{ raceTo: number, useFargoHotHandicap: boolean }>(url, { direction });
     }
 
-    public resetScore() {
-        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/score`;
+    public resetScore(table: number) {
+        const url = `${this.apiURL}/${this.apiVersion}/table/${table}/${this.endpoint}/score`;
         return this.http.delete<{ scoreOne: number, scoreTwo: number }>(url);
     }
 
-    public updateScore(playerNum: number, direction: Direction) {
-        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/score`;
+    public updateScore(table: number, playerNum: number, direction: Direction) {
+        const url = `${this.apiURL}/${this.apiVersion}/table/${table}/${this.endpoint}/score`;
         return this.http.patch<{ scoreOne: number, scoreTwo: number }>(url, { playerNum, direction });
     }
 
-    public setGameType(type: GameType) {
-        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/type`;
+    public setGameType(table: number, type: GameType) {
+        const url = `${this.apiURL}/${this.apiVersion}/table/${table}/${this.endpoint}/type`;
         return this.http.patch<{ type: number }>(url, { type });
     }
 
-    public setFargoHotHandicap(useFargoHotHandicap: boolean) {
-        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/fargo-hot-handicap`;
+    public setFargoHotHandicap(table: number, useFargoHotHandicap: boolean) {
+        const url = `${this.apiURL}/${this.apiVersion}/table/${table}/${this.endpoint}/fargo-hot-handicap`;
         return this.http.patch<{ useFargoHotHandicap: boolean }>(url, { useFargoHotHandicap });
     }
 
-    public toggleOverlay() {
-        const url = `${this.apiURL}/${this.apiVersion}/overlay/toggle`;
-        return this.http.get<{ hidden: boolean }>(url);
-    }
-
-    public save() {
-        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}`;
+    public save(table: number) {
+        const url = `${this.apiURL}/${this.apiVersion}/table/${table}/${this.endpoint}`;
         return this.http.post<void>(url, {});
     }
 }

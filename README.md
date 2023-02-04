@@ -15,6 +15,8 @@ An OBS browser source overlay that will show which players are currently playing
     `cd pool-overlay`
 
 3. Install dependencies.
+   
+    **Note:** We are currently using the Pro version of FontAwesome so we need to include the token as an environment variable (FONTAWESOME_NPM_AUTH_TOKEN) which is read from the `.npmrc` file during install. You can get the token from your FontAwesome account settings. Docker will add the environment variable as a build arg through docker compose.
 
     `npm install`
 

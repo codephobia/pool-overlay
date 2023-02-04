@@ -16,6 +16,9 @@
         "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
+            "@dashboard/components/*": [
+                "libs/dashboard/components/*/src/index.ts"
+            ],
             "@pool-overlay/models": ["libs/models/src/index.ts"],
             "@pool-overlay/scoreboard": ["libs/scoreboard/src/index.ts"]
         }

@@ -5,6 +5,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
+import { SearchModule } from '@dashboard/components/search';
+import { PaginationModule } from '@dashboard/components/pagination';
 import { SharedModule } from '../shared/shared.module';
 import { PlayersRoutingModule } from './players-routing.module';
 import { PlayersListPageComponent } from './containers/players-list-page/players-list-page.component';
@@ -35,8 +37,10 @@ const SERVICES = [
         ReactiveFormsModule,
         MatDialogModule,
         FontAwesomeModule,
+        SearchModule,
         SharedModule,
         PlayersRoutingModule,
+        PaginationModule,
     ],
     exports: [],
     declarations: [

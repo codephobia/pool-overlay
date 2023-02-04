@@ -1,0 +1,9 @@
+<div class="relative flex flex-col flex-grow h-42px">
+    <form class="flex flex-col flex-grow" [formGroup]="form" (ngSubmit)="submit()">
+        <label class="hidden" [for]="id">Search</label>
+        <input class="bg-sad-input h-42px text-white flex flex-col flex-grow rounded pl-14px pr-14" formControlName="search" [id]="id" type="text" placeholder="Search..." />
+        <button class="absolute top-0 right-0 z-10 text-sad-icon w-42px h-42px" type="submit">
+            <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
+        </button>
+    </form>
+</div>

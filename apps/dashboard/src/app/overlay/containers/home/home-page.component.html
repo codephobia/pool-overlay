@@ -1,6 +1,25 @@
+<ul class="flex flex-wrap text-sm font-medium text-center text-gray-500 dark:text-gray-400 p-4">
+    <li class="mr-2" *ngFor="let table of tables">
+        <button
+            type="button"
+            (click)="setTable(table)"
+            class="inline-block py-3 px-4 rounded-lg"
+            [ngClass]="{ 'text-white bg-blue-600': table === currentTable, 'hover:bg-gray-800 hover:text-white': table != currentTable }"
+        >
+            Table {{ table }}
+        </button>
+    </li>
+    <li>
+        <a class="inline-block py-3 px-4 text-gray-400 cursor-not-allowed dark:text-gray-500"> <fa-icon [icon]="faPlus"></fa-icon> Add Table </a>
+    </li>
+</ul>
 <div class="flex flex-row flex-none mt-5 h-52 justify-center items-center">
-    <pool-overlay-scoreboard></pool-overlay-scoreboard>
+    <ng-container *ngFor="let table of tables">
+        <pool-overlay-scoreboard [hidden]="table !== currentTable" [table]="table"></pool-overlay-scoreboard>
+    </ng-container>
 </div>
 <div>
-    <pool-overlay-controller></pool-overlay-controller>
+    <ng-container *ngFor="let table of tables">
+        <pool-overlay-controller [hidden]="table !== currentTable" [table]="table"></pool-overlay-controller>
+    </ng-container>
 </div>

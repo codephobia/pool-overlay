@@ -38,6 +38,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/api/Dockerfile
+      args:
+        FONTAWESOME_NPM_AUTH_TOKEN: ${FONTAWESOME_NPM_AUTH_TOKEN}
     image: pool-api:0.1.0
     restart: always
     env_file: ./apps/api/.env
@@ -58,6 +60,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/overlay/Dockerfile
+      args:
+        FONTAWESOME_NPM_AUTH_TOKEN: ${FONTAWESOME_NPM_AUTH_TOKEN}
     image: pool-overlay:0.1.0
     ports:
       - 4200:4200
@@ -75,6 +79,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/dashboard/Dockerfile
+      args:
+        FONTAWESOME_NPM_AUTH_TOKEN: ${FONTAWESOME_NPM_AUTH_TOKEN}
     image: pool-dashboard:0.1.0
     ports:
       - 4201:4200
@@ -91,6 +97,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/telestrator/Dockerfile
+      args:
+        FONTAWESOME_NPM_AUTH_TOKEN: ${FONTAWESOME_NPM_AUTH_TOKEN}
     image: pool-telestrator:0.1.0
     ports:
       - 4202:4200

@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
-import { GameType, gameTypeToString, IGame } from '@pool-overlay/models';
+import { GameType, gameTypeToString, IGame, OverlayState } from '@pool-overlay/models';
 import { SocketService } from '../../services/socket.service';
 import { handicapTransition } from './handicap.animation';
 import { scoreboardTransition } from './scoreboard.animation';
@@ -14,18 +14,32 @@ import { ScoreboardStore } from './scoreboard.store';
     animations: [scoreboardTransition, handicapTransition],
 })
 export class ScoreboardComponent implements OnInit {
+    @Input()
+    public table: number = 1;
+
     public readonly vm$ = this._scoreboardStore.vm$;
 
     constructor(
         private _scoreboardStore: ScoreboardStore,
         private _socketService: SocketService,
     ) {
-        this._socketService.bind('GAME_EVENT', this._scoreboardStore.setGame);
-        this._socketService.bind('OVERLAY_TOGGLE', this._scoreboardStore.setHidden);
-        this._socketService.connect();
+
     }
 
     public ngOnInit(): void {
+        this._socketService.bind('GAME_EVENT', (res: { game: IGame }) => {
+            if (res.game.table === this.table) {
+                this._scoreboardStore.setGame(res);
+            }
+        });
+        this._socketService.bind('OVERLAY_STATE_EVENT', (res: OverlayState) => {
+            if (res.table === this.table) {
+                this._scoreboardStore.setOverlay(res);
+            }
+        });
+        this._socketService.connect();
+
+        this._scoreboardStore.setOverlayTable(this.table);
         this._scoreboardStore.getGame();
     }
 

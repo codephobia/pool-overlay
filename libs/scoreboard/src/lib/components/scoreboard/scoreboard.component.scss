@@ -5,6 +5,7 @@ $score-background-color: #18191e;
 $score-text-color: #ffffff;
 $versus-background-color: #99002c;
 $game-background-color: #1b3887;
+$game-text-color: #ffffff;
 $player-name-text-color: #0c0104;
 $versus-text-color: #ffffff;
 $fargo-background-color: #313236;
@@ -12,6 +13,44 @@ $fargo-text-color: #ffffff;
 $handicap-background-color: #99002c;
 $handicap-level-background-color: #1b3887;
 $handicap-text-color: #ffffff;
+
+$bar-height: 3px;
+$bar-crop-width: 1px;
+
+$handicap-player-padding-width: 6px;
+$handicap-level-width: 54px;
+$handicap-level-margin-width: -5px;
+$handicap-race-to-width: 32px;
+$handicap-race-to-margin-width: 8px;
+$handicap-angle-width: 11px;
+$handicap-height: 30px;
+$handicap-crop-width: 11px;
+$handicap-wrapper-width: (
+    ($handicap-angle-width * 2 + $handicap-race-to-width) * 2) + $handicap-level-width + ($handicap-player-padding-width * 2) + ($handicap-level-margin-width * 2
+);
+
+$divider-width: 3px;
+
+$player-height: 60px;
+$flag-width: 77px;
+$player-name-width: 350px;
+$fargo-width: 64px;
+$player-angle-width: 11px;
+$player-angle-margin-width: 8px;
+$player-crop-width: $player-angle-width + $player-angle-margin-width;
+
+$player-wrapper-width: $player-name-width + $divider-width;
+$player-wrapper-flag-width: $flag-width + (2 * $player-angle-margin-width) + $divider-width;
+$player-wrapper-fargo-width: $fargo-width + (2 * $player-angle-margin-width) + $divider-width;
+
+$score-width: 64px;
+$vs-width: 100px;
+$scores-wrapper-width: $vs-width + (2 * $divider-width);
+$scores-wrapper-scores-width: (2 * $score-width)+(2 * $player-crop-width);
+
+$game-wrapper-width: 272px;
+$game-wrapper-height: 60px;
+$game-height: 40px;
 
 :host {
     flex: none;
@@ -29,8 +68,8 @@ $handicap-text-color: #ffffff;
                 position: relative;
                 z-index: 2;
                 overflow: hidden;
-                width: 174px;
-                height: 33px;
+                width: $handicap-wrapper-width;
+                height: calc($handicap-height + $bar-height);
 
                 .handicap {
                     position: absolute;
@@ -46,7 +85,8 @@ $handicap-text-color: #ffffff;
                         display: flex;
                         flex-direction: row;
                         flex: none;
-                        height: 3px;
+                        width: calc(100% - ($handicap-player-padding-width * 4));
+                        height: $bar-height;
                         background-image: linear-gradient(
                             90deg,
                             $gradient-dark,
@@ -54,23 +94,18 @@ $handicap-text-color: #ffffff;
                             $gradient-dark
                         );
                         clip-path: polygon(
-                            1px 0,
-                            calc(100% - 1px) 0,
+                            $bar-crop-width 0,
+                            calc(100% - $bar-crop-width) 0,
                             100% 100%,
                             0 100%
                         );
-
-                        &.top {
-                            margin: 0 22px;
-                            width: calc(100% - 34px);
-                        }
                     }
 
                     .player-info {
                         display: flex;
                         flex-direction: row;
                         flex: 1 0 auto;
-                        padding: 0 11px;
+                        padding: 0 $handicap-player-padding-width;
                         position: relative;
 
                         .player-wrapper {
@@ -82,14 +117,14 @@ $handicap-text-color: #ffffff;
                                 display: flex;
                                 flex-direction: row;
                                 flex: 1 0 auto;
-                                height: 30px;
+                                height: $handicap-height;
 
                                 .divider {
                                     position: relative;
                                     flex: none;
                                     z-index: 2;
-                                    width: 3px;
-                                    height: 30px;
+                                    width: $divider-width;
+                                    height: $handicap-height;
                                     background-image: linear-gradient(
                                         180deg,
                                         $gradient-dark,
@@ -103,8 +138,8 @@ $handicap-text-color: #ffffff;
                                     flex-direction: column;
                                     flex: 1 0 auto;
                                     background-color: $handicap-background-color;
-                                    width: 32px;
-                                    margin: 0 8px;
+                                    width: $handicap-race-to-width;
+                                    margin: 0 $handicap-race-to-margin-width;
                                     position: relative;
                                     z-index: 1;
                                     justify-content: center;
@@ -118,7 +153,7 @@ $handicap-text-color: #ffffff;
                                         bottom: 0;
                                         content: '';
                                         background-color: inherit;
-                                        width: 19px;
+                                        width: calc($handicap-race-to-margin-width + $handicap-angle-width);
                                         transform-origin: 100%;
                                         z-index: -1;
                                     }
@@ -129,7 +164,7 @@ $handicap-text-color: #ffffff;
                                         bottom: 0;
                                         content: '';
                                         background-color: inherit;
-                                        width: 19px;
+                                        width: calc($handicap-race-to-margin-width + $handicap-angle-width);
                                         transform-origin: 100%;
                                         z-index: -1;
                                     }
@@ -141,12 +176,12 @@ $handicap-text-color: #ffffff;
                                     }
                                     .race-to {
                                         &:before {
-                                            right: calc(100% - 11px);
+                                            right: calc(100% - $handicap-angle-width);
                                             transform: skewX(-20deg);
                                         }
 
                                         &:after {
-                                            left: calc(100% - 11px);
+                                            left: calc(100% - $handicap-angle-width);
                                             transform: skewX(-20deg);
                                         }
                                     }
@@ -157,12 +192,12 @@ $handicap-text-color: #ffffff;
                                     }
                                     .race-to {
                                         &:before {
-                                            left: calc(100% - 11px);
+                                            left: calc(100% - $handicap-angle-width);
                                             transform: skewX(20deg);
                                         }
 
                                         &:after {
-                                            right: calc(100% - 11px);
+                                            right: calc(100% - $handicap-angle-width);
                                             transform: skewX(20deg);
                                         }
                                     }
@@ -177,13 +212,13 @@ $handicap-text-color: #ffffff;
                             position: relative;
                             z-index: 2;
                             overflow: hidden;
-                            margin: 0 -5px;
-                            width: 54px;
-                            height: 30px;
+                            margin: 0 $handicap-level-margin-width;
+                            width: $handicap-level-width;
+                            height: $handicap-height;
                             background-color: $fargo-background-color;
                             clip-path: polygon(
-                                11px 0,
-                                calc(100% - 11px) 0,
+                                $handicap-angle-width 0,
+                                calc(100% - $handicap-angle-width) 0,
                                 100% 100%,
                                 0 100%
                             );
@@ -195,7 +230,6 @@ $handicap-text-color: #ffffff;
                                 font-size: 10px;
                                 color: $handicap-text-color;
                                 letter-spacing: 1px;
-                                // writing-mode: vertical-rl;
                                 text-orientation: upright;
                             }
 
@@ -230,7 +264,7 @@ $handicap-text-color: #ffffff;
                     display: flex;
                     flex-direction: row;
                     flex: none;
-                    height: 3px;
+                    height: $bar-height;
                     background-image: linear-gradient(
                         90deg,
                         $gradient-dark,
@@ -238,20 +272,19 @@ $handicap-text-color: #ffffff;
                         $gradient-dark
                     );
                     clip-path: polygon(
-                        1px 0,
-                        calc(100% - 1px) 0,
+                        $bar-crop-width 0,
+                        calc(100% - $bar-crop-width) 0,
                         100% 100%,
                         0 100%
                     );
 
                     &.top {
-                        margin: 0 22px;
-                        width: calc(100% - 44px);
+                        width: calc(100% - (4 * $player-angle-width));
                     }
 
                     &.bottom {
-                        margin: 0 -1px;
-                        width: calc(100% + 2px);
+                        margin: 0 -#{$bar-crop-width};
+                        width: calc(100% + (2 * $bar-crop-width));
                     }
                 }
 
@@ -259,7 +292,7 @@ $handicap-text-color: #ffffff;
                     display: flex;
                     flex-direction: row;
                     flex: 1 0 auto;
-                    padding: 0 11px;
+                    padding: 0 $player-angle-width;
                     position: relative;
                     z-index: 2;
 
@@ -268,11 +301,22 @@ $handicap-text-color: #ffffff;
                         display: flex;
                         flex-direction: row;
                         flex: 1 0 auto;
-                        // width: 449px;
-                        width: 532px;
+                        width: $player-wrapper-width;
                         z-index: 1;
                         overflow: hidden;
-                        margin: 0 -11px;
+                        margin: 0 (-1 * $player-angle-width);
+
+                        &.with-fargo {
+                            width: $player-wrapper-width + $player-wrapper-fargo-width;
+                        }
+
+                        &.with-flag {
+                            width: $player-wrapper-width + $player-wrapper-flag-width;
+
+                            &.with-fargo {
+                                width: $player-wrapper-width + $player-wrapper-fargo-width + $player-wrapper-flag-width;
+                            }
+                        }
 
                         .player {
                             position: absolute;
@@ -280,14 +324,14 @@ $handicap-text-color: #ffffff;
                             display: flex;
                             flex-direction: row;
                             flex: 1 0 auto;
-                            height: 60px;
+                            height: $player-height;
                             z-index: 1;
 
                             .divider {
                                 position: relative;
                                 flex: none;
                                 z-index: 2;
-                                width: 3px;
+                                width: $divider-width;
                                 background-image: linear-gradient(
                                     180deg,
                                     $gradient-dark,
@@ -298,9 +342,9 @@ $handicap-text-color: #ffffff;
 
                             .flag {
                                 flex: none;
-                                width: 77px;
+                                width: $flag-width;
                                 background-color: $flag-background-color;
-                                margin: 0 8px;
+                                margin: 0 $player-angle-margin-width;
                                 position: relative;
                                 z-index: 1;
 
@@ -310,7 +354,7 @@ $handicap-text-color: #ffffff;
                                     bottom: 0;
                                     content: '';
                                     background-color: inherit;
-                                    width: 19px;
+                                    width: $player-crop-width;
                                     transform-origin: 100%;
                                     z-index: -1;
                                 }
@@ -321,7 +365,7 @@ $handicap-text-color: #ffffff;
                                     bottom: 0;
                                     content: '';
                                     background-color: inherit;
-                                    width: 19px;
+                                    width: $player-crop-width;
                                     transform-origin: 100%;
                                     z-index: -1;
                                 }
@@ -330,16 +374,16 @@ $handicap-text-color: #ffffff;
                                     position: absolute;
                                     z-index: 2;
                                     top: 0;
-                                    left: -19px;
+                                    left: (-1 * $player-crop-width);
                                 }
                             }
 
                             .player-name {
-                                margin: 0 -11px;
+                                margin: 0 (-1 * $player-angle-width);
                                 display: flex;
                                 flex-direction: column;
                                 flex: none;
-                                width: 350px;
+                                width: $player-name-width;
                                 background-image: linear-gradient(
                                     180deg,
                                     $gradient-light,
@@ -357,8 +401,8 @@ $handicap-text-color: #ffffff;
                                 flex-direction: column;
                                 flex: 1 0 auto;
                                 background-color: $fargo-background-color;
-                                width: 64px;
-                                margin: 0 8px;
+                                width: $fargo-width;
+                                margin: 0 $player-angle-margin-width;
                                 position: relative;
                                 z-index: 1;
                                 justify-content: center;
@@ -370,7 +414,7 @@ $handicap-text-color: #ffffff;
                                     position: absolute;
                                     top: 4px;
                                     left: 0px;
-                                    width: 64px;
+                                    width: $fargo-width;
                                     color: $fargo-text-color;
                                     font-size: 10px;
                                     text-align: center;
@@ -383,7 +427,7 @@ $handicap-text-color: #ffffff;
                                     bottom: 0;
                                     content: '';
                                     background-color: inherit;
-                                    width: 19px;
+                                    width: $player-crop-width;
                                     transform-origin: 100%;
                                     z-index: -1;
                                 }
@@ -394,14 +438,14 @@ $handicap-text-color: #ffffff;
                                     bottom: 0;
                                     content: '';
                                     background-color: inherit;
-                                    width: 19px;
+                                    width: $player-crop-width;
                                     transform-origin: 100%;
                                     z-index: -1;
                                 }
                             }
 
                             &.one {
-                                left: 11px;
+                                left: $player-angle-width;
 
                                 .divider {
                                     transform: skewX(-20deg);
@@ -409,20 +453,20 @@ $handicap-text-color: #ffffff;
 
                                 .flag {
                                     &:before {
-                                        right: calc(100% - 11px);
+                                        right: calc(100% - $player-angle-width);
                                         transform: skewX(-20deg);
                                     }
 
                                     &:after {
-                                        left: calc(100% - 11px);
+                                        left: calc(100% - $player-angle-width);
                                         transform: skewX(-20deg);
                                     }
 
                                     app-flag {
                                         clip-path: polygon(
-                                            20px 0,
+                                            (2 * $player-angle-width) 0,
                                             100% 0,
-                                            calc(100% - 20px) 100%,
+                                            calc(100% - (2 * $player-angle-width)) 100%,
                                             0 100%
                                         );
                                     }
@@ -430,77 +474,77 @@ $handicap-text-color: #ffffff;
 
                                 .player-name {
                                     clip-path: polygon(
-                                        22px 0,
+                                        (2 * $player-angle-width) 0,
                                         100% 0,
-                                        calc(100% - 22px) 100%,
+                                        calc(100% - (2 * $player-angle-width)) 100%,
                                         0 100%
                                     );
                                 }
 
                                 .fargo-rating {
                                     .title {
-                                        margin-left: 8px;
+                                        margin-left: $player-angle-margin-width;
                                     }
 
                                     &:before {
-                                        right: calc(100% - 11px);
+                                        right: calc(100% - $player-angle-width);
                                         transform: skewX(-20deg);
                                     }
 
                                     &:after {
-                                        left: calc(100% - 11px);
+                                        left: calc(100% - $player-angle-width);
                                         transform: skewX(-20deg);
                                     }
                                 }
                             }
 
                             &.two {
-                                right: 11px;
+                                right: $player-angle-width;
 
                                 .divider {
                                     transform: skewX(20deg);
                                 }
                                 .flag {
                                     &:before {
-                                        left: calc(100% - 11px);
+                                        left: calc(100% - $player-angle-width);
                                         transform: skewX(20deg);
                                     }
 
                                     &:after {
-                                        right: calc(100% - 11px);
+                                        right: calc(100% - $player-angle-width);
                                         transform: skewX(20deg);
                                     }
 
                                     app-flag {
                                         clip-path: polygon(
                                             0 0,
-                                            calc(100% - 20px) 0,
+                                            calc(100% - (2 * $player-angle-width)) 0,
                                             100% 100%,
-                                            20px 100%
+                                            (2 * $player-angle-width) 100%
                                         );
                                     }
                                 }
                                 .player-name {
                                     clip-path: polygon(
                                         0 0,
-                                        calc(100% - 22px) 0,
+                                        calc(100% - (2 * $player-angle-width)) 0,
                                         100% 100%,
-                                        22px 100%
+                                        (2 * $player-angle-width) 100%
                                     );
                                 }
 
                                 .fargo-rating {
                                     .title {
-                                        margin-left: -8px;
+                                        margin-left: (-1 * $player-angle-margin-width);
                                     }
 
                                     &:before {
-                                        left: calc(100% - 11px);
+                                        left: calc(100% - $player-angle-width);
                                         transform: skewX(20deg);
                                     }
 
                                     &:after {
-                                        right: calc(100% - 11px);
+                                        right: calc(100% - $player-angle-width);
                                         transform: skewX(20deg);
                                     }
                                 }
@@ -512,25 +556,29 @@ $handicap-text-color: #ffffff;
                         position: relative;
                         z-index: 2;
                         overflow: hidden;
-                        margin: 0 -11px;
-                        width: 272px;
-                        height: 60px;
+                        margin: 0 (-1 * $player-angle-width);
+                        width: $scores-wrapper-width;
+                        height: $player-height;
+
+                        &.with-score {
+                            width: $scores-wrapper-width + $scores-wrapper-scores-width;
+                        }
 
                         .scores {
                             position: absolute;
                             top: 0px;
-                            left: 11px;
-                            right: 11px;
+                            left: $player-angle-width;
+                            right: $player-angle-width;
 
                             display: flex;
                             flex-direction: row;
                             flex: none;
-                            height: 60px;
+                            height: $player-height;
 
                             .divider {
                                 position: relative;
                                 z-index: 2;
-                                width: 3px;
+                                width: $divider-width;
                                 background-image: linear-gradient(
                                     180deg,
                                     $gradient-dark,
@@ -552,8 +600,8 @@ $handicap-text-color: #ffffff;
                                 flex-direction: column;
                                 flex: 1 0 auto;
                                 background-color: $score-background-color;
-                                width: 64px;
-                                margin: 0 8px;
+                                width: $score-width;
+                                margin: 0 $player-angle-margin-width;
                                 position: relative;
                                 z-index: 1;
                                 justify-content: center;
@@ -567,7 +615,7 @@ $handicap-text-color: #ffffff;
                                     bottom: 0;
                                     content: '';
                                     background-color: inherit;
-                                    width: 19px;
+                                    width: $player-crop-width;
                                     transform-origin: 100%;
                                     z-index: -1;
                                 }
@@ -578,30 +626,30 @@ $handicap-text-color: #ffffff;
                                     bottom: 0;
                                     content: '';
                                     background-color: inherit;
-                                    width: 19px;
+                                    width: $player-crop-width;
                                     transform-origin: 100%;
                                     z-index: -1;
                                 }
 
                                 &.left {
                                     &:before {
-                                        right: calc(100% - 11px);
+                                        right: calc(100% - $player-angle-width);
                                         transform: skewX(-20deg);
                                     }
 
                                     &:after {
-                                        left: calc(100% - 11px);
+                                        left: calc(100% - $player-angle-width);
                                         transform: skewX(-20deg);
                                     }
                                 }
                                 &.right {
                                     &:before {
-                                        left: calc(100% - 11px);
+                                        left: calc(100% - $player-angle-width);
                                         transform: skewX(20deg);
                                     }
 
                                     &:after {
-                                        right: calc(100% - 11px);
+                                        right: calc(100% - $player-angle-width);
                                         transform: skewX(20deg);
                                     }
                                 }
@@ -611,12 +659,12 @@ $handicap-text-color: #ffffff;
                                 display: flex;
                                 flex-direction: column;
                                 flex: 1 0 auto;
-                                margin: 0 -11px;
-                                width: 100px;
+                                margin: 0 (-1 * $player-angle-width);
+                                width: $vs-width;
                                 background-color: $versus-background-color;
                                 clip-path: polygon(
-                                    22px 0,
-                                    calc(100% - 22px) 0,
+                                    (2 * $player-angle-width) 0,
+                                    calc(100% - (2 * $player-angle-width)) 0,
                                     100% 100%,
                                     0 100%
                                 );
@@ -635,8 +683,8 @@ $handicap-text-color: #ffffff;
                 position: relative;
                 z-index: 2;
                 overflow: hidden;
-                width: 272px;
-                height: 60px;
+                width: $game-wrapper-width;
+                height: $game-wrapper-height;
 
                 .game {
                     position: absolute;
@@ -644,17 +692,17 @@ $handicap-text-color: #ffffff;
                     display: flex;
                     flex-direction: row;
                     flex: none;
-                    width: 272px;
-                    height: 40px;
+                    width: $game-wrapper-width;
+                    height: $game-height;
                     background-color: $game-background-color;
                     clip-path: polygon(
                         0 0,
                         100% 0,
-                        calc(100% - 22px) 100%,
-                        22px 100%
+                        calc(100% - (2 * $player-angle-width)) 100%,
+                        (2 * $player-angle-width) 100%
                     );
                     font-size: 18px;
-                    color: #ffffff;
+                    color: $game-text-color;
                     justify-content: center;
                     align-items: center;
                     text-transform: uppercase;

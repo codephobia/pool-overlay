@@ -18,7 +18,7 @@ type Core struct {
 	server      *api.Server
 	overlay     *overlayPkg.Overlay
 	telestrator *telestrator.Telestrator
-	state       *state.State
+	tables      map[int]*state.State
 }
 
 // NewCore returns a new Core.
@@ -44,7 +44,9 @@ func NewCore() (*Core, error) {
 	telestrator := telestrator.NewTelestrator()
 
 	// Initialize game state.
-	state := state.NewState(db)
+	tables := map[int]*state.State{}
+	tables[1] = state.NewState(db, 1)
+	tables[2] = state.NewState(db, 2)
 
 	// Initialize API Server.
 	apiConfig := &api.Config{
@@ -56,14 +58,14 @@ func NewCore() (*Core, error) {
 			Previous: "1",
 		},
 	}
-	server := api.NewServer(apiConfig, db, overlay, telestrator, state)
+	server := api.NewServer(apiConfig, db, overlay, telestrator, tables)
 
 	return &Core{
 		db:          db,
 		server:      server,
 		overlay:     overlay,
 		telestrator: telestrator,
-		state:       state,
+		tables:      tables,
 	}, nil
 }
 

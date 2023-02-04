@@ -1,7 +1,12 @@
-<div class="w-52 h-screen bg-blue-900 drop-shadow">
-    <ul class="p-2.5 flex flex-col gap-2.5">
-        <li class="h-10 flex flex-row" *ngFor="let button of buttons">
-            <a class="pl-2.5 pr-2.5 bg-white bg-opacity-50 rounded flex-grow leading-10 text-gray-900 hover:bg-blue-600 hover:text-white" [routerLink]="button.link">{{ button.title }}</a>
-        </li>
-    </ul>
+<div class="w-16 h-screen relative">
+    <div class="w-16 h-screen bg-sad-background drop-shadow box-content border-r border-sad-dark fixed">
+        <div class="w-16 h-16 bg-sad-active box-content border-r border-b border-sad-dark"></div>
+        <ul class="p-3 flex mt-5 flex-col gap-2.5">
+            <li class="h-10 flex flex-row" *ngFor="let button of buttons">
+                <a class="pl-2.5 pr-2.5 rounded flex-grow text-center leading-10 text-sad-icon opacity-50 hover:opacity-100" [routerLink]="button.link" routerLinkActive="bg-sad-active opacity-100">
+                    <fa-icon [icon]="button.icon"></fa-icon>
+                </a>
+            </li>
+        </ul>
+    </div>
 </div>

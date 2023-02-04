@@ -20,7 +20,7 @@ type Server struct {
 	db          *gorm.DB
 	overlay     *overlay.Overlay
 	telestrator *telestrator.Telestrator
-	state       *state.State
+	tables      map[int]*state.State
 
 	httpServer *http.Server
 	router     *mux.Router
@@ -28,13 +28,13 @@ type Server struct {
 }
 
 // NewServer returns a new api server.
-func NewServer(config *Config, db *gorm.DB, overlay *overlay.Overlay, telestrator *telestrator.Telestrator, state *state.State) *Server {
+func NewServer(config *Config, db *gorm.DB, overlay *overlay.Overlay, telestrator *telestrator.Telestrator, tables map[int]*state.State) *Server {
 	return &Server{
 		config:      config,
 		db:          db,
 		overlay:     overlay,
 		telestrator: telestrator,
-		state:       state,
+		tables:      tables,
 
 		router:  mux.NewRouter().StrictSlash(true),
 		version: make(map[string]*mux.Router),
