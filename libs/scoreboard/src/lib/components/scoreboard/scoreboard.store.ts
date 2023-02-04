@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, withLatestFrom } from 'rxjs/operators';
 
 import { IGame, OverlayState } from '@pool-overlay/models';
 import { APIService } from '../../services/api.service';
@@ -16,8 +16,9 @@ export class ScoreboardStore extends ComponentStore<ScoreboardState> {
         super({
             game: null,
             overlay: {
+                table: 1,
                 hidden: false,
-                showFlags: true,
+                showFlags: false,
                 showFargo: true,
                 showScore: true,
             },
@@ -35,6 +36,14 @@ export class ScoreboardStore extends ComponentStore<ScoreboardState> {
         overlay,
     }));
 
+    public readonly setOverlayTable = this.updater<number>((state, table) => ({
+        ...state,
+        overlay: {
+            ...state.overlay,
+            table,
+        },
+    }));
+
     // selectors
     public readonly game$ = this.select((state) => state.game);
     public readonly overlay$ = this.select((state) => state.overlay);
@@ -50,8 +59,9 @@ export class ScoreboardStore extends ComponentStore<ScoreboardState> {
     // effects
     public readonly getGame = this.effect((trigger$) => {
         return trigger$.pipe(
-            switchMap(() =>
-                this._apiService.getGame().pipe(
+            withLatestFrom(this.select(state => state.overlay.table)),
+            switchMap(([_, table]) =>
+                this._apiService.getGame(table).pipe(
                     tapResponse(
                         (game) => {
                             this.setGame({ game });

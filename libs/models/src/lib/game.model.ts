@@ -4,6 +4,7 @@ import { VsMode } from './vs-mode.enum';
 import { FargoHotHandicap } from './fargo-hot-handicap';
 
 export interface IGame {
+    table: number;
     type: GameType;
     vs_mode: VsMode;
     race_to: number;

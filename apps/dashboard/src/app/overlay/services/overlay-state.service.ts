@@ -17,23 +17,23 @@ export class OverlayStateService {
         this.apiVersion = config.environment.apiVersion;
     }
 
-    public toggle() {
-        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/toggle`;
+    public toggle(table: number) {
+        const url = `${this.apiURL}/${this.apiVersion}/table/${table}/${this.endpoint}/toggle`;
         return this.http.get<{ hidden: boolean }>(url);
     }
 
-    public toggleFlags() {
-        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/toggle/flags`;
+    public toggleFlags(table: number) {
+        const url = `${this.apiURL}/${this.apiVersion}/table/${table}/${this.endpoint}/toggle/flags`;
         return this.http.get<{ showFlags: boolean }>(url);
     }
 
-    public toggleFargo() {
-        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/toggle/fargo`;
+    public toggleFargo(table: number) {
+        const url = `${this.apiURL}/${this.apiVersion}/table/${table}/${this.endpoint}/toggle/fargo`;
         return this.http.get<{ showFargo: boolean }>(url);
     }
 
-    public toggleScore() {
-        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/toggle/score`;
+    public toggleScore(table: number) {
+        const url = `${this.apiURL}/${this.apiVersion}/table/${table}/${this.endpoint}/toggle/score`;
         return this.http.get<{ showScore: boolean }>(url);
     }
 }

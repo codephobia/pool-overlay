@@ -3,6 +3,7 @@ package state
 import "sync"
 
 type OverlayState struct {
+	Table     int  `json:"table"`
 	Hidden    bool `json:"hidden"`
 	ShowFlags bool `json:"showFlags"`
 	ShowFargo bool `json:"showFargo"`
@@ -12,8 +13,9 @@ type OverlayState struct {
 }
 
 // NewOverlayState creates a new overlay state.
-func NewOverlayState() *OverlayState {
+func NewOverlayState(table int) *OverlayState {
 	return &OverlayState{
+		Table:     table,
 		Hidden:    false,
 		ShowFlags: true,
 		ShowFargo: true,

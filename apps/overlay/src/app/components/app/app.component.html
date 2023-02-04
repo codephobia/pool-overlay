@@ -1,1 +1,1 @@
-<pool-overlay-scoreboard></pool-overlay-scoreboard>
+<pool-overlay-scoreboard *ngIf="table$ | async as table" [table]="table"></pool-overlay-scoreboard>

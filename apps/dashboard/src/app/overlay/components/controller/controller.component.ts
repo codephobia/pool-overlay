@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { take, filter } from 'rxjs/operators';
 
-import { GameType } from '@pool-overlay/models';
+import { GameType, IGame, OverlayState } from '@pool-overlay/models';
 import { ControllerStore } from './controller.store';
 import { Direction } from '../../models/direction.model';
 import { PlayerModalComponent, PlayerModalData } from '../player-modal/player-modal.component';
@@ -14,6 +14,9 @@ import { SocketService } from '@pool-overlay/scoreboard';
     providers: [ControllerStore, SocketService],
 })
 export class ControllerComponent implements OnInit {
+    @Input()
+    public table: number = 1;
+
     public readonly vm$ = this.store.vm$;
 
     constructor(
@@ -21,12 +24,23 @@ export class ControllerComponent implements OnInit {
         private readonly socketService: SocketService,
         private readonly store: ControllerStore,
     ) {
-        this.socketService.bind('GAME_EVENT', res => this.store.setGame(res.game));
-        this.socketService.bind('OVERLAY_STATE_EVENT', this.store.setOverlay);
-        this.socketService.connect();
     }
 
     public ngOnInit(): void {
+        this.socketService.bind('GAME_EVENT', (res: { game: IGame }) => {
+            if (this.table === res.game.table) {
+                this.store.setGame(res.game);
+            }
+        });
+        this.socketService.bind('OVERLAY_STATE_EVENT', (res: OverlayState) => {
+            if (this.table === res.table) {
+                this.store.setOverlay(res);
+            }
+        });
+        this.socketService.connect();
+
+        // TODO: THIS SHOULD BE A LITTLE CLEANER THAN USING THE OVERLAY TABLE
+        this.store.setOverlayTable(this.table);
         this.store.getGame();
     }
 

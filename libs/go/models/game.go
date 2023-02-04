@@ -22,7 +22,7 @@ var (
 	// The minimum number of games required to use handicapping.
 	minHandicapRaceTo = 2
 	// The maximum number of games allowed to use handicapping.
-	maxHandicapRaceTo = 7
+	maxHandicapRaceTo = 9
 )
 
 // Game is the current state of the game being played.
@@ -30,6 +30,7 @@ type Game struct {
 	db *gorm.DB
 
 	ID        uint       `json:"id,omitempty" gorm:"primarykey"`
+	Table     int        `json:"table" gorm:"column:table_num"`
 	Type      GameType   `json:"type"`
 	VsMode    GameVsMode `json:"vs_mode"`
 	RaceTo    int        `json:"race_to"`
@@ -59,10 +60,11 @@ type Game struct {
 }
 
 // NewGame returns a new Game with default settings.
-func NewGame(db *gorm.DB) *Game {
+func NewGame(db *gorm.DB, table int) *Game {
 	return &Game{
 		db: db,
 
+		Table:  table,
 		Type:   EightBall,
 		RaceTo: 5,
 		VsMode: OneVsOne,
@@ -71,12 +73,12 @@ func NewGame(db *gorm.DB) *Game {
 	}
 }
 
-func (g *Game) LoadLatest() *Game {
+func (g *Game) LoadLatest(table int) *Game {
 	var latest Game
 	latest.db = g.db
 
 	result := g.db.
-		Where("completed = ?", false).
+		Where("completed = ? AND table_num = ?", false, table).
 		Order("id desc").
 		Limit(1).
 		Preload("PlayerOne", func(db *gorm.DB) *gorm.DB {
@@ -504,6 +506,7 @@ func (g *Game) Save(completed bool) error {
 
 	if g.ID != 0 {
 		return g.db.Model(g).Updates(map[string]interface{}{
+			"table_num": g.Table,
 			"type":      g.Type,
 			"vs_mode":   g.VsMode,
 			"race_to":   g.RaceTo,

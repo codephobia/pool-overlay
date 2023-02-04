@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
-import { concatMap, switchMap, tap } from 'rxjs/operators';
+import { concatMap, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 
 import { GameService } from '../../services/game.service';
 import { OverlayStateService } from '../../services/overlay-state.service';
@@ -23,8 +23,9 @@ export class ControllerStore extends ComponentStore<ControllerState> {
             pending: false,
             game: null,
             overlay: {
+                table: 1,
                 hidden: false,
-                showFlags: true,
+                showFlags: false,
                 showFargo: true,
                 showScore: true,
             },
@@ -112,6 +113,14 @@ export class ControllerStore extends ComponentStore<ControllerState> {
         },
     }));
 
+    public readonly setOverlayTable = this.updater<number>((state, table) => ({
+        ...state,
+        overlay: {
+            ...(state.overlay as OverlayState),
+            table,
+        },
+    }));
+
     public readonly pending$ = this.select(state => state.pending);
     public readonly game$ = this.select(state => state.game);
     public readonly overlay$ = this.select(state => state.overlay);
@@ -128,7 +137,8 @@ export class ControllerStore extends ComponentStore<ControllerState> {
 
     public readonly getGame = this.effect(trigger$ => trigger$.pipe(
         tap(() => { this.setPending(true); }),
-        switchMap(() => this.gameService.getGame().pipe(
+        withLatestFrom(this.select(state => state.overlay.table)),
+        switchMap(([_, table]) => this.gameService.getGame(table).pipe(
             tapResponse(
                 game => { this.setGame(game); },
                 error => console.error(error),
@@ -139,7 +149,8 @@ export class ControllerStore extends ComponentStore<ControllerState> {
 
     public readonly unsetPlayer = this.effect<number>(playerNum$ => playerNum$.pipe(
         tap(() => { this.setPending(true); }),
-        switchMap(playerNum => this.gameService.unsetPlayer(playerNum).pipe(
+        withLatestFrom(this.select(state => state.overlay.table)),
+        switchMap(([playerNum, table]) => this.gameService.unsetPlayer(table, playerNum).pipe(
             tapResponse(
                 game => { this.setGame(game); },
                 error => console.error(error),
@@ -150,7 +161,8 @@ export class ControllerStore extends ComponentStore<ControllerState> {
 
     public readonly setPlayer = this.effect<{ playerNum: number, playerID: number }>(trigger$ => trigger$.pipe(
         tap(() => { this.setPending(true); }),
-        switchMap(({ playerNum, playerID }) => this.gameService.setPlayer(playerNum, playerID).pipe(
+        withLatestFrom(this.select(state => state.overlay.table)),
+        switchMap(([{ playerNum, playerID }, table]) => this.gameService.setPlayer(table, playerNum, playerID).pipe(
             tapResponse(
                 game => { this.setGame(game); },
                 error => console.error(error),
@@ -161,7 +173,8 @@ export class ControllerStore extends ComponentStore<ControllerState> {
 
     public readonly updateRaceTo = this.effect<Direction>(direction$ => direction$.pipe(
         tap(() => { this.setPending(true); }),
-        switchMap(direction => this.gameService.updateRaceTo(direction).pipe(
+        withLatestFrom(this.select(state => state.overlay.table)),
+        switchMap(([direction, table]) => this.gameService.updateRaceTo(table, direction).pipe(
             tapResponse(
                 ({ raceTo, useFargoHotHandicap }) => {
                     this.setRaceTo({
@@ -177,7 +190,8 @@ export class ControllerStore extends ComponentStore<ControllerState> {
 
     public readonly resetScore = this.effect(trigger$ => trigger$.pipe(
         tap(() => { this.setPending(true); }),
-        switchMap(() => this.gameService.resetScore().pipe(
+        withLatestFrom(this.select(state => state.overlay.table)),
+        switchMap(([_, table]) => this.gameService.resetScore(table).pipe(
             tapResponse(
                 ({ scoreOne, scoreTwo }) => {
                     this.setScore({
@@ -193,7 +207,8 @@ export class ControllerStore extends ComponentStore<ControllerState> {
 
     public readonly updateScore = this.effect<{ playerNum: number, direction: Direction }>(trigger$ => trigger$.pipe(
         tap(() => { this.setPending(true); }),
-        switchMap(({ playerNum, direction }) => this.gameService.updateScore(playerNum, direction).pipe(
+        withLatestFrom(this.select(state => state.overlay.table)),
+        switchMap(([{ playerNum, direction }, table]) => this.gameService.updateScore(table, playerNum, direction).pipe(
             tapResponse(
                 ({ scoreOne, scoreTwo }) => {
                     this.setScore({
@@ -209,7 +224,8 @@ export class ControllerStore extends ComponentStore<ControllerState> {
 
     public readonly updateGameType = this.effect<GameType>(gameType$ => gameType$.pipe(
         tap(() => { this.setPending(true); }),
-        switchMap(gameType => this.gameService.setGameType(gameType).pipe(
+        withLatestFrom(this.select(state => state.overlay.table)),
+        switchMap(([gameType, table]) => this.gameService.setGameType(table, gameType).pipe(
             tapResponse(
                 ({ type }) => {
                     this.setGameType(type);
@@ -222,7 +238,8 @@ export class ControllerStore extends ComponentStore<ControllerState> {
 
     public readonly toggleOverlay = this.effect(trigger$ => trigger$.pipe(
         tap(() => { this.setPending(true); }),
-        switchMap(() => this.overlayStateService.toggle().pipe(
+        withLatestFrom(this.select(state => state.overlay)),
+        switchMap(([_, overlay]) => this.overlayStateService.toggle(overlay.table).pipe(
             tapResponse(
                 ({ hidden }) => {
                     this.setHidden(hidden);
@@ -235,7 +252,8 @@ export class ControllerStore extends ComponentStore<ControllerState> {
 
     public readonly toggleFlags = this.effect(trigger$ => trigger$.pipe(
         tap(() => { this.setPending(true); }),
-        switchMap(() => this.overlayStateService.toggleFlags().pipe(
+        withLatestFrom(this.select(state => state.overlay)),
+        switchMap(([_, overlay]) => this.overlayStateService.toggleFlags(overlay.table).pipe(
             tapResponse(
                 ({ showFlags }) => {
                     this.setShowFlags(showFlags);
@@ -248,7 +266,8 @@ export class ControllerStore extends ComponentStore<ControllerState> {
 
     public readonly toggleFargo = this.effect(trigger$ => trigger$.pipe(
         tap(() => { this.setPending(true); }),
-        switchMap(() => this.overlayStateService.toggleFargo().pipe(
+        withLatestFrom(this.select(state => state.overlay)),
+        switchMap(([_, overlay]) => this.overlayStateService.toggleFargo(overlay.table).pipe(
             tapResponse(
                 ({ showFargo }) => {
                     this.setShowFargo(showFargo);
@@ -261,7 +280,8 @@ export class ControllerStore extends ComponentStore<ControllerState> {
 
     public readonly toggleScore = this.effect(trigger$ => trigger$.pipe(
         tap(() => { this.setPending(true); }),
-        switchMap(() => this.overlayStateService.toggleScore().pipe(
+        withLatestFrom(this.select(state => state.overlay)),
+        switchMap(([_, overlay]) => this.overlayStateService.toggleScore(overlay.table).pipe(
             tapResponse(
                 ({ showScore }) => {
                     this.setShowScore(showScore);
@@ -274,7 +294,8 @@ export class ControllerStore extends ComponentStore<ControllerState> {
 
     public readonly toggleFargoHotHandicap = this.effect<boolean>(useFargoHotHandicap$ => useFargoHotHandicap$.pipe(
         tap(() => { this.setPending(true); }),
-        switchMap(useFargoHotHandicap => this.gameService.setFargoHotHandicap(useFargoHotHandicap).pipe(
+        withLatestFrom(this.select(state => state.overlay.table)),
+        switchMap(([useFargoHotHandicap, table]) => this.gameService.setFargoHotHandicap(table, useFargoHotHandicap).pipe(
             tapResponse(
                 ({ useFargoHotHandicap }) => {
                     this.setFargoHotHandicap(useFargoHotHandicap);
@@ -287,7 +308,8 @@ export class ControllerStore extends ComponentStore<ControllerState> {
 
     public readonly save = this.effect(trigger$ => trigger$.pipe(
         tap(() => { this.setPending(true); }),
-        concatMap(() => this.gameService.save().pipe(
+        withLatestFrom(this.select(state => state.overlay.table)),
+        concatMap(([_, table]) => this.gameService.save(table).pipe(
             tapResponse(
                 () => { },
                 error => console.error(error),

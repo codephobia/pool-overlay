@@ -18,8 +18,8 @@ export class APIService {
         this._apiVersion = config.apiVersion;
     }
 
-    getGame(): Observable<IGame> {
-        const url = `${this._apiURL}/${this._apiVersion}/game`;
+    getGame(table: number): Observable<IGame> {
+        const url = `${this._apiURL}/${this._apiVersion}/table/${table}/game`;
         return this._http.get<IGame>(url);
     }
 }
