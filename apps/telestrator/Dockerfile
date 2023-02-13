@@ -1,4 +1,4 @@
-FROM node:16.15.0-alpine3.14
+FROM node:18.14.0-alpine3.17
 
 WORKDIR /workspace
 
@@ -8,7 +8,7 @@ ARG FONTAWESOME_NPM_AUTH_TOKEN
 # Note: tsconfig.base.json holds paths for libs, so may want this being loaded
 # via a volume instead.
 COPY jest.config.ts \
-    jest.preset.ts \
+    jest.preset.js \
     nx.json \
     package-lock.json \
     package.json \
@@ -18,4 +18,4 @@ COPY jest.config.ts \
     .npmrc \
     /workspace/
 
-RUN npm install
+RUN npm ci

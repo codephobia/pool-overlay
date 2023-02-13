@@ -32,13 +32,15 @@ COPY libs/go libs/go
 COPY nx.json workspace.json tsconfig.base.json ./
 
 # Build api app
-RUN nx build api
+# RUN nx build api
+RUN go build -o dist/apps/api/api ./apps/api
 
 # Build seed app
-RUN nx build seed
+# RUN nx build seed
+RUN go build -o dist/apps/seed/seed ./apps/seed
 
 # This is the stage where the final production image is built
-FROM golang:1.14-alpine as final
+FROM golang:1.20-alpine as final
 
 # Set environment variables
 ENV PORT=1268
