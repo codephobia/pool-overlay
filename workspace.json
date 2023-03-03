@@ -382,6 +382,76 @@
       },
       "tags": []
     },
+    "score-keeper-nativescript": {
+      "root": "apps/score-keeper-nativescript/",
+      "sourceRoot": "apps/score-keeper-nativescript/src",
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "builder": "@nativescript/nx:build",
+          "options": {
+            "noHmr": true,
+            "production": true,
+            "uglify": true,
+            "release": true,
+            "forDevice": true
+          },
+          "configurations": {
+            "prod": {
+              "fileReplacements": [
+                {
+                  "replace": "./src/environments/environment.ts",
+                  "with": "./src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "ios": {
+          "builder": "@nativescript/nx:build",
+          "options": {
+            "platform": "ios"
+          },
+          "configurations": {
+            "build": {
+              "copyTo": "./dist/build.ipa"
+            },
+            "prod": {
+              "combineWithConfig": "build:prod"
+            }
+          }
+        },
+        "android": {
+          "builder": "@nativescript/nx:build",
+          "options": {
+            "platform": "android"
+          },
+          "configurations": {
+            "build": {
+              "copyTo": "./dist/build.apk"
+            },
+            "prod": {
+              "combineWithConfig": "build:prod"
+            }
+          }
+        },
+        "clean": {
+          "builder": "@nativescript/nx:build",
+          "options": {
+            "clean": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/score-keeper-nativescript/**/*.ts",
+              "apps/score-keeper-nativescript/src/**/*.html"
+            ]
+          }
+        }
+      }
+    },
     "scoreboard": {
       "projectType": "library",
       "root": "libs/scoreboard",
