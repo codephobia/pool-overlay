@@ -1,3 +1,3 @@
 const { getJestProjects } = require('@nrwl/jest');
 
-module.exports = { projects: [...getJestProjects(), '<rootDir>/apps/overlay'] };
+export default { projects: [...getJestProjects(), '<rootDir>/apps/overlay'] };

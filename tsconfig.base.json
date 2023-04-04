@@ -20,7 +20,8 @@
                 "libs/dashboard/components/*/src/index.ts"
             ],
             "@pool-overlay/models": ["libs/models/src/index.ts"],
-            "@pool-overlay/scoreboard": ["libs/scoreboard/src/index.ts"]
+            "@pool-overlay/scoreboard": ["libs/scoreboard/src/index.ts"],
+            "@pool-overlay/score-keeper": ["libs/score-keeper/src/index.ts"]
         }
     },
     "exclude": ["node_modules", "tmp"]

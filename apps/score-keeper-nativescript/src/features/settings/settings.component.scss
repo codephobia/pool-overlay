@@ -1,0 +1,42 @@
+.settings {
+    background-color: #394b72;
+
+    .options-wrapper {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        .options {
+            background-color: black;
+            width: 30%;
+            padding: 50;
+            border-radius: 10;
+
+            label {
+                color: white;
+                font-size: 30;
+            }
+
+            .option-table-number {
+                margin-bottom: 50;
+
+                .table-button {
+                    background-color: #394b72;
+
+                    &.active {
+                        background-color: green;
+                    }
+                }
+            }
+        }
+
+        .save-button {
+            color: white;
+            background-color: #992222;
+        }
+    }
+
+    .back-icon {
+        opacity: .5;
+    }
+}

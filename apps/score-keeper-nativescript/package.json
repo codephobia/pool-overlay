@@ -1,0 +1,17 @@
+{
+    "name": "scorekeeper",
+    "main": "./src/main.ts",
+    "license": "SEE LICENSE IN <your-license-filename>",
+    "version": "0.0.0",
+    "scripts": {
+        "postinstall": "node ./tools/postinstall.js"
+    },
+    "dependencies": {
+        "@nativescript/core": "*",
+        "@valor/nativescript-websockets": "^1.0.5"
+    },
+    "devDependencies": {
+        "@nativescript/android": "~8.4.0",
+        "@nativescript/ios": "~8.4.0"
+    }
+}

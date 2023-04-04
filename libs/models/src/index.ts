@@ -5,3 +5,4 @@ export * from './lib/player.model';
 export * from './lib/team.model';
 export * from './lib/vs-mode.enum';
 export * from './lib/overlay-state.model';
+export * from './lib/direction.model';

@@ -1,10 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { take, filter } from 'rxjs/operators';
 
-import { GameType, IGame, OverlayState } from '@pool-overlay/models';
+import { GameType, IGame, OverlayState, Direction } from '@pool-overlay/models';
 import { ControllerStore } from './controller.store';
-import { Direction } from '../../models/direction.model';
 import { PlayerModalComponent, PlayerModalData } from '../player-modal/player-modal.component';
 import { SocketService } from '@pool-overlay/scoreboard';
 

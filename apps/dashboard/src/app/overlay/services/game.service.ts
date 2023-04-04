@@ -2,8 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 
 import { EnvironmentConfig, ENV_CONFIG } from '../../models/environment-config.model';
-import { GameType, IGame } from '@pool-overlay/models';
-import { Direction } from '../models/direction.model';
+import { GameType, IGame, Direction } from '@pool-overlay/models';
 
 @Injectable()
 export class GameService {

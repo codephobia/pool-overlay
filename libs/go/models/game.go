@@ -22,7 +22,7 @@ var (
 	// The minimum number of games required to use handicapping.
 	minHandicapRaceTo = 2
 	// The maximum number of games allowed to use handicapping.
-	maxHandicapRaceTo = 9
+	maxHandicapRaceTo = 11
 )
 
 // Game is the current state of the game being played.
