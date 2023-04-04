@@ -7,7 +7,8 @@
         "postinstall": "node ./tools/postinstall.js"
     },
     "dependencies": {
-        "@nativescript/core": "*"
+        "@nativescript/core": "*",
+        "@valor/nativescript-websockets": "^1.0.5"
     },
     "devDependencies": {
         "@nativescript/android": "~8.4.0",

@@ -4,8 +4,7 @@ import { concatMap, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 
 import { GameService } from '../../services/game.service';
 import { OverlayStateService } from '../../services/overlay-state.service';
-import { GameType, IGame, OverlayState } from '@pool-overlay/models';
-import { Direction } from '../../models/direction.model';
+import { GameType, IGame, OverlayState, Direction } from '@pool-overlay/models';
 
 export interface ControllerState {
     pending: boolean;

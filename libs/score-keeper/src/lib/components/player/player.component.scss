@@ -1,0 +1,58 @@
+.player {
+    .name {
+        align-items: center;
+        justify-content: center;
+
+        label {
+            font-size: 30px;
+            color: white;
+        }
+    }
+
+    .content {
+        background-color: #2d2d2d;
+
+        .buttons {
+            .button {
+            }
+        }
+
+        .score {
+            align-items: center;
+            justify-content: center;
+
+            label {
+                font-size: 250px;
+                color: white;
+            }
+        }
+    }
+
+    .footer {
+        background-color: #2d2d2d;
+
+        .race-to {
+            align-items: center;
+            justify-content: center;
+
+            label {
+                font-size: 30px;
+                color: white;
+            }
+        }
+    }
+
+    &--blue {
+        .name,
+        .race-to {
+            background-color: #304292;
+        }
+    }
+
+    &--orange {
+        .name,
+        .race-to {
+            background-color: #ce7024;
+        }
+    }
+}

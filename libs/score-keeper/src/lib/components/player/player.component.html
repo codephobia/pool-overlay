@@ -1,0 +1,25 @@
+<GridLayout class="player player--{{ color }}" rows="16*,2,68*,16*" columns="*">
+    <FlexboxLayout class="name" row="0" col="0">
+        <label [text]="name"></label>
+    </FlexboxLayout>
+    <GridLayout class="content" row="2" col="0" rows="*,*" columns="*">
+        <GridLayout class="buttons" row="0" rowSpan="2" col="0" rows="*,*" , columns="*">
+            <StackLayout class="button" row="0" col="0" (tap)="updateScore(increment)"></StackLayout>
+            <StackLayout class="button" row="1" col="0" (tap)="updateScore(decrement)"></StackLayout>
+        </GridLayout>
+        <GridLayout row="0" rowSpan="2" col="0">
+            <FlexboxLayout></FlexboxLayout>
+            <FlexboxLayout class="score">
+                <label [text]="score"></label>
+            </FlexboxLayout>
+            <FlexboxLayout></FlexboxLayout>
+        </GridLayout>
+    </GridLayout>
+    <StackLayout class="footer" row="3" col="0">
+        <GridLayout rows="*,*" columns="42*,16*,42*">
+            <FlexboxLayout class="race-to" *ngIf="showRaceTo" row="1" col="1">
+                <label [text]="raceTo"></label>
+            </FlexboxLayout>
+        </GridLayout>
+    </StackLayout>
+</GridLayout>

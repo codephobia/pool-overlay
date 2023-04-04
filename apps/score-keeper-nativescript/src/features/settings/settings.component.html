@@ -1,0 +1,30 @@
+<AbsoluteLayout class="settings">
+    <FlexboxLayout top="0" left="0" width="100%" height="100%" class="options-wrapper">
+        <StackLayout class="options" [formGroup]="form">
+            <StackLayout class="option-table-number">
+                <Label text="Table Number"></Label>
+                <StackLayout orientation="horizontal">
+                    <button class="table-button" *ngFor="let table of tables" [text]="table" [class.active]="(table$ | async) === table" (tap)="updateTable(table)"></button>
+                </StackLayout>
+            </StackLayout>
+            <StackLayout class="option-server-address">
+                <Label text="Server Address"></Label>
+                <TextField
+                    hint="Enter server ip address here..."
+                    [text]="serverAddress$ | async"
+                    secure="false"
+                    keyboardType="url"
+                    returnKeyType="done"
+                    autocorrect="false"
+                    (returnPress)="saveServerAddress($event)"
+                >
+                </TextField>
+            </StackLayout>
+        </StackLayout>
+    </FlexboxLayout>
+    <DockLayout top="0" left="0" width="100%" height="100%" stretchLastChild="false">
+        <GridLayout dock="left" rows="50, *" columns="50, *">
+            <image class="back-icon" src="~/assets/images/back_icon.png" row="0" col="0" width="40" height="40" [nsRouterLink]="['/home']"></image>
+        </GridLayout>
+    </DockLayout>
+</AbsoluteLayout>

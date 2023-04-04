@@ -1,0 +1,47 @@
+.home {
+    background-color: black;
+
+    .widgets {
+        .table {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: black;
+
+            label {
+                color: white;
+                font-size: 15;
+            }
+        }
+
+        .race-to {
+            .title {
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background-color: black;
+
+                label {
+                    color: white;
+                    font-size: 15;
+                }
+            }
+
+            .amount {
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background-color: #992222;
+
+                label {
+                    color: white;
+                    font-size: 30;
+                }
+            }
+        }
+    }
+
+    .settings-icon {
+        opacity: .5;
+    }
+}
