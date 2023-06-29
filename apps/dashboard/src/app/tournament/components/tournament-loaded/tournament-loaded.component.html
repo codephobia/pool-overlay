@@ -1,0 +1,30 @@
+<ng-container *ngIf="vm$ | async as vm">
+    <div class="flex flex-col flex-grow" *ngIf="vm.isLoaded; else loading">
+        <div class="flex flex-row h-66px bg-sad-input border-sad-active border-b">
+            <div class="w-9/12 flex flex-col justify-center items-start px-10">
+                <h2 class="text-white uppercase">{{ vm.tournament?.name }}</h2>
+            </div>
+            <div class="w-3/12 flex flex-col justify-center items-end px-10">
+                <a href="https://challonge.com/{{ vm.tournament?.url }}" target="_blank" class="text-white bg-sad-challonge rounded py-2.5 px-5 uppercase text-xs">View on Challonge</a>
+            </div>
+        </div>
+        <div class="flex flex-row flex-grow bg-sad-table-odd">
+            <div class="flex flex-col flex-grow p-5 gap-5">
+                <div class="flex flex-row gap-5">
+                    <div class="flex flex-col flex-grow" *ngFor="let table of [1, 2, 3]">
+                        <div class="flex flex-row h-66px items-center text-white py-2.5 px-5 border-l border-r border-t border-sad-active rounded-t bg-sad-table-even uppercase">Table {{ table }}</div>
+                        <div class="flex flex-row bg-sad-table-odd p-5 border border-sad-active rounded-b">
+                            <div class="flex flex-col gap-2.5">
+                                <div class="flex flex-row gap-2.5"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-row h-66px bg-sad-section-title border-sad-active border-t border-b justify-end items-center px-10">
+            <button type="button" class="text-white bg-sad-error rounded py-2.5 px-5 uppercase text-xs" (click)="unloadTournament()">Unload Tournament</button>
+        </div>
+    </div>
+    <ng-template #loading></ng-template>
+</ng-container>

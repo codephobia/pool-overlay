@@ -25,6 +25,7 @@ module.exports = {
                     'table-even': 'var(--color-sad-bg-table-even)',
                     success: 'var(--color-sad-success)',
                     error: 'var(--color-sad-error)',
+                    challonge: 'var(--color-sad-challonge)',
                 },
             },
             borderColor: {

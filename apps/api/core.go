@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/codephobia/pool-overlay/libs/go/api"
+	"github.com/codephobia/pool-overlay/libs/go/challonge"
 	overlayPkg "github.com/codephobia/pool-overlay/libs/go/overlay"
 	"github.com/codephobia/pool-overlay/libs/go/state"
 	"github.com/codephobia/pool-overlay/libs/go/telestrator"
@@ -19,6 +20,7 @@ type Core struct {
 	overlay     *overlayPkg.Overlay
 	telestrator *telestrator.Telestrator
 	tables      map[int]*state.State
+	challonge   *challonge.Challonge
 }
 
 // NewCore returns a new Core.
@@ -47,6 +49,10 @@ func NewCore() (*Core, error) {
 	tables := map[int]*state.State{}
 	tables[1] = state.NewState(db, 1)
 	tables[2] = state.NewState(db, 2)
+	tables[3] = state.NewState(db, 3)
+
+	// Initialize Challonge.
+	challonge := challonge.NewChallonge(os.Getenv("CHALLONGE_API_KEY"), os.Getenv("CHALLONGE_USERNAME"), db, overlay, tables)
 
 	// Initialize API Server.
 	apiConfig := &api.Config{
@@ -58,7 +64,7 @@ func NewCore() (*Core, error) {
 			Previous: "1",
 		},
 	}
-	server := api.NewServer(apiConfig, db, overlay, telestrator, tables)
+	server := api.NewServer(apiConfig, db, overlay, telestrator, tables, challonge)
 
 	return &Core{
 		db:          db,
@@ -66,6 +72,7 @@ func NewCore() (*Core, error) {
 		overlay:     overlay,
 		telestrator: telestrator,
 		tables:      tables,
+		challonge:   challonge,
 	}, nil
 }
 

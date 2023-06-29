@@ -174,6 +174,16 @@ func (g *Game) SetVsMode(mode GameVsMode) error {
 	return g.Save(false)
 }
 
+// SetRaceTo sets the race to a specified amount.
+func (g *Game) SetRaceTo(raceTo int) error {
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
+
+	g.RaceTo = raceTo
+
+	return g.Save(false)
+}
+
 // IncrementRaceTo increases the RaceTo of the game by one.
 func (g *Game) IncrementRaceTo() error {
 	g.mutex.Lock()

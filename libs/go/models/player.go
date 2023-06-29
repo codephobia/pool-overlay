@@ -8,19 +8,21 @@ import (
 )
 
 var (
-	ErrPlayerIDInvalid    = errors.New("invalid player id")
-	ErrPlayerNotFound     = errors.New("player not found")
-	ErrPlayerHasIDAlready = errors.New("player already has an id")
+	ErrPlayerIDInvalid                = errors.New("invalid player id")
+	ErrPlayerFargoObservableIDInvalid = errors.New("invalid fargo observable id")
+	ErrPlayerNotFound                 = errors.New("player not found")
+	ErrPlayerHasIDAlready             = errors.New("player already has an id")
 )
 
 // Player is a pool player.
 type Player struct {
-	ID          uint   `json:"id,omitempty" gorm:"primarykey"`
-	Name        string `json:"name,omitempty" gorm:"size:100"`
-	FlagID      uint   `json:"flag_id,omitempty"`
-	Flag        *Flag  `json:"flag,omitempty" gorm:"foreignKey:flag_id"`
-	FargoID     uint   `json:"fargo_id,omitempty"`
-	FargoRating uint   `json:"fargo_rating,omitempty"`
+	ID                uint   `json:"id,omitempty" gorm:"primarykey"`
+	Name              string `json:"name,omitempty" gorm:"size:100"`
+	FlagID            uint   `json:"flag_id,omitempty"`
+	Flag              *Flag  `json:"flag,omitempty" gorm:"foreignKey:flag_id"`
+	FargoID           uint   `json:"fargo_id,omitempty"`
+	FargoObservableID uint   `json:"fargo_observable_id,omitempty"`
+	FargoRating       uint   `json:"fargo_rating,omitempty"`
 
 	CreatedAt *time.Time      `json:"created_at,omitempty"`
 	UpdatedAt *time.Time      `json:"updated_at,omitempty"`
@@ -30,7 +32,7 @@ type Player struct {
 // LoadByID loads a player by ID.
 func (p *Player) LoadByID(database *gorm.DB, id int) error {
 	result := database.
-		Select("id", "name", "flag_id", "fargo_id", "fargo_rating").
+		Select("id", "name", "flag_id", "fargo_id", "fargo_observable_id", "fargo_rating").
 		Where("id = ?", id).
 		Preload("Flag", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id", "country", "image_path")
@@ -42,6 +44,27 @@ func (p *Player) LoadByID(database *gorm.DB, id int) error {
 
 	if result.Error != nil {
 		return ErrPlayerIDInvalid
+	}
+
+	if result.RowsAffected != 1 {
+		return ErrPlayerNotFound
+	}
+
+	return nil
+}
+
+// LoadByFargoObservableID loads a player by Fargo observable ID.
+func (p *Player) LoadByFargoObservableID(database *gorm.DB, id int) error {
+	result := database.
+		Select("id", "name", "flag_id", "fargo_id", "fargo_observable_id", "fargo_rating").
+		Where("fargo_observable_id = ?", id).
+		Preload("Flag", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "country", "image_path")
+		}).
+		Find(p)
+
+	if result.Error != nil {
+		return ErrPlayerFargoObservableIDInvalid
 	}
 
 	if result.RowsAffected != 1 {

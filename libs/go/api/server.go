@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/codephobia/pool-overlay/libs/go/challonge"
 	"github.com/codephobia/pool-overlay/libs/go/overlay"
 	"github.com/codephobia/pool-overlay/libs/go/state"
 	"github.com/codephobia/pool-overlay/libs/go/telestrator"
@@ -21,6 +22,7 @@ type Server struct {
 	overlay     *overlay.Overlay
 	telestrator *telestrator.Telestrator
 	tables      map[int]*state.State
+	challonge   *challonge.Challonge
 
 	httpServer *http.Server
 	router     *mux.Router
@@ -28,13 +30,14 @@ type Server struct {
 }
 
 // NewServer returns a new api server.
-func NewServer(config *Config, db *gorm.DB, overlay *overlay.Overlay, telestrator *telestrator.Telestrator, tables map[int]*state.State) *Server {
+func NewServer(config *Config, db *gorm.DB, overlay *overlay.Overlay, telestrator *telestrator.Telestrator, tables map[int]*state.State, challonge *challonge.Challonge) *Server {
 	return &Server{
 		config:      config,
 		db:          db,
 		overlay:     overlay,
 		telestrator: telestrator,
 		tables:      tables,
+		challonge:   challonge,
 
 		router:  mux.NewRouter().StrictSlash(true),
 		version: make(map[string]*mux.Router),
