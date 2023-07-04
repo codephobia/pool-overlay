@@ -6,8 +6,8 @@
             [playerNum]="1"
             [name]="vm.game?.player_one?.name"
             [score]="vm.game?.score_one"
-            [raceTo]="playerOneRaceTo$ | async"
-            [showRaceTo]="showRaceTo$ | async"
+            [raceTo]="vm.playerOneRaceTo"
+            [showRaceTo]="vm.showRaceTo"
             color="blue"
             (update)="updatePlayer($event)"
         ></app-player>
@@ -17,15 +17,15 @@
             [playerNum]="2"
             [name]="vm.game?.player_two?.name"
             [score]="vm.game?.score_two"
-            [raceTo]="playerTwoRaceTo$ | async"
-            [showRaceTo]="showRaceTo$ | async"
+            [raceTo]="vm.playerTwoRaceTo"
+            [showRaceTo]="vm.showRaceTo"
             color="orange"
             (update)="updatePlayer($event)"
         ></app-player>
     </GridLayout>
     <GridLayout class="widgets" top="0" left="0" width="100%" height="100%" rows="5*,8*,82*,13*" columns="42*,4*,8*,4*,42*">
         <FlexboxLayout class="table" row="0" col="2">
-            <label text="TABLE {{ table }}"></label>
+            <label text="TABLE {{ vm.table }}"></label>
         </FlexboxLayout>
         <FlexboxLayout class="logo" row="2" col="1" colSpan="3">
             <image src="~/assets/images/logo.png" width="100%"></image>
@@ -44,4 +44,10 @@
             <image class="settings-icon" src="~/assets/images/settings_icon.png" row="1" col="1" width="40" height="40" [nsRouterLink]="['/settings']"></image>
         </GridLayout>
     </DockLayout>
+    <GridLayout *ngIf="vm.overlay.waitingForPlayers" backgroundColor="black" top="0" left="0" width="100%" height="100%" rows="*" columns="*">
+        <image row="1" col="1" src="~/assets/images/tablet-waiting-for-players.png" width="100%"></image>
+    </GridLayout>
+    <GridLayout *ngIf="vm.overlay.tableNoLongerInUse" backgroundColor="black" top="0" left="0" width="100%" height="100%" rows="*" columns="*">
+        <image row="1" col="1" src="~/assets/images/tablet-table-no-longer-in-tournament.png" width="100%"></image>
+    </GridLayout>
 </AbsoluteLayout>

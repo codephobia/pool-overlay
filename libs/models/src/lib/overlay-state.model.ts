@@ -4,4 +4,7 @@ export interface OverlayState {
     showFlags: boolean;
     showFargo: boolean;
     showScore: boolean;
+    waitingForPlayers: boolean;
+    waitingForTournamentStart: boolean;
+    tableNoLongerInUse: boolean;
 }

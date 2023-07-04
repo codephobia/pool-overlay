@@ -3,11 +3,14 @@ package state
 import "sync"
 
 type OverlayState struct {
-	Table     int  `json:"table"`
-	Hidden    bool `json:"hidden"`
-	ShowFlags bool `json:"showFlags"`
-	ShowFargo bool `json:"showFargo"`
-	ShowScore bool `json:"showScore"`
+	Table                     int  `json:"table"`
+	Hidden                    bool `json:"hidden"`
+	ShowFlags                 bool `json:"showFlags"`
+	ShowFargo                 bool `json:"showFargo"`
+	ShowScore                 bool `json:"showScore"`
+	WaitingForPlayers         bool `json:"waitingForPlayers"`
+	WaitingForTournamentStart bool `json:"waitingForTournamentStart"`
+	TableNoLongerInUse        bool `json:"tableNoLongerInUse"`
 
 	mutex sync.Mutex `json:"-"`
 }

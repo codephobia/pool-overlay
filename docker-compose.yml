@@ -18,6 +18,7 @@ services:
       - poolnet
 
   db-admin:
+    profiles: ["dev"]
     container_name: pool-db-admin
     image: dpage/pgadmin4
     environment:

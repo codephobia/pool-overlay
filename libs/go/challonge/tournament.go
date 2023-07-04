@@ -60,14 +60,9 @@ func (t *Tournament) Validate() error {
 func (t *Tournament) GetNextMatch() *Match {
 	sortedMatches := t.getMatchesByPlayOrder()
 
-	log.Printf("sorted matches: %+v", sortedMatches)
-
 	for i := range sortedMatches {
 		match := sortedMatches[i]
-
-		log.Printf("match id: %d", match.ID)
-
-		if match.State == "open" && match.UnderwayAt == nil {
+		if match.State == "open" && match.UnderwayAt == nil && match.Player1ID != nil && match.Player2ID != nil {
 			log.Printf("found next match: %d", match.ID)
 
 			return match
@@ -90,7 +85,7 @@ func (t *Tournament) HasMoreMatches() bool {
 }
 
 // CompleteIfPossible attempts to complete the tournament.
-func (t *Tournament) CompleteIfPossible(apiKey string) error {
+func (t *Tournament) CompleteIfPossible(username, apiKey string) error {
 	for i := range t.Matches {
 		match := t.Matches[i]
 		if match.State != "complete" {
@@ -103,7 +98,7 @@ func (t *Tournament) CompleteIfPossible(apiKey string) error {
 	if err != nil {
 		return err
 	}
-	req.SetBasicAuth(apiKey, "")
+	req.SetBasicAuth(username, apiKey)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

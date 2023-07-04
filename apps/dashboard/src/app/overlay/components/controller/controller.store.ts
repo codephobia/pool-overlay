@@ -27,6 +27,9 @@ export class ControllerStore extends ComponentStore<ControllerState> {
                 showFlags: false,
                 showFargo: true,
                 showScore: true,
+                waitingForPlayers: false,
+                waitingForTournamentStart: false,
+                tableNoLongerInUse: false,
             },
         });
     }

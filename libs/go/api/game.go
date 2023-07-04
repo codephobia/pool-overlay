@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/codephobia/pool-overlay/libs/go/events"
@@ -138,11 +139,20 @@ func (server *Server) handleGamePost(w http.ResponseWriter, r *http.Request, tab
 		return
 	}
 
-	// Reset game to create a new one with same players / settings.
-	if err := server.tables[table].Game.Reset(); err != nil {
-		server.handleError(w, r, http.StatusInternalServerError, err)
-		return
+	// Check if we're in tournament mode right now.
+	if server.challonge.InTournamentMode() {
+		if err := server.challonge.Continue(table); err != nil {
+			log.Printf("unable to continue tournament: %s", err)
+		}
+	} else {
+		// Reset game to create a new one with same players / settings.
+		if err := server.tables[table].Game.Reset(); err != nil {
+			server.handleError(w, r, http.StatusInternalServerError, err)
+			return
+		}
 	}
+
+	// TODO: BROADCAST NEXT GAME FOR TABLE OR LOCK DOWN TABLET ON THAT TABLE
 
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
@@ -397,6 +407,14 @@ func (server *Server) handleGameScorePatch(w http.ResponseWriter, r *http.Reques
 
 	// Broadcast update to overlay.
 	server.overlay.Broadcast <- message
+
+	// Check if we're in tournament mode right now.
+	if server.challonge.InTournamentMode() {
+		if err := server.challonge.UpdateMatchScore(table); err != nil {
+			// fail gracefully since live score keeping isn't that important
+			log.Printf("error updating match score on challonge: %s", err)
+		}
+	}
 
 	// send response
 	server.handleSuccess(w, r, GameScoreResp{

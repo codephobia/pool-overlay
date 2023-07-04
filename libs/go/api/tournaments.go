@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -146,8 +145,6 @@ func (server *Server) handleTournamentLoadPost(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	log.Printf("*** SETTINGS 1 ***: %+v", body)
-
 	// make settings
 	settings := &challonge.Settings{
 		MaxTables:     3,
@@ -160,8 +157,6 @@ func (server *Server) handleTournamentLoadPost(w http.ResponseWriter, r *http.Re
 		ASideRaceTo:   body.Settings.ASideRaceTo,
 		BSideRaceTo:   body.Settings.BSideRaceTo,
 	}
-
-	log.Printf("*** SETTINGS 2 ***: %+v", (*settings))
 
 	// load tournament
 	err := server.challonge.LoadTournament(body.ID, settings)

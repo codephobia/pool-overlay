@@ -181,6 +181,21 @@ func (g *Game) SetRaceTo(raceTo int) error {
 
 	g.RaceTo = raceTo
 
+	// TODO: Reach out to Fargo and see if we can account for all races.
+	// Make sure we aren't using handicapping if outside of the race threshold.
+	if g.RaceTo > maxHandicapRaceTo {
+		if err := g.SetUseFargoHotHandicap(false); err != nil {
+			return err
+		}
+	}
+
+	// Update fargo hot handicap if we are using it.
+	if g.UseFargoHotHandicap {
+		if err := g.updateFargoHotHandicap(); err != nil {
+			return err
+		}
+	}
+
 	return g.Save(false)
 }
 
@@ -508,6 +523,48 @@ func (g *Game) updateFargoHotHandicap() error {
 	g.FargoHotHandicap = &currentHandicap
 
 	return nil
+}
+
+// WinningPlayerNum returns the winning player number (1 or 2) or if no winner,
+// returns 0.
+func (g *Game) WinningPlayerNum() int {
+	// If not using handicap just take the highest score.
+	if !g.UseFargoHotHandicap && g.ScoreOne != g.ScoreTwo && (g.ScoreOne == g.RaceTo || g.ScoreTwo == g.RaceTo) {
+		if g.ScoreOne > g.ScoreTwo {
+			return 1
+		} else {
+			return 2
+		}
+	} else if g.UseFargoHotHandicap {
+		playerOneFargo := g.PlayerOne.FargoRating
+		playerTwoFargo := g.PlayerTwo.FargoRating
+		winsHigher := g.FargoHotHandicap.WinsHigher
+		winsLower := g.FargoHotHandicap.WinsLower
+
+		var playerOneRaceTo uint
+		if playerOneFargo > playerTwoFargo {
+			playerOneRaceTo = winsHigher
+		} else {
+			playerOneRaceTo = winsLower
+		}
+
+		var playerTwoRaceTo uint
+		if playerTwoFargo > playerOneFargo {
+			playerTwoRaceTo = winsHigher
+		} else {
+			playerTwoRaceTo = winsLower
+		}
+
+		// TODO: SHOULD MAYBE TEST THAT BOTH DONT EQUAL
+
+		if g.ScoreOne == int(playerOneRaceTo) {
+			return 1
+		} else if g.ScoreTwo == int(playerTwoRaceTo) {
+			return 2
+		}
+	}
+
+	return 0
 }
 
 // Save saves the game to the database.

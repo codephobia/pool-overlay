@@ -21,6 +21,9 @@ export class ScoreboardStore extends ComponentStore<ScoreboardState> {
                 showFlags: false,
                 showFargo: true,
                 showScore: true,
+                waitingForPlayers: false,
+                waitingForTournamentStart: false,
+                tableNoLongerInUse: false,
             },
         });
     }

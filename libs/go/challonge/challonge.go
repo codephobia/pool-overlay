@@ -106,7 +106,181 @@ func (c *Challonge) LoadTournament(id int, settings *Settings) error {
 		return err
 	}
 
+	// Broadcast messages
+	if err := c.broadcastAllTables(); err != nil {
+		return err
+	}
+
 	return nil
+}
+
+// UpdateMatchScore updates a match score on challonge.
+func (c *Challonge) UpdateMatchScore(table int) error {
+	match := c.CurrentMatches[table]
+	scoresCsv := fmt.Sprintf("%d-%d", c.tables[table].Game.ScoreOne, c.tables[table].Game.ScoreTwo)
+
+	return match.UpdateScore(c.config.Username, c.config.APIKey, scoresCsv)
+}
+
+// Continue completes a game, and sets up the next match for the tournament.
+func (c *Challonge) Continue(table int) error {
+	// report the finished match
+	if err := c.reportMatch(table); err != nil {
+		return err
+	}
+
+	// update all other matches not on tables
+	for _, match := range c.Tournament.Matches {
+		if c.CurrentMatches[1] != nil && match.ID == c.CurrentMatches[1].ID {
+			continue
+		}
+
+		if c.CurrentMatches[2] != nil && match.ID == c.CurrentMatches[2].ID {
+			continue
+		}
+
+		if c.CurrentMatches[3] != nil && match.ID == c.CurrentMatches[3].ID {
+			continue
+		}
+
+		if err := match.Refresh(c.config.Username, c.config.APIKey); err != nil {
+			log.Printf("unable to refresh match: %s", err)
+		}
+	}
+
+	// should we drop max tables
+	// TODO: REMOVE THIS HACKY SHIT
+	if c.CurrentMatches[table].Round == -3 && c.Settings.MaxTables == 3 {
+		c.Settings.MaxTables = 2
+	}
+	if c.CurrentMatches[table].Round == -4 && c.Settings.MaxTables == 2 {
+		c.Settings.MaxTables = 1
+	}
+
+	// unset the current table
+	c.CurrentMatches[table] = nil
+
+	// check if current table is now outside of max tables bounds
+	if table > c.Settings.MaxTables {
+		c.tables[table].Overlay.TableNoLongerInUse = true
+
+		// Unset waiting for players since this will never happen now
+		c.tables[table].Overlay.WaitingForPlayers = false
+
+		// Generate overlay state message to broadcast to overlay.
+		overlayMessage, err := overlayPkg.NewEvent(
+			events.OverlayStateEventType,
+			c.tables[table].Overlay,
+		).ToBytes()
+		if err != nil {
+			return err
+		}
+
+		// Broadcast new overlay state to overlay.
+		c.overlay.Broadcast <- overlayMessage
+	}
+
+	for i := 1; i <= c.Settings.MaxTables; i++ {
+		if c.CurrentMatches[i] != nil {
+			continue
+		}
+
+		if c.Tournament.HasMoreMatches() {
+			match := c.Tournament.GetNextMatch()
+
+			if match != nil {
+				c.CurrentMatches[i] = match
+
+				// set game data
+				// load players to the overlay for that table
+				c.tables[i].Game.SetPlayer(1, c.PlayersMap[*match.Player1ID])
+				c.tables[i].Game.SetPlayer(2, c.PlayersMap[*match.Player2ID])
+				c.tables[i].Game.ResetScore()
+
+				// set race for a/b side
+				if match.IsOnASide() {
+					c.tables[i].Game.SetRaceTo(c.Settings.ASideRaceTo)
+				} else {
+					c.tables[i].Game.SetRaceTo(c.Settings.BSideRaceTo)
+				}
+
+				// mark match as in progress on challonge if possible
+				if err := match.SetInProgress(c.config.Username, c.config.APIKey); err != nil {
+					return err
+				}
+
+				// Generate game message to broadcast to overlay.
+				gameMessage, err := overlayPkg.NewEvent(
+					events.GameEventType,
+					events.NewGameEventPayload(c.tables[i].Game),
+				).ToBytes()
+				if err != nil {
+					return err
+				}
+
+				// Broadcast new game state to overlay.
+				c.overlay.Broadcast <- gameMessage
+
+				// flag overlay as hidden
+				c.tables[i].Overlay.SetHidden(false)
+				c.tables[i].Overlay.WaitingForPlayers = false
+
+				// Generate overlay state message to broadcast to overlay.
+				overlayMessage, err := overlayPkg.NewEvent(
+					events.OverlayStateEventType,
+					c.tables[i].Overlay,
+				).ToBytes()
+				if err != nil {
+					return err
+				}
+
+				// Broadcast new overlay state to overlay.
+				c.overlay.Broadcast <- overlayMessage
+			} else {
+				// flag overlay as hidden
+				c.tables[i].Overlay.SetHidden(true)
+				c.tables[i].Overlay.WaitingForPlayers = true
+
+				// Generate overlay state message to broadcast to overlay.
+				overlayMessage, err := overlayPkg.NewEvent(
+					events.OverlayStateEventType,
+					c.tables[i].Overlay,
+				).ToBytes()
+				if err != nil {
+					return err
+				}
+
+				// Broadcast new overlay state to overlay.
+				c.overlay.Broadcast <- overlayMessage
+			}
+		} else {
+			if err := c.Tournament.CompleteIfPossible(c.config.Username, c.config.APIKey); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+// ReportMatch reports the match winner to Challonge.
+func (c *Challonge) reportMatch(table int) error {
+	match := c.CurrentMatches[table]
+	scoresCsv := fmt.Sprintf("%d-%d", c.tables[table].Game.ScoreOne, c.tables[table].Game.ScoreTwo)
+	winningPlayerNum := c.tables[table].Game.WinningPlayerNum()
+
+	if winningPlayerNum == 0 {
+		return fmt.Errorf("game on table %d has no winner", table)
+	}
+
+	var winningPlayerID int
+	if winningPlayerNum == 1 {
+		winningPlayerID = *c.CurrentMatches[table].Player1ID
+	} else {
+		winningPlayerID = *c.CurrentMatches[table].Player2ID
+	}
+
+	return match.ReportWinner(c.config.Username, c.config.APIKey, winningPlayerID, scoresCsv)
 }
 
 // UnloadTournament unsets the current tournament.
@@ -119,8 +293,6 @@ func (c *Challonge) UnloadTournament() {
 
 // Initializes all the settings for the tables and overlays.
 func (c *Challonge) initializeTournament() error {
-	log.Printf("*** SETTINGS 3 ***: %+v", c.Settings)
-
 	for i := 1; i <= c.Settings.MaxTables; i++ {
 		// **********
 		// ** GAME **
@@ -130,43 +302,20 @@ func (c *Challonge) initializeTournament() error {
 		c.tables[i].Game.UnsetPlayer(1)
 		c.tables[i].Game.UnsetPlayer(2)
 
-		// Set g)ame settings.
+		// Set game settings.
 		c.tables[i].Game.SetType(c.Settings.GameType)
 		c.tables[i].Game.SetVsMode(models.OneVsOne)
 		c.tables[i].Game.SetUseFargoHotHandicap(c.Settings.IsHandicapped)
 		c.tables[i].Game.SetRaceTo(c.Settings.ASideRaceTo)
 
-		// Generate game message to broadcast to overlay.
-		gameMessage, err := overlayPkg.NewEvent(
-			events.GameEventType,
-			events.NewGameEventPayload(c.tables[i].Game),
-		).ToBytes()
-		if err != nil {
-			return err
-		}
-
-		// Broadcast new game state to overlay.
-		c.overlay.Broadcast <- gameMessage
-
 		// *************
 		// ** OVERLAY **
 		// *************
+		// Set overlay settings.
 		c.tables[i].Overlay.SetHidden(!c.Settings.ShowOverlay)
 		c.tables[i].Overlay.SetFlags(c.Settings.ShowFlags)
 		c.tables[i].Overlay.SetFargo(c.Settings.ShowFargo)
 		c.tables[i].Overlay.SetScore(c.Settings.ShowScore)
-
-		// Generate overlay state message to broadcast to overlay.
-		overlayMessage, err := overlayPkg.NewEvent(
-			events.OverlayStateEventType,
-			c.tables[i].Overlay,
-		).ToBytes()
-		if err != nil {
-			return err
-		}
-
-		// Broadcast new overlay state to overlay.
-		c.overlay.Broadcast <- overlayMessage
 	}
 
 	return nil
@@ -220,16 +369,8 @@ func (c *Challonge) fillTables() error {
 			return fmt.Errorf("no next match found")
 		}
 
-		log.Printf("using match: %d", match.ID)
-
 		// add that match to the current matches for that table
 		c.CurrentMatches[i] = match
-
-		log.Printf("player 1 challonge id: %d", *match.Player1ID)
-		log.Printf("player 2 challonge id: %d", *match.Player2ID)
-
-		log.Printf("player 1 db id: %d", c.PlayersMap[*match.Player1ID].ID)
-		log.Printf("player 2 db id: %d", c.PlayersMap[*match.Player2ID].ID)
 
 		// load players to the overlay for that table
 		c.tables[i].Game.SetPlayer(1, c.PlayersMap[*match.Player1ID])
@@ -239,6 +380,37 @@ func (c *Challonge) fillTables() error {
 		if err := match.SetInProgress(c.config.Username, c.config.APIKey); err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+// Broadcasts game and overlay data to all tables after tournament load.
+func (c *Challonge) broadcastAllTables() error {
+	for i := 1; i <= c.Settings.MaxTables; i++ {
+		// Generate game message to broadcast to overlay.
+		gameMessage, err := overlayPkg.NewEvent(
+			events.GameEventType,
+			events.NewGameEventPayload(c.tables[i].Game),
+		).ToBytes()
+		if err != nil {
+			return err
+		}
+
+		// Broadcast new game state to overlay.
+		c.overlay.Broadcast <- gameMessage
+
+		// Generate overlay state message to broadcast to overlay.
+		overlayMessage, err := overlayPkg.NewEvent(
+			events.OverlayStateEventType,
+			c.tables[i].Overlay,
+		).ToBytes()
+		if err != nil {
+			return err
+		}
+
+		// Broadcast new overlay state to overlay.
+		c.overlay.Broadcast <- overlayMessage
 	}
 
 	return nil
