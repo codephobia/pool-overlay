@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
 import { IGame, OverlayState, Tournament } from '@pool-overlay/models';
 import { switchMap, tap } from 'rxjs';
+import { TablesService } from '../../services/tables.service';
 import { TournamentsService } from '../../services/tournament.service';
 
 export enum LoadingState {
@@ -33,6 +34,7 @@ export class TournamentLoadedStore extends ComponentStore<TournamentLoadedState>
     constructor(
         private router: Router,
         private tournamentsService: TournamentsService,
+        private tablesService: TablesService,
     ) {
         super(initialState);
     }
@@ -118,5 +120,14 @@ export class TournamentLoadedStore extends ComponentStore<TournamentLoadedState>
 
     readonly setOverlay = this.effect<OverlayState>((state$) => state$.pipe(
         tap((overlay) => this.updateTableOverlay(overlay)),
+    ));
+
+    readonly swapTables = this.effect<{ tableOne: number, tableTwo: number }>((trigger$) => trigger$.pipe(
+        switchMap(({ tableOne, tableTwo }) => this.tablesService.swap(tableOne, tableTwo).pipe(
+            tapResponse(
+                () => { },
+                (err) => console.error(err),
+            ),
+        ))
     ));
 }

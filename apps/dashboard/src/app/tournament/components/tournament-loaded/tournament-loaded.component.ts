@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { faClock, faLock } from '@fortawesome/pro-regular-svg-icons';
+import { faClock, faEllipsisVertical, faLock } from '@fortawesome/pro-regular-svg-icons';
 import { GameType, IPlayer, FargoHotHandicap } from '@pool-overlay/models';
 import { SocketService } from '@pool-overlay/scoreboard';
 import { filter, map, Observable } from 'rxjs';
@@ -13,6 +13,7 @@ import { TournamentLoadedStore } from './tournament-loaded.store';
 export class TournamentLoadedComponent {
     readonly faClock = faClock;
     readonly faLock = faLock;
+    readonly faEllipsisVertical = faEllipsisVertical
     readonly gameType = GameType;
     readonly tables = [1, 2, 3];
     readonly vm$ = this.store.vm$;
@@ -47,6 +48,10 @@ export class TournamentLoadedComponent {
                 return (game.player_one as IPlayer).fargo_rating < (game.player_two as IPlayer).fargo_rating ? (game.fargo_hot_handicap as FargoHotHandicap).wins_higher : (game.fargo_hot_handicap as FargoHotHandicap).wins_lower
             }),
         );
+    }
+
+    public swapTables(tableOne: number, tableTwo: number): void {
+        this.store.swapTables({ tableOne, tableTwo });
     }
 
     public unloadTournament(): void {

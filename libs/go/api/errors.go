@@ -35,4 +35,6 @@ var (
 	ErrInvalidTournamentID = errors.New("invalid tournament id")
 	// ErrInvalidTournamentDetails - Invalid tournament details.
 	ErrInvalidTournamentDetails = errors.New("invalid tournament details")
+	// ErrInvalidTableNumber - Invalid table number.
+	ErrInvalidTableNumber = errors.New("invalid table number")
 )

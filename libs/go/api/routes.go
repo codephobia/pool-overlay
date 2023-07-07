@@ -74,6 +74,11 @@ func (server *Server) InitRoutes() {
 	// flags
 	server.AddRouteToAllVersions("/flags", server.handleFlags())
 
+	// table/swap
+	server.AddRouteToAllVersions("/table/1/swap/{newTable}", server.handleTableSwap(1))
+	server.AddRouteToAllVersions("/table/2/swap/{newTable}", server.handleTableSwap(2))
+	server.AddRouteToAllVersions("/table/3/swap/{newTable}", server.handleTableSwap(3))
+
 	// game
 	server.AddRouteToAllVersions("/table/1/game", server.handleGame(1))
 	server.AddRouteToAllVersions("/table/2/game", server.handleGame(2))
