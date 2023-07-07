@@ -316,6 +316,11 @@ func (c *Challonge) initializeTournament() error {
 		c.tables[i].Overlay.SetFlags(c.Settings.ShowFlags)
 		c.tables[i].Overlay.SetFargo(c.Settings.ShowFargo)
 		c.tables[i].Overlay.SetScore(c.Settings.ShowScore)
+
+		c.tables[i].Overlay.WaitingForTournamentStart = false
+		c.tables[i].Overlay.WaitingForPlayers = false
+		c.tables[i].Overlay.TableNoLongerInUse = false
+
 	}
 
 	return nil

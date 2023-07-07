@@ -9,3 +9,4 @@ export * from './lib/direction.model';
 export * from './lib/tournament.model';
 export * from './lib/tournament-match.model';
 export * from './lib/tournament-settings.model';
+export * from './lib/fargo-hot-handicap';

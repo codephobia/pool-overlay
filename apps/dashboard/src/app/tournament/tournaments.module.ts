@@ -12,6 +12,7 @@ import { TournamentSetupPageComponent } from './containers/tournament-setup/tour
 import { TournamentSetupComponent } from './components/tournament-setup/tournament-setup.component';
 import { LoadedPageComponent } from './containers/loaded/loaded-page.component';
 import { TournamentLoadedComponent } from './components/tournament-loaded/tournament-loaded.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 const COMPONENTS = [
     HomePageComponent,
@@ -31,6 +32,7 @@ const SERVICES = [
         CommonModule,
         HttpClientModule,
         ReactiveFormsModule,
+        FontAwesomeModule,
         TournamentsRoutingModule,
         ToggleModule,
     ],

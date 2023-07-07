@@ -29,9 +29,9 @@ Uses the Challonge API to load tournaments, update matches, and automatically up
     x Player confirms match is completed on tablet.
     x Save game to database.
     x Mark match as completed with winner and score on Challonge.
-    - Check if we should be staying at the same amount of tables.
-    - Check if another match still needs to be played.
-      - If yes, get next match and load to same table, otherwise reduce the number of tables.
+    x Check if we should be staying at the same amount of tables. (temp solution)
+    x Check if another match still needs to be played.
+      x If yes, get next match and load to same table, otherwise reduce the number of tables.
 6. Skipping a match
     - Admin can skip a match on a table.
     - Check if another match still needs to be played.
@@ -39,7 +39,7 @@ Uses the Challonge API to load tournaments, update matches, and automatically up
 7. Allow chop in finals.
     - Admin has a way to submit score of 0-0 in case players chop. This allows the tournament to complete, but doesn't get entered as wins or losses into Fargo.
 8. Complete tournament
-    - When final game is saved, it should attempt to complete the tournament.
+    x When final game is saved, it should attempt to complete the tournament.
     - Unloads the tournament.
 
 Other nice to haves:

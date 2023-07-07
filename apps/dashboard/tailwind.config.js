@@ -26,6 +26,9 @@ module.exports = {
                     success: 'var(--color-sad-success)',
                     error: 'var(--color-sad-error)',
                     challonge: 'var(--color-sad-challonge)',
+                    'player-one': 'var(--color-sad-player-one-background)',
+                    'player-two': 'var(--color-sad-player-two-background)',
+                    'player-score': 'var(--color-sad-player-score-background)',
                 },
             },
             borderColor: {
