@@ -90,10 +90,11 @@ func (p *Player) Update(database *gorm.DB) error {
 	}
 
 	return database.Model(p).Updates(map[string]interface{}{
-		"name":         p.Name,
-		"flag_id":      p.FlagID,
-		"fargo_id":     p.FargoID,
-		"fargo_rating": p.FargoRating,
+		"name":                p.Name,
+		"flag_id":             p.FlagID,
+		"fargo_observable_id": p.FargoObservableID,
+		"fargo_id":            p.FargoID,
+		"fargo_rating":        p.FargoRating,
 	}).Error
 }
 

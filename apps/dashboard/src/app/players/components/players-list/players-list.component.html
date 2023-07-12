@@ -3,8 +3,11 @@
         <div class="w-1/12 flex flex-col justify-center items-start px-10">
             <p class="text-white uppercase text-xs">Flag</p>
         </div>
-        <div class="w-5/12 flex flex-col justify-center items-start px-10">
+        <div class="w-3/12 flex flex-col justify-center items-start px-10">
             <p class="text-white uppercase text-xs">Name</p>
+        </div>
+        <div class="w-2/12 flex flex-col justify-center items-start px-10">
+            <p class="text-white uppercase text-xs whitespace-nowrap">Fargo Observable ID</p>
         </div>
         <div class="w-2/12 flex flex-col justify-center items-start px-10">
             <p class="text-white uppercase text-xs whitespace-nowrap">Fargo ID</p>
@@ -19,8 +22,11 @@
             <div class="w-1/12 flex flex-col justify-center items-start px-10">
                 <img *ngIf="player?.flag" class="w-5 h-auto" src="./assets/flags/{{ player?.flag?.image_path }}" [alt]="player?.flag?.country" />
             </div>
-            <div class="w-5/12 flex flex-col justify-center px-10">
+            <div class="w-3/12 flex flex-col justify-center px-10">
                 <p class="text-white uppercase text-xs whitespace-nowrap">{{ player?.name }}</p>
+            </div>
+            <div class="w-2/12 flex flex-col justify-center px-10">
+                <p class="text-white uppercase text-xs">{{ player?.fargo_observable_id }}</p>
             </div>
             <div class="w-2/12 flex flex-col justify-center px-10">
                 <p class="text-white uppercase text-xs">{{ player?.fargo_id }}</p>
