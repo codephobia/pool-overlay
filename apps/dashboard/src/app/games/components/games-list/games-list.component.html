@@ -1,41 +1,41 @@
 <div class="flex flex-col flex-grow">
-    <div class="flex flex-row h-20 px-5 gap-5 bg-blue-900">
-        <div class="w-52 flex flex-col justify-center">
-            <p class="text-white">Player One</p>
+    <div class="flex flex-row h-66px bg-sad-input border-sad-active border-b">
+        <div class="w-3/12 flex flex-col justify-center items-start px-10">
+            <p class="text-white uppercase text-xs">Player One</p>
         </div>
-        <div class="w-52 flex flex-col justify-center">
-            <p class="text-white">Player Two</p>
+        <div class="w-3/12 flex flex-col justify-center items-start px-10">
+            <p class="text-white uppercase text-xs">Player Two</p>
         </div>
-        <div class="w-24 flex flex-col justify-center">
-            <p class="text-white whitespace-nowrap">Game Type</p>
+        <div class="w-2/12 flex flex-col justify-center items-start px-10">
+            <p class="text-white uppercase text-xs whitespace-nowrap">Game Type</p>
         </div>
-        <div class="w-24 flex flex-col justify-center">
-            <p class="text-white whitespace-nowrap">Race To</p>
+        <div class="w-2/12 flex flex-col justify-center items-start px-10">
+            <p class="text-white uppercase text-xs whitespace-nowrap">Race To</p>
         </div>
-        <div class="flex flex-col flex-grow justify-center">
-            <p class="text-white whitespace-nowrap">Date</p>
+        <div class="w-2/12 flex flex-col justify-center items-start px-10">
+            <p class="text-white uppercase text-xs whitespace-nowrap">Date</p>
         </div>
     </div>
     <ng-container *ngIf="loaded; else loading">
-        <div class="flex flex-row h-20 px-5 gap-5" *ngFor="let game of games; even as isEven; odd as isOdd" [ngClass]="{ 'bg-gray-600': isEven, 'bg-gray-700': isOdd }">
-            <div class="w-52 flex flex-col justify-center">
-                <p class="text-white whitespace-nowrap">
+        <div class="flex flex-row h-66px" *ngFor="let game of games; even as isEven; odd as isOdd" [ngClass]="{ 'bg-sad-table-even': isEven, 'bg-sad-table-odd': isOdd }">
+            <div class="w-3/12 flex flex-col justify-center items-start px-10">
+                <p class="text-white uppercase text-xs whitespace-nowrap">
                     {{ game?.player_one?.name }} <span>({{ game?.score_one }})</span>
                 </p>
             </div>
-            <div class="w-52 flex flex-col justify-center">
-                <p class="text-white whitespace-nowrap">
+            <div class="w-3/12 flex flex-col justify-center items-start px-10">
+                <p class="text-white uppercase text-xs whitespace-nowrap">
                     {{ game?.player_two?.name }} <span>({{ game?.score_two }})</span>
                 </p>
             </div>
-            <div class="w-24 flex flex-col justify-center">
-                <p class="text-white whitespace-nowrap">{{ game?.type }}</p>
+            <div class="w-2/12 flex flex-col justify-center items-start px-10">
+                <p class="text-white uppercase text-xs whitespace-nowrap">{{ game?.type }}</p>
             </div>
-            <div class="w-24 flex flex-col justify-center">
-                <p class="text-white whitespace-nowrap">{{ game?.race_to }}</p>
+            <div class="w-2/12 flex flex-col justify-center items-start px-10">
+                <p class="text-white uppercase text-xs whitespace-nowrap">{{ game?.race_to }}</p>
             </div>
-            <div class="flex flex-col flex-grow justify-center">
-                <p class="text-white whitespace-nowrap">{{ game?.updated_at | date: 'medium' }}</p>
+            <div class="w-2/12 flex flex-col justify-center items-start px-10">
+                <p class="text-white uppercase text-xs whitespace-nowrap">{{ game?.updated_at | date: 'medium' }}</p>
             </div>
         </div>
     </ng-container>
