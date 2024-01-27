@@ -206,15 +206,29 @@ func (c *Challonge) initializeTournament() error {
 		// ** GAME **
 		// **********
 		// Reset the table.
-		c.tables[i].Game.ResetScore()
-		c.tables[i].Game.UnsetPlayer(1)
-		c.tables[i].Game.UnsetPlayer(2)
+		if err := c.tables[i].Game.ResetScore(); err != nil {
+			return err
+		}
+		if err := c.tables[i].Game.UnsetPlayer(1); err != nil {
+			return err
+		}
+		if err := c.tables[i].Game.UnsetPlayer(2); err != nil {
+			return err
+		}
 
 		// Set game settings.
-		c.tables[i].Game.SetType(c.Settings.GameType)
-		c.tables[i].Game.SetVsMode(models.OneVsOne)
-		c.tables[i].Game.SetUseFargoHotHandicap(c.Settings.IsHandicapped)
-		c.tables[i].Game.SetRaceTo(c.Settings.ASideRaceTo)
+		if err := c.tables[i].Game.SetType(c.Settings.GameType); err != nil {
+			return err
+		}
+		if err := c.tables[i].Game.SetVsMode(models.OneVsOne); err != nil {
+			return err
+		}
+		if err := c.tables[i].Game.SetUseFargoHotHandicap(c.Settings.IsHandicapped); err != nil {
+			return err
+		}
+		if err := c.tables[i].Game.SetRaceTo(c.Settings.ASideRaceTo); err != nil {
+			return err
+		}
 
 		// *************
 		// ** OVERLAY **
@@ -312,15 +326,25 @@ func (c *Challonge) getNextMatchForTable(table int) (*Match, error) {
 		c.CurrentMatches[table] = match
 
 		// load players to the overlay for that table
-		c.tables[table].Game.SetPlayer(1, c.PlayersMap[*match.Player1ID])
-		c.tables[table].Game.SetPlayer(2, c.PlayersMap[*match.Player2ID])
-		c.tables[table].Game.ResetScore()
+		if err := c.tables[table].Game.SetPlayer(1, c.PlayersMap[*match.Player1ID]); err != nil {
+			return nil, err
+		}
+		if err := c.tables[table].Game.SetPlayer(2, c.PlayersMap[*match.Player2ID]); err != nil {
+			return nil, err
+		}
+		if err := c.tables[table].Game.ResetScore(); err != nil {
+			return nil, err
+		}
 
 		// set race for a/b side
 		if match.IsOnASide() {
-			c.tables[table].Game.SetRaceTo(c.Settings.ASideRaceTo)
+			if err := c.tables[table].Game.SetRaceTo(c.Settings.ASideRaceTo); err != nil {
+				return nil, err
+			}
 		} else {
-			c.tables[table].Game.SetRaceTo(c.Settings.BSideRaceTo)
+			if err := c.tables[table].Game.SetRaceTo(c.Settings.BSideRaceTo); err != nil {
+				return nil, err
+			}
 		}
 
 		// mark match as in progress on challonge if possible
