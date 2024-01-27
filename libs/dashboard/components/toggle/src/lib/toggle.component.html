@@ -1,6 +1,5 @@
 <div class="flex flex-col" *ngIf="vm$ | async as vm">
     <div class="flex flex-row gap-5 items-center">
-        <label class="inline-block text-white w-14" [for]="id">{{ label }}</label>
         <div class="w-12 h-6 relative">
             <div
                 class="w-4 h-4 rounded-lg absolute top-1 left-1 z-10 transition pointer-events-none transform"
@@ -15,5 +14,6 @@
                 (change)="toggle()"
             />
         </div>
+        <label class="inline-block text-white min-w-min" [for]="id">{{ label }}</label>
     </div>
 </div>

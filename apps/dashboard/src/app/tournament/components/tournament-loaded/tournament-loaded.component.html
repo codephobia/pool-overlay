@@ -1,0 +1,93 @@
+<ng-container *ngIf="vm$ | async as vm">
+    <div class="flex flex-col flex-grow" *ngIf="vm.isLoaded; else loading">
+        <div class="flex flex-row h-66px bg-sad-input border-sad-active border-b">
+            <div class="w-9/12 flex flex-col justify-center items-start px-10">
+                <h2 class="text-white uppercase">{{ vm.tournament?.name }}</h2>
+            </div>
+            <div class="w-3/12 flex flex-col justify-center items-end px-10">
+                <a href="https://challonge.com/{{ vm.tournament?.url }}" target="_blank" class="text-white bg-sad-challonge rounded py-2.5 px-5 uppercase text-xs">View on Challonge</a>
+            </div>
+        </div>
+        <div class="flex flex-row flex-grow bg-sad-table-odd">
+            <div class="flex flex-col flex-grow p-5 gap-5">
+                <div class="flex flex-row gap-5">
+                    <div class="flex flex-col flex-grow text-white w-1/3" *ngFor="let table of tables">
+                        <div class="flex flex-row h-66px justify-between items-center py-2.5 px-5 border-l border-r border-t border-sad-active rounded-t bg-sad-table-even uppercase">
+                            <div>Table {{ table }}</div>
+                            <div>
+                                <button type="button" [cdkMenuTriggerFor]="menu" class="border border-sad-active rounded py-1 px-4 hover:bg-sad-active hover:border-white">
+                                    <fa-icon [icon]="faEllipsisVertical"></fa-icon>
+                                </button>
+                                <ng-template #menu>
+                                    <div class="border bg-sad-input border-sad-active rounded mt-2.5 py-2.5 text-white" cdkMenu>
+                                        <ng-container *ngFor="let menuTable of tables">
+                                            <button type="button" *ngIf="table !== menuTable" class="block hover:bg-sad-active py-2.5 px-5" cdkMenuItem (click)="swapTables(table, menuTable)">
+                                                Swap with Table {{ menuTable }}
+                                            </button>
+                                        </ng-container>
+                                    </div>
+                                </ng-template>
+                            </div>
+                        </div>
+                        <div class="flex flex-row flex-grow bg-sad-table-odd border border-sad-active rounded-b">
+                            <ng-container *ngIf="!vm.tables[table]?.overlay?.waitingForPlayers && !vm.tables[table]?.overlay?.tableNoLongerInUse; else locked">
+                                <div class="flex flex-col flex-grow" *ngIf="vm.tables[table]?.game as game">
+                                    <div class="flex flex-row flex-grow">
+                                        <div class="flex flex-col flex-grow justify-center items-center bg-sad-player-one w-1/2">
+                                            {{ game?.player_one?.name }} ({{ game?.player_one?.fargo_rating }})
+                                        </div>
+                                        <div class="flex flex-col flex-grow p-5 justify-center items-center bg-sad-player-two w-1/2">
+                                            {{ game?.player_two?.name }} ({{ game?.player_two?.fargo_rating }})
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-row flex-grow py-5 bg-sad-player-score text-6xl">
+                                        <div class="flex flex-col flex-grow justify-center items-center w-1/2">{{ game?.score_one }}</div>
+                                        <div class="flex flex-col flex-grow justify-center items-center w-1/2">{{ game?.score_two }}</div>
+                                    </div>
+                                    <div class="flex flex-row flex-grow bg-sad-player-score rounded-b">
+                                        <div class="flex flex-col w-1/2 justify-end items-center">
+                                            <div
+                                                *ngIf="game?.fargo_hot_handicap?.wins_higher !== game?.fargo_hot_handicap?.wins_lower"
+                                                class="flex flex-row justify-center items-center w-20 bg-sad-player-one py-2.5 text-2xl"
+                                            >
+                                                {{ playerOneRaceTo$(table) | async }}
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col w-20 -mx-10">
+                                            <div class="flex flex-row bg-black justify-center items-center py-1 text-sm">RACE TO</div>
+                                            <div class="flex flex-row bg-sad-error justify-center items-center py-2.5 text-2xl">{{ game?.race_to }}</div>
+                                        </div>
+                                        <div class="flex flex-col w-1/2 justify-end items-center">
+                                            <div
+                                                *ngIf="game?.fargo_hot_handicap?.wins_higher !== game?.fargo_hot_handicap?.wins_lower"
+                                                class="flex flex-row justify-center items-center w-20 bg-sad-player-two py-2.5 text-2xl"
+                                            >
+                                                {{ playerTwoRaceTo$(table) | async }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <ng-template #locked>
+                                <div class="flex flex-col flex-grow h-60">
+                                    <div *ngIf="vm.tables[table]?.overlay?.waitingForPlayers" class="flex flex-col flex-grow justify-center items-center">
+                                        <fa-icon class="text-7xl" [icon]="faClock"></fa-icon>
+                                        <p class="pt-2.5 text-sm">Waiting for players...</p>
+                                    </div>
+                                    <div *ngIf="vm.tables[table]?.overlay?.tableNoLongerInUse" class="flex flex-col flex-grow justify-center items-center">
+                                        <fa-icon class="text-7xl" [icon]="faLock"></fa-icon>
+                                        <p class="pt-2.5 text-sm">Table is no longer in tournament.</p>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-row h-66px bg-sad-section-title border-sad-active border-t border-b justify-end items-center px-10">
+            <button type="button" class="text-white bg-sad-error rounded py-2.5 px-5 uppercase text-xs" (click)="unloadTournament()">Unload Tournament</button>
+        </div>
+    </div>
+    <ng-template #loading></ng-template>
+</ng-container>

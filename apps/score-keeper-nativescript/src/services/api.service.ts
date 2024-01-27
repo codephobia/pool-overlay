@@ -24,4 +24,9 @@ export class APIService {
         const url = `${this._apiURL}/${this._apiVersion}/table/${table}/game/score`;
         return this._http.patch<{ scoreOne: number, scoreTwo: number }>(url, { playerNum, direction });
     }
+
+    public saveGame(table: number): Observable<void> {
+        const url = `${this._apiURL}/${this._apiVersion}/table/${table}/game`;
+        return this._http.post<void>(url, {});
+    }
 }

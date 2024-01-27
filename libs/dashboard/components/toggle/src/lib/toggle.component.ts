@@ -16,7 +16,6 @@ export class ToggleComponent {
 
     @Input()
     public set checked(value: boolean) {
-        console.log(`input: ${value}`);
         this.store.setChecked(value);
     }
 

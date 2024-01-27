@@ -5,6 +5,7 @@ export interface IPlayer {
     name: string;
     flag_id: number;
     flag?: IFlag;
+    fargo_observable_id: number;
     fargo_id: number;
     fargo_rating: number;
 }

@@ -19,6 +19,7 @@ export class PlayerFormComponent {
         this.form.addControl('id', this._fb.control(this._player.id, Validators.required));
         this.form.controls.name.patchValue(this._player.name);
         this.form.controls.flag_id.patchValue(this._player.flag_id);
+        this.form.controls.fargo_observable_id.patchValue(this._player.fargo_observable_id);
         this.form.controls.fargo_id.patchValue(this._player.fargo_id);
         this.form.controls.fargo_rating.patchValue(this._player.fargo_rating);
     }
@@ -42,6 +43,7 @@ export class PlayerFormComponent {
         this.form = this._fb.group({
             name: ['', Validators.required],
             flag_id: [1, Validators.required],
+            fargo_observable_id: [0, Validators.required],
             fargo_id: [0, Validators.required],
             fargo_rating: [0, Validators.required],
         });

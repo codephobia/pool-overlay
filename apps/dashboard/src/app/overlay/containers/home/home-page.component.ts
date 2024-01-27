@@ -7,7 +7,7 @@ import { faPlus } from '@fortawesome/pro-regular-svg-icons';
 })
 export class HomePageComponent {
     public faPlus = faPlus;
-    public tables: number[] = [1, 2];
+    public tables: number[] = [1, 2, 3];
     public currentTable = 1;
 
     public setTable(table: number): void {

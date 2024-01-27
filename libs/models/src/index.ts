@@ -6,3 +6,7 @@ export * from './lib/team.model';
 export * from './lib/vs-mode.enum';
 export * from './lib/overlay-state.model';
 export * from './lib/direction.model';
+export * from './lib/tournament.model';
+export * from './lib/tournament-match.model';
+export * from './lib/tournament-settings.model';
+export * from './lib/fargo-hot-handicap';

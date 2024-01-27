@@ -17,19 +17,21 @@ const (
 
 // PlayersPostBody is an incoming body on a POST request for creating a player.
 type PlayersPostBody struct {
-	Name        string `json:"name"`
-	FlagID      uint   `json:"flag_id"`
-	FargoID     uint   `json:"fargo_id"`
-	FargoRating uint   `json:"fargo_rating"`
+	Name              string `json:"name"`
+	FlagID            uint   `json:"flag_id"`
+	FargoObservableID uint   `json:"fargo_observable_id"`
+	FargoID           uint   `json:"fargo_id"`
+	FargoRating       uint   `json:"fargo_rating"`
 }
 
 // PlayersPatchBody is an incoming body on a PATCH request for updating a
 // player.
 type PlayersPatchBody struct {
-	Name        string `json:"name"`
-	FlagID      uint   `json:"flag_id"`
-	FargoID     uint   `json:"fargo_id"`
-	FargoRating uint   `json:"fargo_rating"`
+	Name              string `json:"name"`
+	FlagID            uint   `json:"flag_id"`
+	FargoObservableID uint   `json:"fargo_observable_id"`
+	FargoID           uint   `json:"fargo_id"`
+	FargoRating       uint   `json:"fargo_rating"`
 }
 
 // Handler for /players.
@@ -88,7 +90,7 @@ func (server *Server) handlePlayersGet(w http.ResponseWriter, r *http.Request) {
 
 	offset := pageNum*playersPerPage - playersPerPage
 	playersResult := server.db.
-		Select("id", "name", "flag_id", "fargo_id", "fargo_rating").
+		Select("id", "name", "flag_id", "fargo_observable_id", "fargo_id", "fargo_rating").
 		Order("name").
 		Limit(playersPerPage).
 		Offset(offset).
@@ -117,10 +119,11 @@ func (server *Server) handlePlayersPost(w http.ResponseWriter, r *http.Request) 
 
 	// create a new player from the body
 	player := &models.Player{
-		Name:        body.Name,
-		FlagID:      body.FlagID,
-		FargoID:     body.FargoID,
-		FargoRating: body.FargoRating,
+		Name:              body.Name,
+		FlagID:            body.FlagID,
+		FargoObservableID: body.FargoObservableID,
+		FargoID:           body.FargoID,
+		FargoRating:       body.FargoRating,
 	}
 
 	// add new player to the database
@@ -256,6 +259,7 @@ func (server *Server) handlePlayerByIDPatch(w http.ResponseWriter, r *http.Reque
 	// update player details from the body
 	player.Name = body.Name
 	player.FlagID = body.FlagID
+	player.FargoObservableID = body.FargoObservableID
 	player.FargoID = body.FargoID
 	player.FargoRating = body.FargoRating
 

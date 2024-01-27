@@ -11,7 +11,7 @@ import { SharedModule } from './features/shared/shared.module';
 const routes: Routes = [
     {
         path: '',
-        redirectTo: '/settings',
+        redirectTo: '/home',
         pathMatch: 'full'
     },
     {

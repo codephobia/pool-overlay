@@ -29,4 +29,12 @@ var (
 	ErrInvalidGameDirection = errors.New("invalid game direction")
 	// ErrUnableToBroadcastUpdate - Unable to broadcast update.
 	ErrUnableToBroadcastUpdate = errors.New("unable to broadcast update")
+	// ErrTournamentNotFound - Tournament not found.
+	ErrTournamentNotFound = errors.New("tournament not found")
+	// ErrInvalidTournamentID - Invalid tournament id.
+	ErrInvalidTournamentID = errors.New("invalid tournament id")
+	// ErrInvalidTournamentDetails - Invalid tournament details.
+	ErrInvalidTournamentDetails = errors.New("invalid tournament details")
+	// ErrInvalidTableNumber - Invalid table number.
+	ErrInvalidTableNumber = errors.New("invalid table number")
 )

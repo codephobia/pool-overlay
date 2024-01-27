@@ -63,18 +63,34 @@ func (server *Server) handleOverlayGet(w http.ResponseWriter, r *http.Request) {
 	go oc.WritePump()
 	go oc.ReadPump()
 
-	// Generate current overlay state message.
-	message, err := overlay.NewEvent(
-		events.OverlayStateEventType,
-		server.tables[1].Overlay,
-	).ToBytes()
-	if err != nil {
-		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
-		return
-	}
+	// On connect, send all table games and overlay states.
+	for i := 1; i <= len(server.tables); i++ {
+		// Generate current game state message.
+		gameMessage, err := overlay.NewEvent(
+			events.GameEventType,
+			events.NewGameEventPayload(server.tables[i].Game),
+		).ToBytes()
+		if err != nil {
+			server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+			return
+		}
 
-	// Send current state to new connection.
-	oc.Send <- message
+		// Send current state to new connection.
+		oc.Send <- gameMessage
+
+		// Generate current overlay state message.
+		message, err := overlay.NewEvent(
+			events.OverlayStateEventType,
+			server.tables[i].Overlay,
+		).ToBytes()
+		if err != nil {
+			server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
+			return
+		}
+
+		// Send current state to new connection.
+		oc.Send <- message
+	}
 }
 
 // Handler for overlay toggle.

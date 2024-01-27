@@ -8,6 +8,6 @@ import { AppComponent } from './app.component';
     imports: [CoreModule, SharedModule, AppRoutingModule],
     declarations: [AppComponent],
     bootstrap: [AppComponent],
-    schemas: [NO_ERRORS_SCHEMA]
+    schemas: [NO_ERRORS_SCHEMA],
 })
 export class AppModule { }

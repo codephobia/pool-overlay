@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { faDesktop, faUser, faPool8Ball, faPencil } from '@fortawesome/pro-regular-svg-icons';
+import { faDesktop, faUser, faPool8Ball, faPencil, faTrophyStar } from '@fortawesome/pro-regular-svg-icons';
 
 @Component({
     selector: 'pool-overlay-side-nav',
@@ -10,6 +10,10 @@ export class SideNavComponent {
         icon: faDesktop,
         title: 'Overlay',
         link: 'overlay',
+    }, {
+        icon: faTrophyStar,
+        title: 'Tournaments',
+        link: 'tournaments',
     }, {
         icon: faUser,
         title: 'Players',
