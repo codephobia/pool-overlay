@@ -14,6 +14,7 @@ export enum LoadingState {
 interface TournamentSetupState {
     callState: LoadingState;
     tournament: Tournament | null;
+    maxTables: number;
     isHandicapped: boolean;
     showOverlay: boolean;
     showFlags: boolean;
@@ -27,6 +28,7 @@ interface TournamentSetupState {
 export const initialState: TournamentSetupState = {
     callState: LoadingState.INIT,
     tournament: null,
+    maxTables: 3,
     isHandicapped: true,
     showOverlay: true,
     showFlags: false,
@@ -58,6 +60,10 @@ export class TournamentSetupStore extends ComponentStore<TournamentSetupState> {
         callState: LoadingState.LOADED,
     }));
 
+    readonly updateMaxTables = this.updater<number>((state, maxTables) => ({
+        ...state,
+        maxTables,
+    }));
 
     readonly updateGameType = this.updater<GameType>((state, gameType) => ({
         ...state,
@@ -102,6 +108,7 @@ export class TournamentSetupStore extends ComponentStore<TournamentSetupState> {
     // selectors
     private isLoaded$ = this.select((state) => state.callState === LoadingState.LOADED);
     private tournament$ = this.select((state) => state.tournament);
+    private maxTables$ = this.select((state) => state.maxTables);
     private isHandicapped$ = this.select((state) => state.isHandicapped);
     private showOverlay$ = this.select((state) => state.showOverlay);
     private showFlags$ = this.select((state) => state.showFlags);
@@ -113,6 +120,7 @@ export class TournamentSetupStore extends ComponentStore<TournamentSetupState> {
     readonly vm$ = this.select(
         this.isLoaded$,
         this.tournament$,
+        this.maxTables$,
         this.isHandicapped$,
         this.showOverlay$,
         this.showFlags$,
@@ -121,9 +129,10 @@ export class TournamentSetupStore extends ComponentStore<TournamentSetupState> {
         this.gameType$,
         this.aSideRaceTo$,
         this.bSideRaceTo$,
-        (isLoaded, tournament, isHandicapped, showOverlay, showFlags, showFargo, showScore, gameType, aSideRaceTo, bSideRaceTo) => ({
+        (isLoaded, tournament, maxTables, isHandicapped, showOverlay, showFlags, showFargo, showScore, gameType, aSideRaceTo, bSideRaceTo) => ({
             isLoaded,
             tournament,
+            maxTables,
             isHandicapped,
             showOverlay,
             showFlags,
@@ -151,6 +160,7 @@ export class TournamentSetupStore extends ComponentStore<TournamentSetupState> {
     readonly loadTournament = this.effect((trigger$) => trigger$.pipe(
         withLatestFrom(
             this.tournament$,
+            this.maxTables$,
             this.gameType$,
             this.showOverlay$,
             this.showFlags$,
@@ -160,7 +170,8 @@ export class TournamentSetupStore extends ComponentStore<TournamentSetupState> {
             this.aSideRaceTo$,
             this.bSideRaceTo$,
         ),
-        switchMap(([, tournament, game_type, show_overlay, show_flags, show_fargo, show_score, is_handicapped, a_side_race_to, b_side_race_to]) => this.tournamentsService.load(tournament!.id, {
+        switchMap(([, tournament, max_tables, game_type, show_overlay, show_flags, show_fargo, show_score, is_handicapped, a_side_race_to, b_side_race_to]) => this.tournamentsService.load(tournament!.id, {
+            max_tables,
             game_type,
             show_overlay,
             show_flags,

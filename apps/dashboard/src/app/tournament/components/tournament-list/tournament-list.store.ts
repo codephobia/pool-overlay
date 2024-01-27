@@ -43,12 +43,19 @@ export class TournamentListStore extends ComponentStore<TournamentListState> {
     // selectors
     private isLoaded$ = this.select((state) => state.callState === LoadingState.LOADED);
     private tournaments$ = this.select((state) => state.tournaments);
+    private hasTournaments$ = this.select(
+        this.isLoaded$,
+        this.tournaments$,
+        (loaded, tournaments) => loaded && !!tournaments.length
+    );
     readonly vm$ = this.select(
         this.isLoaded$,
         this.tournaments$,
-        (isLoaded, tournaments) => ({
+        this.hasTournaments$,
+        (isLoaded, tournaments, hasTournaments) => ({
             isLoaded,
             tournaments,
+            hasTournaments,
         })
     );
 

@@ -1,5 +1,5 @@
 <div class="flex flex-col flex-grow" *ngIf="vm$ | async as vm">
-    <div class="flex flex-row h-66px bg-sad-input border-sad-active border-b">
+    <div *ngIf="vm.hasTournaments" class="flex flex-row h-66px bg-sad-input border-sad-active border-b">
         <div class="w-9/12 flex flex-col justify-center items-start px-10">
             <p class="text-white uppercase text-xs">Name</p>
         </div>
@@ -17,6 +17,9 @@
                 </div>
             </div>
         </div>
+        <ng-container *ngIf="!vm.hasTournaments">
+            <p class="p-4 text-white bg-sad-input border-sad-active border-t">Please create a new tournament on Challonge to continue.</p>
+        </ng-container>
     </ng-container>
     <ng-template #loading>
         <div class="relative flex flex-row h-66px" *ngFor="let tournament of [1, 2, 3, 4, 5]; even as isEven; odd as isOdd" [ngClass]="{ 'bg-sad-table-even': isEven, 'bg-sad-table-odd': isOdd }">

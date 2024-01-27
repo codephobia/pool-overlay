@@ -20,6 +20,10 @@ export class TournamentSetupComponent {
         this.store.getTournamentById(tournamentId);
     }
 
+    public updateMaxTables(maxTables: number): void {
+        this.store.updateMaxTables(maxTables);
+    }
+
     public updateGameType(gameType: GameType): void {
         this.store.updateGameType(gameType);
     }

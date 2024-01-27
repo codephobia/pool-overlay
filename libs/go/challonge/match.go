@@ -3,7 +3,7 @@ package challonge
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -69,7 +69,7 @@ func (m *Match) UpdateScore(username string, apiKey string, scoresCsv string) er
 
 	params := fmt.Sprintf("match[scores_csv]=%s", scoresCsv)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Body = ioutil.NopCloser(strings.NewReader(params))
+	req.Body = io.NopCloser(strings.NewReader(params))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -94,7 +94,7 @@ func (m *Match) ReportWinner(username string, apiKey string, playerID int, score
 
 	params := fmt.Sprintf("match[winner_id]=%d&match[scores_csv]=%s", playerID, scoresCsv)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Body = ioutil.NopCloser(strings.NewReader(params))
+	req.Body = io.NopCloser(strings.NewReader(params))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -110,15 +110,6 @@ func (m *Match) ReportWinner(username string, apiKey string, playerID int, score
 // IsOnASide returns if the round is on the A side or not.
 func (m *Match) IsOnASide() bool {
 	return m.Round > 0
-	// aSideRounds := []int{1, 2, 3, 4, 5, 6, 7, 8, 15, 16, 20, 22}
-
-	// for _, round := range aSideRounds {
-	// 	if round == m.Round {
-	// 		return true
-	// 	}
-	// }
-
-	// return false
 }
 
 // Refreshes a match with new data from Challonge.

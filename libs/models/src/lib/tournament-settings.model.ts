@@ -1,6 +1,7 @@
 import { GameType } from './game-type.enum';
 
 export interface TournamentSettings {
+    max_tables: number;
     game_type: GameType;
     show_overlay: boolean;
     show_flags: boolean;

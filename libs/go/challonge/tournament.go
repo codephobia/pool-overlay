@@ -2,7 +2,6 @@ package challonge
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -41,16 +40,11 @@ type Tournament struct {
 	Participants []*Participant `json:"participants"`
 }
 
-var (
-	// ErrNoIncompleteTournaments - No incomplete tournaments.
-	ErrNoIncompleteTournaments = errors.New("no incomplete tournaments")
-)
-
 // Validate checks to make sure the tournament is in a valid format.
 func (t *Tournament) Validate() error {
 	err := t.verifyPlayerNames()
 	if err != nil {
-		return err
+		log.Printf("Error: %s", err)
 	}
 
 	return nil
@@ -69,8 +63,6 @@ func (t *Tournament) GetNextMatch() *Match {
 		}
 	}
 
-	log.Print("didn't find a match")
-
 	return nil
 }
 
@@ -82,6 +74,30 @@ func (t *Tournament) HasMoreMatches() bool {
 		}
 	}
 	return false
+}
+
+// CountParallelMatches returns a count of the maximum number of matches that could be played
+// in parallel.
+func (t *Tournament) CountParallelMatches() int {
+	sortedMatches := t.getMatchesByPlayOrder()
+	activePlayers := make(map[int]bool)
+	parallelCount := 0
+
+	for i := range sortedMatches {
+		match := sortedMatches[i]
+		if match.State != "complete" {
+			// Check if players are already in a match
+			if _, exists := activePlayers[*match.Player1ID]; !exists {
+				if _, exists := activePlayers[*match.Player2ID]; !exists {
+					// Mark players as active
+					activePlayers[*match.Player1ID] = true
+					activePlayers[*match.Player2ID] = true
+					parallelCount++
+				}
+			}
+		}
+	}
+	return parallelCount
 }
 
 // CompleteIfPossible attempts to complete the tournament.
@@ -127,8 +143,7 @@ func (t *Tournament) getMatches(username, apiKey string) error {
 	defer resp.Body.Close()
 
 	var matchesResp MatchesResp
-	err = json.NewDecoder(resp.Body).Decode(&matchesResp)
-	if err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&matchesResp); err != nil {
 		return err
 	}
 
@@ -143,12 +158,55 @@ func (t *Tournament) getMatches(username, apiKey string) error {
 	return nil
 }
 
+// updateMatches updates all the matches for the tournament.
+func (t *Tournament) updateMatches(username, apiKey string) error {
+	url := fmt.Sprintf("https://api.challonge.com/v1/tournaments/%d/matches.json", t.ID)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
+	req.SetBasicAuth(username, apiKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	var matchesResp MatchesResp
+	if err := json.NewDecoder(resp.Body).Decode(&matchesResp); err != nil {
+		return err
+	}
+
+	var matches []*Match
+	for i := range matchesResp {
+		match := matchesResp[i]
+		matches = append(matches, &match.Match)
+	}
+
+	for _, match := range t.Matches {
+		for _, updatedMatch := range matches {
+			if match.ID == updatedMatch.ID {
+				match.State = updatedMatch.State
+				match.Player1ID = updatedMatch.Player1ID
+				match.Player2ID = updatedMatch.Player2ID
+				match.ScoresCsv = updatedMatch.ScoresCsv
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // verifyPlayerNames makes sure all the player names in Challonge are in the correct format.
 func (t *Tournament) verifyPlayerNames() error {
 	playerNames := t.playerNames()
 
 	// This regex assumes names do not contain '-' or '(' and the Fargo ID is numeric
-	re := regexp.MustCompile(`^[^-]+ - [^(-]+ \(\d+\)$`)
+	// re := regexp.MustCompile(`^[^-]+ - [^(-]+ \(\d+\)$`)
+	re := regexp.MustCompile(`^(.+) - (\d+) \((\d+)\)$`)
 
 	var invalidNames []string
 	for _, name := range playerNames {
@@ -218,32 +276,6 @@ func (t *Tournament) getMatchesByPlayOrder() []*Match {
 	return sortedMatches
 }
 
-// getMatchesByRound returns all the matches in a tournament, sorted in order of appearance on the bracket.
-// func (t *Tournament) getMatchesByRound() []*Match {
-// 	matchesByRound := make(map[int][]*Match)
-
-// 	// Group matches by round
-// 	for i := range t.Matches {
-// 		match := t.Matches[i]
-// 		matchesByRound[match.Round] = append(matchesByRound[match.Round], match)
-// 	}
-
-// 	// Sort matches within each round
-// 	for _, matches := range matchesByRound {
-// 		sort.Slice(matches, func(i, j int) bool {
-// 			return matches[i].Identifier < matches[j].Identifier
-// 		})
-// 	}
-
-// 	// Flatten matches into a single slice, sorted by round and position
-// 	var sortedMatches []*Match
-// 	for i := 1; i <= t.Rounds; i++ {
-// 		sortedMatches = append(sortedMatches, matchesByRound[i]...)
-// 	}
-
-// 	return sortedMatches
-// }
-
 // getLatestTournaments returns the latest tournaments for the specified Challonge account.
 func getLatestTournaments(username, apiKey string) ([]*Tournament, error) {
 	url := "https://api.challonge.com/v1/tournaments.json?state=all&created_after=2022-01-01"
@@ -270,14 +302,11 @@ func getLatestTournaments(username, apiKey string) ([]*Tournament, error) {
 
 	// Filter off completed tournaments
 	for _, tournament := range tournamentsResp {
-		if tournament.Tournament.CompletedAt == nil {
-			tournaments = append(tournaments, &tournament.Tournament)
-		}
-	}
+		currentTournament := tournament.Tournament
 
-	// Return error if no incomplete tournaments
-	if len(tournaments) == 0 {
-		return nil, ErrNoIncompleteTournaments
+        if currentTournament.CompletedAt == nil {
+			tournaments = append(tournaments, &currentTournament)
+		}
 	}
 
 	// Sort tournaments by created date (most recent first)

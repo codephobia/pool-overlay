@@ -1,17 +1,18 @@
 # Use nxgo/cli as the base image to do the build
-FROM nxgo/cli as builder
+# FROM nxgo/cli as builder
+FROM golang:1.20-alpine as builder
 
 # Create app directory
 WORKDIR /workspace
 
 # Build argument for fontawesome npm token
-ARG FONTAWESOME_NPM_AUTH_TOKEN
+# ARG FONTAWESOME_NPM_AUTH_TOKEN
 
 # Copy package.json and the lock file
-COPY package.json package-lock.json .npmrc ./
+# COPY package.json package-lock.json .npmrc ./
 
 # Install app dependencies
-RUN npm ci
+# RUN npm ci
 
 # Copy go mod files
 COPY go.mod go.sum ./
@@ -29,7 +30,7 @@ COPY apps/seed apps/seed
 COPY libs/go libs/go
 
 # Copy Nx files
-COPY nx.json workspace.json tsconfig.base.json ./
+# COPY nx.json workspace.json tsconfig.base.json ./
 
 # Build api app
 # RUN nx build api

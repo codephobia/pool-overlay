@@ -16,6 +16,7 @@ type TournamentLoadBody struct {
 }
 
 type TournamentLoadBodySettings struct {
+	MaxTables     int             `json:"max_tables"`
 	GameType      models.GameType `json:"game_type"`
 	ShowOverlay   bool            `json:"show_overlay"`
 	ShowFlags     bool            `json:"show_flags"`
@@ -147,7 +148,7 @@ func (server *Server) handleTournamentLoadPost(w http.ResponseWriter, r *http.Re
 
 	// make settings
 	settings := &challonge.Settings{
-		MaxTables:     3,
+		MaxTables:     body.Settings.MaxTables,
 		GameType:      body.Settings.GameType,
 		ShowOverlay:   body.Settings.ShowOverlay,
 		ShowFlags:     body.Settings.ShowFlags,
