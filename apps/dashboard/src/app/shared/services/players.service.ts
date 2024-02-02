@@ -6,6 +6,11 @@ import { EnvironmentConfig, ENV_CONFIG } from '../../models/environment-config.m
 import { IPlayer } from '@pool-overlay/models';
 import { ICount } from '../../models/count.model';
 
+export interface PlayerFindOptions {
+    page: number;
+    search?: string;
+}
+
 @Injectable()
 export class PlayersService {
     private apiURL: string;
@@ -20,8 +25,13 @@ export class PlayersService {
         this.apiVersion = config.environment.apiVersion;
     }
 
-    public find(page = 1): Observable<IPlayer[]> {
-        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}?page=${page}`;
+    public find({ page, search }: PlayerFindOptions = { page: 1 }): Observable<IPlayer[]> {
+        let url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}?page=${page}`;
+
+        if (search) {
+            url = url + `&search=${search}`;
+        }
+
         return this.http.get<IPlayer[]>(url);
     }
 
