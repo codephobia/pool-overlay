@@ -35,7 +35,6 @@ export class PlayersListPageComponent {
         this.router.navigate(['.'], {
             relativeTo: this.activatedRoute,
             queryParams: { search: newSearch },
-            queryParamsHandling: 'merge',
         });
     }
 

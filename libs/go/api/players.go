@@ -52,6 +52,9 @@ func (server *Server) handlePlayers() http.Handler {
 
 // Players handler for GET method. Returns a page of players.
 func (server *Server) handlePlayersGet(w http.ResponseWriter, r *http.Request) {
+	// where clause for find and count
+	where := make(map[string]interface{})
+
 	// get query vars
 	v := r.URL.Query()
 
@@ -70,9 +73,17 @@ func (server *Server) handlePlayersGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// get search
+	search := v.Get("search")
+
+	// only add search to where if there is a length
+	if len(search) > 0 {
+		where["name"] = search
+	}
+
 	// get count of players to test page ceiling
 	var count int64
-	countResult := server.db.Model(&models.Player{}).Count(&count)
+	countResult := server.db.Model(&models.Player{}).Where(where).Count(&count)
 	if countResult.Error != nil {
 		server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
 		return
@@ -80,7 +91,7 @@ func (server *Server) handlePlayersGet(w http.ResponseWriter, r *http.Request) {
 
 	// check if page is beyond maximum
 	totalPages := int(math.Ceil(float64(count) / playersPerPage))
-	if pageNum > totalPages {
+	if pageNum > totalPages && totalPages != 0 {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidPageNumber)
 		return
 	}
@@ -91,6 +102,7 @@ func (server *Server) handlePlayersGet(w http.ResponseWriter, r *http.Request) {
 	offset := pageNum*playersPerPage - playersPerPage
 	playersResult := server.db.
 		Select("id", "name", "flag_id", "fargo_observable_id", "fargo_id", "fargo_rating").
+		Where(where).
 		Order("name").
 		Limit(playersPerPage).
 		Offset(offset).
@@ -152,9 +164,24 @@ func (server *Server) handlePlayersCount() http.Handler {
 
 // Players count handler for GET method.
 func (server *Server) handlePlayersCountGet(w http.ResponseWriter, r *http.Request) {
-	// get count of players
 	var count int64
-	countResult := server.db.Model(&models.Player{}).Count(&count)
+
+	// where clause for count
+	where := make(map[string]interface{})
+
+	// get query vars
+	v := r.URL.Query()
+
+	// get search
+	search := v.Get("search")
+
+	// only add search to where if there is a length
+	if len(search) > 0 {
+		where["name"] = search
+	}
+
+	// get count of players
+	countResult := server.db.Model(&models.Player{}).Where(where).Count(&count)
 	if countResult.Error != nil {
 		server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
 		return

@@ -92,7 +92,7 @@ export class PlayersListStore extends ComponentStore<PlayersListState> {
     public readonly getPlayers = this.effect<PlayerFindOptions>(options$ => options$.pipe(
         switchMap(({ page, search }) => forkJoin([
             this.playersService.find({ page, search }),
-            this.playersService.count(),
+            this.playersService.count({ search }),
         ]).pipe(
             tapResponse(
                 ([players, { count }]) => {

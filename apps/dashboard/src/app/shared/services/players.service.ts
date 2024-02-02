@@ -11,6 +11,10 @@ export interface PlayerFindOptions {
     search?: string;
 }
 
+export interface PlayerCountOptions {
+    search?: string;
+}
+
 @Injectable()
 export class PlayersService {
     private apiURL: string;
@@ -40,8 +44,13 @@ export class PlayersService {
         return this.http.get<IPlayer>(url);
     }
 
-    public count(): Observable<ICount> {
-        const url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/count`;
+    public count({ search }: PlayerCountOptions = {}): Observable<ICount> {
+        let url = `${this.apiURL}/${this.apiVersion}/${this.endpoint}/count`;
+
+        if (search) {
+            url = url + `?search=${search}`;
+        }
+
         return this.http.get<ICount>(url);
     }
 
