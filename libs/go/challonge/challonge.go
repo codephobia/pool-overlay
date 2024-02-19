@@ -337,7 +337,7 @@ func (c *Challonge) getNextMatchForTable(table int) (*Match, error) {
 		}
 
 		// set race for a/b side
-		if match.IsOnASide() {
+		if c.Tournament.matchIsDoubleDip(match) || (!c.Tournament.matchIsDoubleDip(match) && match.IsOnASide()) {
 			if err := c.tables[table].Game.SetRaceTo(c.Settings.ASideRaceTo); err != nil {
 				return nil, err
 			}

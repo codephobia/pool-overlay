@@ -28,14 +28,15 @@ type ParticipantsResp []struct {
 
 // Tournament is a tournament bracket on the Challonge account.
 type Tournament struct {
-	ID             int        `json:"id"`
-	Name           string     `json:"name"`
-	URL            string     `json:"url"`
-	TournamentType string     `json:"tournament_type"`
-	Rounds         int        `json:"rounds"`
-	Matches        []*Match   `json:"matches"`
-	CreatedAt      time.Time  `json:"created_at"`
-	CompletedAt    *time.Time `json:"completed_at"`
+	ID                int        `json:"id"`
+	Name              string     `json:"name"`
+	URL               string     `json:"url"`
+	TournamentType    string     `json:"tournament_type"`
+	ParticipantsCount int        `json:"participants_count"`
+	Rounds            int        `json:"rounds"`
+	Matches           []*Match   `json:"matches"`
+	CreatedAt         time.Time  `json:"created_at"`
+	CompletedAt       *time.Time `json:"completed_at"`
 
 	Participants []*Participant `json:"participants"`
 }
@@ -265,6 +266,21 @@ func (t *Tournament) getParticipants(username, apiKey string) error {
 	return nil
 }
 
+// Returns if the match is the last possible match in the tournament
+func (t *Tournament) matchIsDoubleDip(match *Match) bool {
+	if t.TournamentType == "double elimination" && match.SuggestedPlayOrder == t.getTotalMatchCount() {
+		return true
+	}
+
+	return false
+}
+
+// Returns the total number of matches possible, including the double dip
+func (t *Tournament) getTotalMatchCount() int {
+	// TODO: handle single elimination here
+	return ((t.ParticipantsCount - 1) * 2) + 1
+}
+
 func (t *Tournament) getMatchesByPlayOrder() []*Match {
 	sortedMatches := make([]*Match, len(t.Matches))
 	copy(sortedMatches, t.Matches)
@@ -304,7 +320,7 @@ func getLatestTournaments(username, apiKey string) ([]*Tournament, error) {
 	for _, tournament := range tournamentsResp {
 		currentTournament := tournament.Tournament
 
-        if currentTournament.CompletedAt == nil {
+		if currentTournament.CompletedAt == nil {
 			tournaments = append(tournaments, &currentTournament)
 		}
 	}
