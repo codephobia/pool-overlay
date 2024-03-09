@@ -61,10 +61,16 @@
                         <div class="flex flex-row flex-grow bg-sad-table-odd p-5 border border-sad-active rounded-b">
                             <div class="flex flex-col gap-2.5">
                                 <div class="flex flex-row gap-2.5">
-                                    <button type="button" class="px-5 py-2.5 rounded text-white" [ngClass]="vm.maxTables === 1 ? 'bg-blue-700' : 'bg-gray-700'" (click)="updateMaxTables(1)">1</button>
-                                    <button type="button" class="px-5 py-2.5 rounded text-white" [ngClass]="vm.maxTables === 2 ? 'bg-blue-700' : 'bg-gray-700'" (click)="updateMaxTables(2)">2</button>
-                                    <button type="button" class="px-5 py-2.5 rounded text-white" [ngClass]="vm.maxTables === 3 ? 'bg-blue-700' : 'bg-gray-700'" (click)="updateMaxTables(3)">3</button>
-                                    <button type="button" class="px-5 py-2.5 rounded text-white" [ngClass]="vm.maxTables === 4 ? 'bg-blue-700' : 'bg-gray-700'" (click)="updateMaxTables(4)">4</button>
+                                    <ng-container *ngFor="let table of vm.tables">
+                                        <button
+                                            type="button"
+                                            class="px-5 py-2.5 rounded text-white"
+                                            [ngClass]="vm.maxTables === table ? 'bg-blue-700' : 'bg-gray-700'"
+                                            (click)="updateMaxTables(table)"
+                                        >
+                                            {{ table }}
+                                        </button>
+                                    </ng-container>
                                 </div>
                             </div>
                         </div>

@@ -5,10 +5,12 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/codephobia/pool-overlay/libs/go/events"
 	"github.com/codephobia/pool-overlay/libs/go/models"
 	"github.com/codephobia/pool-overlay/libs/go/overlay"
+	"github.com/gorilla/mux"
 )
 
 const (
@@ -110,15 +112,15 @@ type GameFargoHotHandicapPatchResp struct {
 }
 
 // Handler for /game.
-func (server *Server) handleGame(table int) http.Handler {
+func (server *Server) handleGame() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "OPTIONS":
 			server.HandleOptions(w, r)
 		case "GET":
-			server.handleGameGet(w, r, table)
+			server.handleGameGet(w, r)
 		case "POST":
-			server.handleGamePost(w, r, table)
+			server.handleGamePost(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
@@ -126,38 +128,70 @@ func (server *Server) handleGame(table int) http.Handler {
 }
 
 // Game handler for GET method.
-func (server *Server) handleGameGet(w http.ResponseWriter, r *http.Request, table int) {
+func (server *Server) handleGameGet(w http.ResponseWriter, r *http.Request) {
+	// get params for table numbers from url
+	params := mux.Vars(r)
+
+	// get table number
+	tableNumValue, ok := params["tableNum"]
+	if !ok || len(tableNumValue) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	// convert table number to int
+	tableNum, err := strconv.Atoi(tableNumValue)
+	if err != nil || tableNum > len(server.tables) {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
 	// send response
-	server.handleSuccess(w, r, server.tables[table].Game)
+	server.handleSuccess(w, r, server.tables[tableNum].Game)
 }
 
 // Game handler for POST method.
-func (server *Server) handleGamePost(w http.ResponseWriter, r *http.Request, table int) {
+func (server *Server) handleGamePost(w http.ResponseWriter, r *http.Request) {
+	// get params for table numbers from url
+	params := mux.Vars(r)
+
+	// get table number
+	tableNumValue, ok := params["tableNum"]
+	if !ok || len(tableNumValue) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	// convert table number to int
+	tableNum, err := strconv.Atoi(tableNumValue)
+	if err != nil || tableNum > len(server.tables) {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
 	// Save existing game.
-	if err := server.tables[table].Game.Save(true); err != nil {
+	if err := server.tables[tableNum].Game.Save(true); err != nil {
 		server.handleError(w, r, http.StatusInternalServerError, err)
 		return
 	}
 
 	// Check if we're in tournament mode right now.
 	if server.challonge.InTournamentMode() {
-		if err := server.challonge.Continue(table); err != nil {
+		if err := server.challonge.Continue(tableNum); err != nil {
 			log.Printf("unable to continue tournament: %s", err)
 		}
 	} else {
 		// Reset game to create a new one with same players / settings.
-		if err := server.tables[table].Game.Reset(); err != nil {
+		if err := server.tables[tableNum].Game.Reset(); err != nil {
 			server.handleError(w, r, http.StatusInternalServerError, err)
 			return
 		}
 	}
 
-	// TODO: BROADCAST NEXT GAME FOR TABLE OR LOCK DOWN TABLET ON THAT TABLE
-
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
 		events.GameEventType,
-		events.NewGameEventPayload(server.tables[table].Game),
+		events.NewGameEventPayload(server.tables[tableNum].Game),
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
@@ -172,13 +206,13 @@ func (server *Server) handleGamePost(w http.ResponseWriter, r *http.Request, tab
 }
 
 // Handler for /game/type.
-func (server *Server) handleGameType(table int) http.Handler {
+func (server *Server) handleGameType() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "OPTIONS":
 			server.HandleOptions(w, r)
 		case "PATCH":
-			server.handleGameTypePatch(w, r, table)
+			server.handleGameTypePatch(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
@@ -186,7 +220,24 @@ func (server *Server) handleGameType(table int) http.Handler {
 }
 
 // Game type handler for PATCH method.
-func (server *Server) handleGameTypePatch(w http.ResponseWriter, r *http.Request, table int) {
+func (server *Server) handleGameTypePatch(w http.ResponseWriter, r *http.Request) {
+	// get params for table numbers from url
+	params := mux.Vars(r)
+
+	// get table number
+	tableNumValue, ok := params["tableNum"]
+	if !ok || len(tableNumValue) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	// convert table number to int
+	tableNum, err := strconv.Atoi(tableNumValue)
+	if err != nil || tableNum > len(server.tables) {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
 	// decode the body
 	var body GameTypePatchBody
 	decoder := json.NewDecoder(r.Body)
@@ -202,7 +253,7 @@ func (server *Server) handleGameTypePatch(w http.ResponseWriter, r *http.Request
 	}
 
 	// update game type
-	if err := server.tables[table].Game.SetType(body.Type); err != nil {
+	if err := server.tables[tableNum].Game.SetType(body.Type); err != nil {
 		// TODO: LOG THIS ERROR
 		server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
 	}
@@ -210,7 +261,7 @@ func (server *Server) handleGameTypePatch(w http.ResponseWriter, r *http.Request
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
 		events.GameEventType,
-		events.NewGameEventPayload(server.tables[table].Game),
+		events.NewGameEventPayload(server.tables[tableNum].Game),
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
@@ -225,13 +276,13 @@ func (server *Server) handleGameTypePatch(w http.ResponseWriter, r *http.Request
 }
 
 // Handler for /game/vs-mode.
-func (server *Server) handleGameVsMode(table int) http.Handler {
+func (server *Server) handleGameVsMode() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "OPTIONS":
 			server.HandleOptions(w, r)
 		case "PATCH":
-			server.handleGameVsModePatch(w, r, table)
+			server.handleGameVsModePatch(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
@@ -239,7 +290,24 @@ func (server *Server) handleGameVsMode(table int) http.Handler {
 }
 
 // Game vs-mode handler for PATCH method.
-func (server *Server) handleGameVsModePatch(w http.ResponseWriter, r *http.Request, table int) {
+func (server *Server) handleGameVsModePatch(w http.ResponseWriter, r *http.Request) {
+	// get params for table numbers from url
+	params := mux.Vars(r)
+
+	// get table number
+	tableNumValue, ok := params["tableNum"]
+	if !ok || len(tableNumValue) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	// convert table number to int
+	tableNum, err := strconv.Atoi(tableNumValue)
+	if err != nil || tableNum > len(server.tables) {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
 	// decode the body
 	var body GameVsModePatchBody
 	decoder := json.NewDecoder(r.Body)
@@ -255,7 +323,7 @@ func (server *Server) handleGameVsModePatch(w http.ResponseWriter, r *http.Reque
 	}
 
 	// update game vs mode
-	if err := server.tables[table].Game.SetVsMode(body.VsMode); err != nil {
+	if err := server.tables[tableNum].Game.SetVsMode(body.VsMode); err != nil {
 		// TODO: LOG THIS ERROR
 		server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
 	}
@@ -263,7 +331,7 @@ func (server *Server) handleGameVsModePatch(w http.ResponseWriter, r *http.Reque
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
 		events.GameEventType,
-		events.NewGameEventPayload(server.tables[table].Game),
+		events.NewGameEventPayload(server.tables[tableNum].Game),
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
@@ -278,13 +346,13 @@ func (server *Server) handleGameVsModePatch(w http.ResponseWriter, r *http.Reque
 }
 
 // Handler for /game/race-to.
-func (server *Server) handleGameRaceTo(table int) http.Handler {
+func (server *Server) handleGameRaceTo() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "OPTIONS":
 			server.HandleOptions(w, r)
 		case "PATCH":
-			server.handleGameRaceToPatch(w, r, table)
+			server.handleGameRaceToPatch(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
@@ -292,7 +360,24 @@ func (server *Server) handleGameRaceTo(table int) http.Handler {
 }
 
 // Game race-to handler for PATCH method.
-func (server *Server) handleGameRaceToPatch(w http.ResponseWriter, r *http.Request, table int) {
+func (server *Server) handleGameRaceToPatch(w http.ResponseWriter, r *http.Request) {
+	// get params for table numbers from url
+	params := mux.Vars(r)
+
+	// get table number
+	tableNumValue, ok := params["tableNum"]
+	if !ok || len(tableNumValue) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	// convert table number to int
+	tableNum, err := strconv.Atoi(tableNumValue)
+	if err != nil || tableNum > len(server.tables) {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
 	// decode the body
 	var body GameRaceToPatchBody
 	decoder := json.NewDecoder(r.Body)
@@ -309,12 +394,12 @@ func (server *Server) handleGameRaceToPatch(w http.ResponseWriter, r *http.Reque
 
 	// update race to number
 	if body.Direction == gameDirectionIncrement {
-		if err := server.tables[table].Game.IncrementRaceTo(); err != nil {
+		if err := server.tables[tableNum].Game.IncrementRaceTo(); err != nil {
 			// TODO: LOG THIS ERROR
 			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
 		}
 	} else {
-		if err := server.tables[table].Game.DecrementRaceTo(); err != nil {
+		if err := server.tables[tableNum].Game.DecrementRaceTo(); err != nil {
 			// TODO: LOG THIS ERROR
 			server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
 		}
@@ -323,7 +408,7 @@ func (server *Server) handleGameRaceToPatch(w http.ResponseWriter, r *http.Reque
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
 		events.GameEventType,
-		events.NewGameEventPayload(server.tables[table].Game),
+		events.NewGameEventPayload(server.tables[tableNum].Game),
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
@@ -335,21 +420,21 @@ func (server *Server) handleGameRaceToPatch(w http.ResponseWriter, r *http.Reque
 
 	// send response
 	server.handleSuccess(w, r, GameRaceToResp{
-		RaceTo:              server.tables[table].Game.RaceTo,
-		UseFargoHotHandicap: server.tables[table].Game.UseFargoHotHandicap,
+		RaceTo:              server.tables[tableNum].Game.RaceTo,
+		UseFargoHotHandicap: server.tables[tableNum].Game.UseFargoHotHandicap,
 	})
 }
 
 // Handler for /game/score
-func (server *Server) handleGameScore(table int) http.Handler {
+func (server *Server) handleGameScore() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "OPTIONS":
 			server.HandleOptions(w, r)
 		case "PATCH":
-			server.handleGameScorePatch(w, r, table)
+			server.handleGameScorePatch(w, r)
 		case "DELETE":
-			server.handleGameScoreDelete(w, r, table)
+			server.handleGameScoreDelete(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
@@ -357,7 +442,24 @@ func (server *Server) handleGameScore(table int) http.Handler {
 }
 
 // Game score handler for PATCH method.
-func (server *Server) handleGameScorePatch(w http.ResponseWriter, r *http.Request, table int) {
+func (server *Server) handleGameScorePatch(w http.ResponseWriter, r *http.Request) {
+	// get params for table numbers from url
+	params := mux.Vars(r)
+
+	// get table number
+	tableNumValue, ok := params["tableNum"]
+	if !ok || len(tableNumValue) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	// convert table number to int
+	tableNum, err := strconv.Atoi(tableNumValue)
+	if err != nil || tableNum > len(server.tables) {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
 	// decode the body
 	var body GameScorePatchBody
 	decoder := json.NewDecoder(r.Body)
@@ -374,7 +476,7 @@ func (server *Server) handleGameScorePatch(w http.ResponseWriter, r *http.Reques
 
 	// update score
 	if body.Direction == gameDirectionIncrement {
-		if err := server.tables[table].Game.IncrementScore(body.PlayerNum); err != nil {
+		if err := server.tables[tableNum].Game.IncrementScore(body.PlayerNum); err != nil {
 			if errors.Is(err, models.ErrInvalidPlayerNumber) {
 				server.handleError(w, r, http.StatusUnprocessableEntity, err)
 			} else {
@@ -384,7 +486,7 @@ func (server *Server) handleGameScorePatch(w http.ResponseWriter, r *http.Reques
 			return
 		}
 	} else {
-		if err := server.tables[table].Game.DecrementScore(body.PlayerNum); err != nil {
+		if err := server.tables[tableNum].Game.DecrementScore(body.PlayerNum); err != nil {
 			if errors.Is(err, models.ErrInvalidPlayerNumber) {
 				server.handleError(w, r, http.StatusUnprocessableEntity, err)
 			} else {
@@ -398,7 +500,7 @@ func (server *Server) handleGameScorePatch(w http.ResponseWriter, r *http.Reques
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
 		events.GameEventType,
-		events.NewGameEventPayload(server.tables[table].Game),
+		events.NewGameEventPayload(server.tables[tableNum].Game),
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
@@ -410,7 +512,7 @@ func (server *Server) handleGameScorePatch(w http.ResponseWriter, r *http.Reques
 
 	// Check if we're in tournament mode right now.
 	if server.challonge.InTournamentMode() {
-		if err := server.challonge.UpdateMatchScore(table); err != nil {
+		if err := server.challonge.UpdateMatchScore(tableNum); err != nil {
 			// fail gracefully since live score keeping isn't that important
 			log.Printf("error updating match score on challonge: %s", err)
 		}
@@ -418,15 +520,32 @@ func (server *Server) handleGameScorePatch(w http.ResponseWriter, r *http.Reques
 
 	// send response
 	server.handleSuccess(w, r, GameScoreResp{
-		ScoreOne: server.tables[table].Game.ScoreOne,
-		ScoreTwo: server.tables[table].Game.ScoreTwo,
+		ScoreOne: server.tables[tableNum].Game.ScoreOne,
+		ScoreTwo: server.tables[tableNum].Game.ScoreTwo,
 	})
 }
 
 // Game score reset handler for DELETE method.
-func (server *Server) handleGameScoreDelete(w http.ResponseWriter, r *http.Request, table int) {
+func (server *Server) handleGameScoreDelete(w http.ResponseWriter, r *http.Request) {
+	// get params for table numbers from url
+	params := mux.Vars(r)
+
+	// get table number
+	tableNumValue, ok := params["tableNum"]
+	if !ok || len(tableNumValue) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	// convert table number to int
+	tableNum, err := strconv.Atoi(tableNumValue)
+	if err != nil || tableNum > len(server.tables) {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
 	// reset game score
-	if err := server.tables[table].Game.ResetScore(); err != nil {
+	if err := server.tables[tableNum].Game.ResetScore(); err != nil {
 		// TODO: LOG THIS ERROR
 		server.handleError(w, r, http.StatusInternalServerError, ErrInternalServerError)
 	}
@@ -434,7 +553,7 @@ func (server *Server) handleGameScoreDelete(w http.ResponseWriter, r *http.Reque
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
 		events.GameEventType,
-		events.NewGameEventPayload(server.tables[table].Game),
+		events.NewGameEventPayload(server.tables[tableNum].Game),
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
@@ -446,21 +565,21 @@ func (server *Server) handleGameScoreDelete(w http.ResponseWriter, r *http.Reque
 
 	// send response
 	server.handleSuccess(w, r, GameScoreResp{
-		ScoreOne: server.tables[table].Game.ScoreOne,
-		ScoreTwo: server.tables[table].Game.ScoreTwo,
+		ScoreOne: server.tables[tableNum].Game.ScoreOne,
+		ScoreTwo: server.tables[tableNum].Game.ScoreTwo,
 	})
 }
 
 // Handler for /game/players
-func (server *Server) handleGamePlayers(table int) http.Handler {
+func (server *Server) handleGamePlayers() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "OPTIONS":
 			server.HandleOptions(w, r)
 		case "PATCH":
-			server.handleGamePlayersPatch(w, r, table)
+			server.handleGamePlayersPatch(w, r)
 		case "DELETE":
-			server.handleGamePlayersDelete(w, r, table)
+			server.handleGamePlayersDelete(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
@@ -468,7 +587,24 @@ func (server *Server) handleGamePlayers(table int) http.Handler {
 }
 
 // Game players handler for PATCH method.
-func (server *Server) handleGamePlayersPatch(w http.ResponseWriter, r *http.Request, table int) {
+func (server *Server) handleGamePlayersPatch(w http.ResponseWriter, r *http.Request) {
+	// get params for table numbers from url
+	params := mux.Vars(r)
+
+	// get table number
+	tableNumValue, ok := params["tableNum"]
+	if !ok || len(tableNumValue) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	// convert table number to int
+	tableNum, err := strconv.Atoi(tableNumValue)
+	if err != nil || tableNum > len(server.tables) {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
 	// decode the body
 	var body GamePlayersPatchBody
 	decoder := json.NewDecoder(r.Body)
@@ -490,7 +626,7 @@ func (server *Server) handleGamePlayersPatch(w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	if err := server.tables[table].Game.SetPlayer(body.PlayerNum, &player); err != nil {
+	if err := server.tables[tableNum].Game.SetPlayer(body.PlayerNum, &player); err != nil {
 		if errors.Is(err, models.ErrInvalidPlayerNumber) {
 			server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
 		} else {
@@ -503,7 +639,7 @@ func (server *Server) handleGamePlayersPatch(w http.ResponseWriter, r *http.Requ
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
 		events.GameEventType,
-		events.NewGameEventPayload(server.tables[table].Game),
+		events.NewGameEventPayload(server.tables[tableNum].Game),
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
@@ -514,11 +650,28 @@ func (server *Server) handleGamePlayersPatch(w http.ResponseWriter, r *http.Requ
 	server.overlay.Broadcast <- message
 
 	// send response
-	server.handleSuccess(w, r, server.tables[table].Game)
+	server.handleSuccess(w, r, server.tables[tableNum].Game)
 }
 
 // Game players handler for DELETE method.
-func (server *Server) handleGamePlayersDelete(w http.ResponseWriter, r *http.Request, table int) {
+func (server *Server) handleGamePlayersDelete(w http.ResponseWriter, r *http.Request) {
+	// get params for table numbers from url
+	params := mux.Vars(r)
+
+	// get table number
+	tableNumValue, ok := params["tableNum"]
+	if !ok || len(tableNumValue) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	// convert table number to int
+	tableNum, err := strconv.Atoi(tableNumValue)
+	if err != nil || tableNum > len(server.tables) {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
 	// decode the body
 	var body GamePlayersDeleteBody
 	decoder := json.NewDecoder(r.Body)
@@ -528,7 +681,7 @@ func (server *Server) handleGamePlayersDelete(w http.ResponseWriter, r *http.Req
 	}
 
 	// unset the current player
-	if err := server.tables[table].Game.UnsetPlayer(body.PlayerNum); err != nil {
+	if err := server.tables[tableNum].Game.UnsetPlayer(body.PlayerNum); err != nil {
 		if errors.Is(err, models.ErrInvalidPlayerNumber) {
 			server.handleError(w, r, http.StatusUnprocessableEntity, models.ErrInvalidPlayerNumber)
 		} else {
@@ -541,7 +694,7 @@ func (server *Server) handleGamePlayersDelete(w http.ResponseWriter, r *http.Req
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
 		events.GameEventType,
-		events.NewGameEventPayload(server.tables[table].Game),
+		events.NewGameEventPayload(server.tables[tableNum].Game),
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
@@ -552,7 +705,7 @@ func (server *Server) handleGamePlayersDelete(w http.ResponseWriter, r *http.Req
 	server.overlay.Broadcast <- message
 
 	// send response
-	server.handleSuccess(w, r, server.tables[table].Game)
+	server.handleSuccess(w, r, server.tables[tableNum].Game)
 }
 
 // Handler for /game/players/flag
@@ -728,13 +881,13 @@ func (server *Server) handleGameTeamsPatch(w http.ResponseWriter, r *http.Reques
 }
 
 // Handler for /game/fargo-hot-handicap.
-func (server *Server) handleGameFargoHotHandicap(table int) http.Handler {
+func (server *Server) handleGameFargoHotHandicap() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "OPTIONS":
 			server.HandleOptions(w, r)
 		case "PATCH":
-			server.handleGameFargoHotHandicapPatch(w, r, table)
+			server.handleGameFargoHotHandicapPatch(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
@@ -742,7 +895,24 @@ func (server *Server) handleGameFargoHotHandicap(table int) http.Handler {
 }
 
 // Game fargo-hot-handicap handler for PATCH method.
-func (server *Server) handleGameFargoHotHandicapPatch(w http.ResponseWriter, r *http.Request, table int) {
+func (server *Server) handleGameFargoHotHandicapPatch(w http.ResponseWriter, r *http.Request) {
+	// get params for table numbers from url
+	params := mux.Vars(r)
+
+	// get table number
+	tableNumValue, ok := params["tableNum"]
+	if !ok || len(tableNumValue) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	// convert table number to int
+	tableNum, err := strconv.Atoi(tableNumValue)
+	if err != nil || tableNum > len(server.tables) {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
 	// decode the body
 	var body GameFargoHotHandicapPatchBody
 	decoder := json.NewDecoder(r.Body)
@@ -752,7 +922,7 @@ func (server *Server) handleGameFargoHotHandicapPatch(w http.ResponseWriter, r *
 	}
 
 	// Update the game fargo hot handicap option.
-	if err := server.tables[table].Game.SetUseFargoHotHandicap(body.UseFargoHotHandicap); err != nil {
+	if err := server.tables[tableNum].Game.SetUseFargoHotHandicap(body.UseFargoHotHandicap); err != nil {
 		// TODO: Currently all errors return as 500 here, but might not always make sense. Could use errors.Is for this.
 		server.handleError(w, r, http.StatusInternalServerError, err)
 		return
@@ -761,7 +931,7 @@ func (server *Server) handleGameFargoHotHandicapPatch(w http.ResponseWriter, r *
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
 		events.GameEventType,
-		events.NewGameEventPayload(server.tables[table].Game),
+		events.NewGameEventPayload(server.tables[tableNum].Game),
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
@@ -773,6 +943,6 @@ func (server *Server) handleGameFargoHotHandicapPatch(w http.ResponseWriter, r *
 
 	// send response
 	server.handleSuccess(w, r, GameFargoHotHandicapPatchResp{
-		UseFargoHotHandicap: server.tables[table].Game.UseFargoHotHandicap,
+		UseFargoHotHandicap: server.tables[tableNum].Game.UseFargoHotHandicap,
 	})
 }

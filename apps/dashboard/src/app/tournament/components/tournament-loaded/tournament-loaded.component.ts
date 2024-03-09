@@ -15,7 +15,6 @@ export class TournamentLoadedComponent {
     readonly faLock = faLock;
     readonly faEllipsisVertical = faEllipsisVertical
     readonly gameType = GameType;
-    readonly tables = [1, 2, 3];
     readonly vm$ = this.store.vm$;
 
     constructor(

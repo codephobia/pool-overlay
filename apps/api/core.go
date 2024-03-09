@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/codephobia/pool-overlay/libs/go/api"
 	"github.com/codephobia/pool-overlay/libs/go/challonge"
@@ -47,9 +48,15 @@ func NewCore() (*Core, error) {
 
 	// Initialize game state.
 	tables := map[int]*state.State{}
-	tables[1] = state.NewState(db, 1)
-	tables[2] = state.NewState(db, 2)
-	tables[3] = state.NewState(db, 3)
+
+	// Add tables to game state based on default provided in env file.
+	maxTableCount, err := strconv.Atoi(os.Getenv("MAX_TABLE_COUNT"))
+	if err != nil {
+		maxTableCount = 3
+	}
+	for i := 1; i <= maxTableCount; i++ {
+		tables[i] = state.NewState(db, i)
+	}
 
 	// Initialize Challonge.
 	challonge := challonge.NewChallonge(os.Getenv("CHALLONGE_API_KEY"), os.Getenv("CHALLONGE_USERNAME"), db, overlay, tables)

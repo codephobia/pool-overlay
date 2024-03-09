@@ -5,6 +5,8 @@ import { IGame, OverlayState, Tournament } from '@pool-overlay/models';
 import { switchMap, tap } from 'rxjs';
 import { TablesService } from '../../services/tables.service';
 import { TournamentsService } from '../../services/tournament.service';
+import { Store } from '@ngrx/store';
+import * as fromTables from '../../../core/tables';
 
 export enum LoadingState {
     INIT,
@@ -33,6 +35,7 @@ export const initialState: TournamentLoadedState = {
 export class TournamentLoadedStore extends ComponentStore<TournamentLoadedState> {
     constructor(
         private router: Router,
+        private store: Store,
         private tournamentsService: TournamentsService,
         private tablesService: TablesService,
     ) {
@@ -81,10 +84,12 @@ export class TournamentLoadedStore extends ComponentStore<TournamentLoadedState>
         this.isLoaded$,
         this.tournament$,
         this.tables$,
-        (isLoaded, tournament, tables) => ({
+        this.store.select(fromTables.selectTablesCount),
+        (isLoaded, tournament, tables, tablesCount) => ({
             isLoaded,
             tournament,
             tables,
+            tablesArr: Array.from(new Array(tablesCount), (x, i) => i + 1),
         })
     );
 
