@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
-import { GameType, Tournament } from '@pool-overlay/models';
 import { switchMap, tap, withLatestFrom } from 'rxjs';
+import { GameType, Tournament } from '@pool-overlay/models';
 import { TournamentsService } from '../../services/tournament.service';
+import * as fromTables from '../../../core/tables';
 
 export enum LoadingState {
     INIT,
@@ -43,6 +45,7 @@ export const initialState: TournamentSetupState = {
 export class TournamentSetupStore extends ComponentStore<TournamentSetupState> {
     constructor(
         private router: Router,
+        private store: Store,
         private tournamentsService: TournamentsService,
     ) {
         super(initialState);
@@ -120,6 +123,7 @@ export class TournamentSetupStore extends ComponentStore<TournamentSetupState> {
     readonly vm$ = this.select(
         this.isLoaded$,
         this.tournament$,
+        this.store.select(fromTables.selectTablesCount),
         this.maxTables$,
         this.isHandicapped$,
         this.showOverlay$,
@@ -129,9 +133,10 @@ export class TournamentSetupStore extends ComponentStore<TournamentSetupState> {
         this.gameType$,
         this.aSideRaceTo$,
         this.bSideRaceTo$,
-        (isLoaded, tournament, maxTables, isHandicapped, showOverlay, showFlags, showFargo, showScore, gameType, aSideRaceTo, bSideRaceTo) => ({
+        (isLoaded, tournament, tablesCount, maxTables, isHandicapped, showOverlay, showFlags, showFargo, showScore, gameType, aSideRaceTo, bSideRaceTo) => ({
             isLoaded,
             tournament,
+            tables: Array.from(new Array(tablesCount), (x, i) => i + 1),
             maxTables,
             isHandicapped,
             showOverlay,

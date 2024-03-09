@@ -30,28 +30,16 @@ func (server *Server) InitRoutes() {
 	server.AddRouteToAllVersions("/overlay", server.handleOverlay())
 
 	// overlay/toggle
-	// server.AddRouteToAllVersions("/overlay/toggle", server.handleOverlayToggle())
-	server.AddRouteToAllVersions("/table/1/overlay/toggle", server.handleOverlayToggle(1))
-	server.AddRouteToAllVersions("/table/2/overlay/toggle", server.handleOverlayToggle(2))
-	server.AddRouteToAllVersions("/table/3/overlay/toggle", server.handleOverlayToggle(3))
+	server.AddRouteToAllVersions("/table/{tableNum}/overlay/toggle", server.handleOverlayToggle())
 
 	// overlay/toggle/flags
-	// server.AddRouteToAllVersions("/overlay/toggle/flags", server.handleOverlayToggleFlags())
-	server.AddRouteToAllVersions("/table/1/overlay/toggle/flags", server.handleOverlayToggleFlags(1))
-	server.AddRouteToAllVersions("/table/2/overlay/toggle/flags", server.handleOverlayToggleFlags(2))
-	server.AddRouteToAllVersions("/table/3/overlay/toggle/flags", server.handleOverlayToggleFlags(3))
+	server.AddRouteToAllVersions("/table/{tableNum}/overlay/toggle/flags", server.handleOverlayToggleFlags())
 
 	// overlay/toggle/fargo
-	// server.AddRouteToAllVersions("/overlay/toggle/fargo", server.handleOverlayToggleFargo())
-	server.AddRouteToAllVersions("/table/1/overlay/toggle/fargo", server.handleOverlayToggleFargo(1))
-	server.AddRouteToAllVersions("/table/2/overlay/toggle/fargo", server.handleOverlayToggleFargo(2))
-	server.AddRouteToAllVersions("/table/3/overlay/toggle/fargo", server.handleOverlayToggleFargo(3))
+	server.AddRouteToAllVersions("/table/{tableNum}/overlay/toggle/fargo", server.handleOverlayToggleFargo())
 
 	// overlay/toggle/score
-	// server.AddRouteToAllVersions("/overlay/toggle/score", server.handleOverlayToggleScore())
-	server.AddRouteToAllVersions("/table/1/overlay/toggle/score", server.handleOverlayToggleScore(1))
-	server.AddRouteToAllVersions("/table/2/overlay/toggle/score", server.handleOverlayToggleScore(2))
-	server.AddRouteToAllVersions("/table/3/overlay/toggle/score", server.handleOverlayToggleScore(3))
+	server.AddRouteToAllVersions("/table/{tableNum}/overlay/toggle/score", server.handleOverlayToggleScore())
 
 	// web socket connection to telestrator
 	server.AddRouteToAllVersions("/telestrator", server.handleTelestrator())
@@ -74,40 +62,35 @@ func (server *Server) InitRoutes() {
 	// flags
 	server.AddRouteToAllVersions("/flags", server.handleFlags())
 
+	// table/count
+	server.AddRouteToAllVersions("/table/count", server.handleTableCount())
+
+	// table/add
+	server.AddRouteToAllVersions("/table/add", server.handleTableAdd())
+
+	// table/remove
+	server.AddRouteToAllVersions("/table/remove", server.handleTableRemove())
+
 	// table/swap
-	server.AddRouteToAllVersions("/table/1/swap/{newTable}", server.handleTableSwap(1))
-	server.AddRouteToAllVersions("/table/2/swap/{newTable}", server.handleTableSwap(2))
-	server.AddRouteToAllVersions("/table/3/swap/{newTable}", server.handleTableSwap(3))
+	server.AddRouteToAllVersions("/table/{tableNum}/swap/{newTable}", server.handleTableSwap())
 
 	// game
-	server.AddRouteToAllVersions("/table/1/game", server.handleGame(1))
-	server.AddRouteToAllVersions("/table/2/game", server.handleGame(2))
-	server.AddRouteToAllVersions("/table/3/game", server.handleGame(3))
+	server.AddRouteToAllVersions("/table/{tableNum}/game", server.handleGame())
 
 	// game/type
-	server.AddRouteToAllVersions("/table/1/game/type", server.handleGameType(1))
-	server.AddRouteToAllVersions("/table/2/game/type", server.handleGameType(2))
-	server.AddRouteToAllVersions("/table/3/game/type", server.handleGameType(3))
+	server.AddRouteToAllVersions("/table/{tableNum}/game/type", server.handleGameType())
 
 	// game/vs-mode
-	server.AddRouteToAllVersions("/table/1/game/vs-mode", server.handleGameVsMode(1))
-	server.AddRouteToAllVersions("/table/2/game/vs-mode", server.handleGameVsMode(2))
-	server.AddRouteToAllVersions("/table/3/game/vs-mode", server.handleGameVsMode(3))
+	server.AddRouteToAllVersions("/table/{tableNum}/game/vs-mode", server.handleGameVsMode())
 
 	// game/race-to
-	server.AddRouteToAllVersions("/table/1/game/race-to", server.handleGameRaceTo(1))
-	server.AddRouteToAllVersions("/table/2/game/race-to", server.handleGameRaceTo(2))
-	server.AddRouteToAllVersions("/table/3/game/race-to", server.handleGameRaceTo(3))
+	server.AddRouteToAllVersions("/table/{tableNum}/game/race-to", server.handleGameRaceTo())
 
 	// game/score
-	server.AddRouteToAllVersions("/table/1/game/score", server.handleGameScore(1))
-	server.AddRouteToAllVersions("/table/2/game/score", server.handleGameScore(2))
-	server.AddRouteToAllVersions("/table/3/game/score", server.handleGameScore(3))
+	server.AddRouteToAllVersions("/table/{tableNum}/game/score", server.handleGameScore())
 
 	// game/players
-	server.AddRouteToAllVersions("/table/1/game/players", server.handleGamePlayers(1))
-	server.AddRouteToAllVersions("/table/2/game/players", server.handleGamePlayers(2))
-	server.AddRouteToAllVersions("/table/3/game/players", server.handleGamePlayers(3))
+	server.AddRouteToAllVersions("/table/{tableNum}/game/players", server.handleGamePlayers())
 
 	// game/players/flag
 	server.AddRouteToAllVersions("/game/players/flag", server.handleGamePlayersFlag())
@@ -119,9 +102,7 @@ func (server *Server) InitRoutes() {
 	server.AddRouteToAllVersions("/game/teams", server.handleGameTeams())
 
 	// game/fargo-hot-handicap
-	server.AddRouteToAllVersions("/table/1/game/fargo-hot-handicap", server.handleGameFargoHotHandicap(1))
-	server.AddRouteToAllVersions("/table/2/game/fargo-hot-handicap", server.handleGameFargoHotHandicap(2))
-	server.AddRouteToAllVersions("/table/3/game/fargo-hot-handicap", server.handleGameFargoHotHandicap(3))
+	server.AddRouteToAllVersions("/table/{tableNum}/game/fargo-hot-handicap", server.handleGameFargoHotHandicap())
 
 	// tournament
 	server.AddRouteToAllVersions("/tournament", server.handleTournament())

@@ -37,4 +37,6 @@ var (
 	ErrInvalidTournamentDetails = errors.New("invalid tournament details")
 	// ErrInvalidTableNumber - Invalid table number.
 	ErrInvalidTableNumber = errors.New("invalid table number")
+	// ErrRemoveOnlyTable - Cannot remove only table.
+	ErrRemoveOnlyTable = errors.New("cannot remove only table")
 )

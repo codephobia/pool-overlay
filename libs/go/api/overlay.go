@@ -3,9 +3,11 @@ package api
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/codephobia/pool-overlay/libs/go/events"
 	"github.com/codephobia/pool-overlay/libs/go/overlay"
+	"github.com/gorilla/mux"
 )
 
 // OverlayToggleResp is the response from toggling the overlay.
@@ -94,11 +96,11 @@ func (server *Server) handleOverlayGet(w http.ResponseWriter, r *http.Request) {
 }
 
 // Handler for overlay toggle.
-func (server *Server) handleOverlayToggle(table int) http.Handler {
+func (server *Server) handleOverlayToggle() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			server.handleOverlayToggleGet(w, r, table)
+			server.handleOverlayToggleGet(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
@@ -106,13 +108,30 @@ func (server *Server) handleOverlayToggle(table int) http.Handler {
 }
 
 // Overlay toggle handler for GET method.
-func (server *Server) handleOverlayToggleGet(w http.ResponseWriter, r *http.Request, table int) {
-	hidden := server.tables[table].Overlay.ToggleHidden()
+func (server *Server) handleOverlayToggleGet(w http.ResponseWriter, r *http.Request) {
+	// get params for table numbers from url
+	params := mux.Vars(r)
+
+	// get table number
+	tableNumValue, ok := params["tableNum"]
+	if !ok || len(tableNumValue) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	// convert table number to int
+	tableNum, err := strconv.Atoi(tableNumValue)
+	if err != nil || tableNum > len(server.tables) {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	hidden := server.tables[tableNum].Overlay.ToggleHidden()
 
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
 		events.OverlayStateEventType,
-		server.tables[table].Overlay,
+		server.tables[tableNum].Overlay,
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
@@ -128,11 +147,11 @@ func (server *Server) handleOverlayToggleGet(w http.ResponseWriter, r *http.Requ
 }
 
 // Handler for overlay toggle flags.
-func (server *Server) handleOverlayToggleFlags(table int) http.Handler {
+func (server *Server) handleOverlayToggleFlags() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			server.handleOverlayToggleFlagsGet(w, r, table)
+			server.handleOverlayToggleFlagsGet(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
@@ -140,13 +159,30 @@ func (server *Server) handleOverlayToggleFlags(table int) http.Handler {
 }
 
 // Overlay toggle flags handler for GET method.
-func (server *Server) handleOverlayToggleFlagsGet(w http.ResponseWriter, r *http.Request, table int) {
-	showFlags := server.tables[table].Overlay.ToggleFlags()
+func (server *Server) handleOverlayToggleFlagsGet(w http.ResponseWriter, r *http.Request) {
+	// get params for table numbers from url
+	params := mux.Vars(r)
+
+	// get table number
+	tableNumValue, ok := params["tableNum"]
+	if !ok || len(tableNumValue) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	// convert table number to int
+	tableNum, err := strconv.Atoi(tableNumValue)
+	if err != nil || tableNum > len(server.tables) {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	showFlags := server.tables[tableNum].Overlay.ToggleFlags()
 
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
 		events.OverlayStateEventType,
-		server.tables[table].Overlay,
+		server.tables[tableNum].Overlay,
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
@@ -162,11 +198,11 @@ func (server *Server) handleOverlayToggleFlagsGet(w http.ResponseWriter, r *http
 }
 
 // Handler for overlay toggle fargo.
-func (server *Server) handleOverlayToggleFargo(table int) http.Handler {
+func (server *Server) handleOverlayToggleFargo() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			server.handleOverlayToggleFargoGet(w, r, table)
+			server.handleOverlayToggleFargoGet(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
@@ -174,13 +210,30 @@ func (server *Server) handleOverlayToggleFargo(table int) http.Handler {
 }
 
 // Overlay toggle fargo handler for GET method.
-func (server *Server) handleOverlayToggleFargoGet(w http.ResponseWriter, r *http.Request, table int) {
-	showFargo := server.tables[table].Overlay.ToggleFargo()
+func (server *Server) handleOverlayToggleFargoGet(w http.ResponseWriter, r *http.Request) {
+	// get params for table numbers from url
+	params := mux.Vars(r)
+
+	// get table number
+	tableNumValue, ok := params["tableNum"]
+	if !ok || len(tableNumValue) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	// convert table number to int
+	tableNum, err := strconv.Atoi(tableNumValue)
+	if err != nil || tableNum > len(server.tables) {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	showFargo := server.tables[tableNum].Overlay.ToggleFargo()
 
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
 		events.OverlayStateEventType,
-		server.tables[table].Overlay,
+		server.tables[tableNum].Overlay,
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
@@ -196,11 +249,11 @@ func (server *Server) handleOverlayToggleFargoGet(w http.ResponseWriter, r *http
 }
 
 // Handler for overlay toggle score.
-func (server *Server) handleOverlayToggleScore(table int) http.Handler {
+func (server *Server) handleOverlayToggleScore() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			server.handleOverlayToggleScoreGet(w, r, table)
+			server.handleOverlayToggleScoreGet(w, r)
 		default:
 			server.handleError(w, r, http.StatusMethodNotAllowed, ErrEndpointMethodNotAllowed)
 		}
@@ -208,13 +261,30 @@ func (server *Server) handleOverlayToggleScore(table int) http.Handler {
 }
 
 // Overlay toggle score handler for GET method.
-func (server *Server) handleOverlayToggleScoreGet(w http.ResponseWriter, r *http.Request, table int) {
-	showScore := server.tables[table].Overlay.ToggleScore()
+func (server *Server) handleOverlayToggleScoreGet(w http.ResponseWriter, r *http.Request) {
+	// get params for table numbers from url
+	params := mux.Vars(r)
+
+	// get table number
+	tableNumValue, ok := params["tableNum"]
+	if !ok || len(tableNumValue) < 1 {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	// convert table number to int
+	tableNum, err := strconv.Atoi(tableNumValue)
+	if err != nil || tableNum > len(server.tables) {
+		server.handleError(w, r, http.StatusUnprocessableEntity, ErrInvalidTableNumber)
+		return
+	}
+
+	showScore := server.tables[tableNum].Overlay.ToggleScore()
 
 	// Generate message to broadcast to overlay.
 	message, err := overlay.NewEvent(
 		events.OverlayStateEventType,
-		server.tables[table].Overlay,
+		server.tables[tableNum].Overlay,
 	).ToBytes()
 	if err != nil {
 		server.handleError(w, r, http.StatusUnprocessableEntity, ErrUnableToBroadcastUpdate)
