@@ -1,8 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { faMagnifyingGlass } from '@fortawesome/pro-regular-svg-icons';
 
 let idCounter = 0;
+
+export interface SearchEvent {
+    search: string;
+}
 
 @Component({
     selector: 'dashboard-search',
@@ -20,7 +24,7 @@ export class SearchComponent {
     }
 
     @Output()
-    public onSearch = new EventEmitter<{ search: string }>();
+    public onSearch = new EventEmitter<SearchEvent>();
 
     public faMagnifyingGlass = faMagnifyingGlass;
     public form: FormGroup;
@@ -31,13 +35,11 @@ export class SearchComponent {
         this.id = `dashboard-search-${++idCounter}`;
 
         this.form = this._fb.group({
-            search: '',
+            search: new FormControl(''),
         });
     }
 
     public submit(): void {
-        this.onSearch.emit({
-            search: '',
-        });
+        this.onSearch.emit(this.form.value);
     }
 }

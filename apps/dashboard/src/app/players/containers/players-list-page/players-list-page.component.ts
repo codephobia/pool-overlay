@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { PageEvent } from '@dashboard/components/pagination';
 import { PlayersListStore } from './players-list.store';
+import { SearchEvent } from '@dashboard/components/search';
 
 @Component({
     selector: 'pool-overlay-players-list-page',
@@ -19,10 +20,21 @@ export class PlayersListPageComponent {
     ) { }
 
     public onPageChange({ page }: PageEvent): void {
+        const newPage = page > 1 ? page : undefined;
+
         this.router.navigate(['.'], {
             relativeTo: this.activatedRoute,
-            queryParams: { page },
+            queryParams: { page: newPage },
             queryParamsHandling: 'merge',
+        });
+    }
+
+    public onSearch({ search }: SearchEvent): void {
+        const newSearch = search?.length ? search : undefined;
+
+        this.router.navigate(['.'], {
+            relativeTo: this.activatedRoute,
+            queryParams: { search: newSearch },
         });
     }
 

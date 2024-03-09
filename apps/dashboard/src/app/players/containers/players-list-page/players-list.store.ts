@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Store, createSelector } from '@ngrx/store';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
-import { forkJoin } from 'rxjs';
+import { combineLatest, forkJoin } from 'rxjs';
 import { concatMap, map, switchMap, takeUntil } from 'rxjs/operators';
 
 import { IPlayer } from '@pool-overlay/models';
-import { PlayersService } from '../../../shared/services/players.service';
+import { PlayersService, PlayerFindOptions } from '../../../shared/services/players.service';
+import { selectQueryParam } from '../../../shared/utils/router.selectors';
 
 export interface PlayersListState {
     loaded: boolean;
-    page: number;
     count: number;
     players: IPlayer[];
 }
@@ -17,34 +18,26 @@ export interface PlayersListState {
 @Injectable()
 export class PlayersListStore extends ComponentStore<PlayersListState> {
     constructor(
-        route: ActivatedRoute,
         private playersService: PlayersService,
+        private store: Store,
     ) {
         super({
             loaded: false,
-            page: 1,
             count: 0,
             players: []
         });
 
-        route.queryParamMap.pipe(
-            map(params => Number(params.get('page'))),
+        combineLatest([
+            this.store.select(this.selectPage),
+            this.store.select(this.selectSearch),
+        ]).pipe(
             takeUntil(this.destroy$),
-        ).subscribe(page => {
-            const newPage = page ? page : 1;
-            this.setPage(newPage);
-            this.getPlayers(newPage);
-        });
+        ).subscribe(([page, search]) => this.getPlayers({ page, search }));
     }
 
     public readonly setLoaded = this.updater<boolean>((state, loaded) => ({
         ...state,
         loaded,
-    }));
-
-    public readonly setPage = this.updater<number>((state, page) => ({
-        ...state,
-        page,
     }));
 
     public readonly setCount = this.updater<number>((state, count) => ({
@@ -69,27 +62,37 @@ export class PlayersListStore extends ComponentStore<PlayersListState> {
         };
     });
 
+    private readonly selectPage = createSelector(
+        selectQueryParam('page'),
+        (page) => Number(page) > 0 ? Number(page) : 1
+    );
+    private readonly selectSearch = createSelector(
+        selectQueryParam('search'),
+        search => search ? String(search) : ''
+    );
+
     public readonly loaded$ = this.select(state => state.loaded);
-    public readonly page$ = this.select(state => state.page);
     public readonly count$ = this.select(state => state.count);
     public readonly players$ = this.select(state => state.players);
     public readonly vm$ = this.select(
         this.loaded$,
-        this.page$,
+        this.store.select(this.selectPage),
+        this.store.select(this.selectSearch),
         this.count$,
         this.players$,
-        (loaded, page, count, players) => ({
+        (loaded, page, search, count, players) => ({
             loaded,
             page,
+            search,
             count,
             players,
         })
     );
 
-    public readonly getPlayers = this.effect<number>(page$ => page$.pipe(
-        switchMap(page => forkJoin([
-            this.playersService.find(page),
-            this.playersService.count(),
+    public readonly getPlayers = this.effect<PlayerFindOptions>(options$ => options$.pipe(
+        switchMap(({ page, search }) => forkJoin([
+            this.playersService.find({ page, search }),
+            this.playersService.count({ search }),
         ]).pipe(
             tapResponse(
                 ([players, { count }]) => {

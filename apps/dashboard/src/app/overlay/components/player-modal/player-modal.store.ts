@@ -66,7 +66,7 @@ export class PlayerModalStore extends ComponentStore<PlayerModalState> {
 
     public readonly getPlayers = this.effect<number>(page$ => page$.pipe(
         switchMap(page => forkJoin([
-            this.playersService.find(page),
+            this.playersService.find({ page }),
             this.playersService.count(),
         ]).pipe(
             tapResponse(
